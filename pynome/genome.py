@@ -4,18 +4,12 @@ import logging
 logging.basicConfig(filename='pynome.genome.log', level=logging.DEBUG)
 logging.debug("Pynome.Genome module initialized.")
 
-
-# TODO: Parameter strings are not correct?
 # TODO: Docstrings are not in PEP8 format.
+
 
 class Genome:
     """
-    @brief    Instance of a Genome class.
-
-    @param    _gff3       String. Local directory of the gff3 file.
-    @param    _fasta      String. Local directory of the fasta file.
-    @param    _assembly_version    String. TODO: Add description.
-    @param    taxonomic_name      String. TODO: Add example.
+    The Genome class
     """
 
     def __index__(self):
@@ -32,35 +26,61 @@ class Genome:
 
     @property
     def assembly_version(self):
-        """
-        @brief     Assembly version property.
-                   Should be a string value in the form of:
-                        "TODO: examplolus specius"
-        """
+        """Assembly version property."""
         return self._assembly_version
+
+    @assembly_version.setter
+    def assembly_version(self, value):
+        """Setter for the assembly version property."""
+        # TODO: Add code to ensure value is a valid assembly number.
+        self._assembly_version = value
+
+    @assembly_version.deleter
+    def assembly_version(self):
+        del self._assembly_version
 
     @property
     def taxonomic_name(self):
-        """
-        @brief     Taxonomic Name property.
-
-        @return    A string is returned in the form of TODO: format.
-        """
+        """Taxonomic Name property. """
         return self._taxonomic_name
+
+    @taxonomic_name.setter
+    def taxonomic_name(self, value):
+        """Taxonomic name setter."""
+        # TODO: Add validation for taxonomic name setter.
+        self._taxonomic_name = value
+
+    @taxonomic_name.deleter
+    def taxonomic_name(self):
+        del self._taxonomic_name
 
     @property
     def gff3(self):
-        """
-        @brief     .gff3 local filepath property.
-        """
+        """.gff3 local filepath property."""
         return self._gff3
+
+    @gff3.setter
+    def gff3(self, value):
+        """gff3 file path setter."""
+        self._gff3 = value
+
+    @gff3.deleter
+    def gff3(self):
+        del self._gff3
 
     @property
     def fasta(self):
-        """
-        @brief     .fasta local file path property
-        """
+        """fasta local file path property"""
         return self._fasta
+
+    @fasta.setter
+    def fasta(self, value):
+        """local fasta path setter"""
+        self._fasta = value
+
+    @fasta.deleter
+    def fasta(self):
+        del self._fasta
 
     def _decompress_file(self):
         """

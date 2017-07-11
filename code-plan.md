@@ -63,3 +63,22 @@
 - downloadGenomes - downloads from an input list of uri / filepaths & write them to a local dir.
 
 
+---
+
+Learning
+--------
+
+On ftplib use:
+
+http://effbot.org/librarybook/ftplib.htm
+
+FILE NAMES
+
+The files are consistently named following this pattern:
+   <species>.<assembly>.<_version>.gff3.gz
+   
+   
+Assembly accession numbers are distinctly-formatted sequence accession numbers that NCBI staff assign to individual genomic assemblies. Unlike other sequence accession numbers, assembly accessions do not represent a single sequence record, but rather the collection of sequence records that comprise an individual genomic assembly.
+
+The format for GenBank (primary) assembly accessions is: [ GCA ][ _ ][nine digits][.][version number]
+The format for RefSeq (NCBI-derived) assembly accessions is: [ GCF ][ _ ][nine digits][.][version number]
