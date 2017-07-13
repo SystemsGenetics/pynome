@@ -1,12 +1,17 @@
+# Import standard modules
 import itertools
 import ftplib
+# Imports from this module
 from .genomedatabase import GenomeDatabase  # import superclass
 
 
 class EnsemblDatabase(GenomeDatabase):
+    """
+    @brief          Ensambl Genome Database class.
+    """
 
     def __init__(self, release_version="release-36"):
-        super(GenomeDatabase, self).__init__()
+        super(EnsemblDatabase, self).__init__()  # Call parent class init
         self._release_version = release_version
         self._ftp_genomes = []
 
@@ -60,56 +65,35 @@ class EnsemblDatabase(GenomeDatabase):
 
                                 'drwxr-sr-x    2 ftp   ftp    4096 Jan 13  2015 EB'
 
-                @returns    a list? or a tuple?
-                            isDirectory TRUE or FALSE
-                            is fa.gz TRUE or FALSE
-                            is gff3.gz TRUE or FALSE
-                            has 'chromosome' in the filename TRUE or FALSE
+                @returns    binary directory: True or False
+
                 """
-
-        # Append each split sub-list to a directory list.
-        split_dir_list = []  # empty list to hold the sub-lists
-        for d in dir_list:
-            split_dir_list.append(d.split())
-
-        for d in split_dir_list:
-            if d[0][0] == 'd':
-                print('{} is a directory.'.format(d[-1]))
-                self._crawl_ftp(d[-1])
-            elif d[-1].endswith('.gz') and 'chromosome' not in d[-1]:
-                # This is then a genome we want to create...
-                print('{} identified as a desired file'.format(d[-1]))
-
-        # PSEUDO CODE:
-        # split this list of strings by the whitespace
-        # check the first entry, the fist value:
-        #       'drwxr-sr-x'
-        # entry[0][0] in this case would be 'd'
-        # if entry[0][0] == 'd':
-        #      _crawl_ftp(current_dir, target_directory)
-        # if 'chromosome' in entry[-1][:]
-        #      ignore this chromosome entry
-        # if the file ends in ".gff3.gz" or "fa.gz"
-        #      then this is a file that should be saved.
-
-
         pass
 
     def _parse_species_filename(self, file_name):
         """<species>.<assembly>.<_version>.gff3.gz"""
-        p = file_name.split('.')
-        species = p[0]
-        assembly = p[1] + '.' + p[2]
-        version = p[-3]
+        
+        # Split the incoming file_name string by decimal points.
+        split_name = file_name.split('.')
+        species = split_name[0]
+        assembly = split_name[1] + '.' + split_name[2]
+        version = split_name[-3]
 
         return (species, assembly, version)
 
+    def _find_genomes(self):
+        """
+        Private function that handles finding the list of genomes.
+        """
+        pass
+
     def find_genomes(self):
-        """        OVERWRITES GENOMEDATABASE FUNCTION."""
-        with ftplib.FTP('ftp.ensemblgenomes.org') as ftp:
-            ftp.login()  # login to the ftp server anonymously
-            # for item in _generate_url
-            # self._crawl_ftp(item)
+        """OVERWRITES GENOMEDATABASE FUNCTION. Calls the _find_genomes() private
+        function."""
+
+        _find_genomes()
+        
+        return
 
     @property
     def release_version(self):

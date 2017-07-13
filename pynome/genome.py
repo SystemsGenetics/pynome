@@ -7,15 +7,14 @@ logging.debug("Pynome.Genome module initialized.")
 # TODO: Docstrings are not in PEP8 format.
 
 
-class Genome:
+class Genome(object):  # (object) should not be needed with python3.6
     """
     The Genome class
     """
 
-    def __index__(self):
+    def __init__(self):
         """
         @brief     Initialization of the Genome class.
-                   Creates t
         """
         self._gff3 = None  # local directory of gff3 file
         self._fasta = None  # local directory of fasta file

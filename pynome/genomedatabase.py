@@ -1,4 +1,4 @@
-class GenomeDatabase:
+class GenomeDatabase(object):
     """
     @brief     Base Genome Database class.
                Many functions will have to be overwritten by
