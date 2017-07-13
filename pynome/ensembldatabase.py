@@ -1,7 +1,7 @@
 # Import standard modules
 import itertools
 import ftplib
-# Imports from this module
+# Imports from internal modules
 from .genomedatabase import GenomeDatabase  # import superclass
 
 
@@ -10,9 +10,9 @@ class EnsemblDatabase(GenomeDatabase):
     @brief          Ensambl Genome Database class.
     """
 
-    def __init__(self, release_version="release-36"):
+    def __init__(self, release_version=36):
         super(EnsemblDatabase, self).__init__()  # Call parent class init
-        self._release_version = release_version
+        self.release_version = release_version
         self._ftp_genomes = []
 
     def _crawl_ftp(self, target_directory):
@@ -71,15 +71,18 @@ class EnsemblDatabase(GenomeDatabase):
         pass
 
     def _parse_species_filename(self, file_name):
-        """<species>.<assembly>.<_version>.gff3.gz"""
-        
-        # Split the incoming file_name string by decimal points.
-        split_name = file_name.split('.')
-        species = split_name[0]
-        assembly = split_name[1] + '.' + split_name[2]
-        version = split_name[-3]
+        """<species>.<assembly>.<_version>.gff3.gz
+        Where the version appers to be limited to two digits.
+        Cut the file_name up to the first period to give the species.
+        Cut the version off the end of the file, only cut up to two 
+            decimal places.
+        The 'remaining' string should by the assembly version.
+        """
+        # return (species, assembly, version)
+        pass
 
-        return (species, assembly, version)
+
+
 
     def _find_genomes(self):
         """
@@ -90,10 +93,7 @@ class EnsemblDatabase(GenomeDatabase):
     def find_genomes(self):
         """OVERWRITES GENOMEDATABASE FUNCTION. Calls the _find_genomes() private
         function."""
-
-        _find_genomes()
-        
-        return
+        pass
 
     @property
     def release_version(self):
@@ -101,6 +101,15 @@ class EnsemblDatabase(GenomeDatabase):
             "release-#", "release-36"
         """
         return self._release_version
+
+    @release_version.setter
+    def release_version(self, value):
+        """Setter for the release_version. Accepts an input integer and returns
+        a string in the form: 'release-##' """
+        # TODO: Add validation to ensure that the input value is an integer.
+        #       Perhaps it should also be limited to the range of available
+        #       release verions on the ensembl site. (1 through 36)
+        self._release_version = 'release-' + str(value)
 
     def download_genomes(self):
         """Downloads the genomes in the database that have both fasta and gff3 files."""
