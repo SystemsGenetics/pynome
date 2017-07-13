@@ -12,6 +12,7 @@ class EnsemblDatabase(GenomeDatabase):
 
     def __init__(self, release_version=36):
         super(EnsemblDatabase, self).__init__()  # Call parent class init
+        self._release_number = None
         self.release_version = release_version
         self._ftp_genomes = []
 
@@ -71,18 +72,16 @@ class EnsemblDatabase(GenomeDatabase):
         pass
 
     def _parse_species_filename(self, file_name):
-        """<species>.<assembly>.<_version>.gff3.gz
-        Where the version appers to be limited to two digits.
-        Cut the file_name up to the first period to give the species.
-        Cut the version off the end of the file, only cut up to two 
-            decimal places.
-        The 'remaining' string should by the assembly version.
-        """
-        # return (species, assembly, version)
-        pass
+        """<species>.<assembly>.<_version>.gff3.gz"""
+        # TODO: Generate docstring for parse_species_filename.
 
-
-
+        # Create a separator based of the release number.
+        version_separator = '.{}'.format(self._release_number)
+        # Split by this separator to get the species and assembly number.
+        species_assembly_list = file_name.split(version_separator)
+        # The first item in the list is the species and assembly.
+        species, assembly = species_assembly_list[0].split('.', 1)
+        return (species, assembly)
 
     def _find_genomes(self):
         """
@@ -109,6 +108,7 @@ class EnsemblDatabase(GenomeDatabase):
         # TODO: Add validation to ensure that the input value is an integer.
         #       Perhaps it should also be limited to the range of available
         #       release verions on the ensembl site. (1 through 36)
+        self._release_number = value
         self._release_version = 'release-' + str(value)
 
     def download_genomes(self):
