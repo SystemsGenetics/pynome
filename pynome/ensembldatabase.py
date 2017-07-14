@@ -1,8 +1,10 @@
 # Import standard modules
 import itertools
-import ftplib
+from ftplib import FTP
 # Imports from internal modules
 from .genomedatabase import GenomeDatabase  # import superclass
+
+ensebml_ftp_uri = 'ftp.ensemblgenomes.org'
 
 
 class EnsemblDatabase(GenomeDatabase):
@@ -16,19 +18,38 @@ class EnsemblDatabase(GenomeDatabase):
         self.release_version = release_version
         self._ftp_genomes = []
 
-    def _crawl_ftp(self, target_directory):
+    def _crawl_ftp(self):
         """
         recursive function to crawl the ftp server to find genome files.
         call _ftp.sendcmd function to get the current URL
         add each file in the current directory to the _ftp_LIST dictionary
         if a new directory is found then recurse _crawlFTP()
         """
+        def _crawl_directory(target_dir):
 
-        # active_directory_list = []  # create an empty list for the callback
-        # ftp.cwd(target_directory)  # change to the target ftp directory
-        # ftp.dir(active_directory_list.append)
+            retrived_dir_list = []  # empty list to hold the callback
 
-        pass
+            # Get the directory listing for the target directory.
+            ftp.dir(target_dir, retrived_dir_list.append)
+
+            print(retrived_dir_list)
+            return
+
+        base_uri_list = self._generate_uri()  # Create the generator of uris.
+
+        # Seems easiest to make a new ftp class for each uri?
+        ftp = FTP()
+        ftp.connect(ensebml_ftp_uri)
+        ftp.login()
+        for uri in base_uri_list:
+            # TODO: Rename PLACEVAR.
+            PLACEVAR = _crawl_directory(uri)
+            parsed = self._parse_listings(PLACEVAR)
+
+        ftp.quit()
+        # This function must be a sub-function for the ftp value to be used
+        # easily. It is possible to use a self.ftp() instance as well.
+
 
     def _generate_uri(self):
         """
@@ -43,23 +64,21 @@ class EnsemblDatabase(GenomeDatabase):
         """
         __ensembl_data_types = ['gff3', 'fasta']
         __ensembl_kingdoms = ['fungi', 'metazoa', 'plants', 'protists']
-        __ensembl_ftp_uri = 'ftp.ensemblgenomes.org'
+        # __ensembl_ftp_uri = 'ftp.ensemblgenomes.org'
 
         # Unique permutations of data types and kingdoms.
         uri_gen = itertools.product(__ensembl_data_types, __ensembl_kingdoms)
 
         # For each iteration, return the desired URI.
         for item in uri_gen:
-            yield '/'.join((__ensembl_ftp_uri,
-                            'pub',
-                            item[1],
+            yield '/'.join(('pub',
+                            item[1],  # the clade or kingdom
                             self._release_version,
-                            item[0],
-                            '',
-                            ))
+                            item[0],  # the data type
+                            '', ))
 
     def _parse_listings(self, dir_list):
-        # TODO: Refactor this function into two functions. (parse, interpret)
+        # TODO: Refactor this function into two functions? (parse, interpret)
         """
                 @breif      Parses the list of files from the ftplib.FTP.dir()
                             command. Output from this command comes in the form:
@@ -68,7 +87,11 @@ class EnsemblDatabase(GenomeDatabase):
 
                 @returns    binary directory: True or False
 
-                """
+        """
+        for dir_entry in dir_list:
+            
+            # self._parse_species_filename()
+
         pass
 
     def _parse_species_filename(self, file_name):
@@ -87,12 +110,14 @@ class EnsemblDatabase(GenomeDatabase):
         """
         Private function that handles finding the list of genomes.
         """
-        pass
+        self._crawl_ftp()
+        return
 
     def find_genomes(self):
         """OVERWRITES GENOMEDATABASE FUNCTION. Calls the _find_genomes() private
         function."""
-        pass
+        self._find_genomes()
+        return
 
     @property
     def release_version(self):
