@@ -28,27 +28,25 @@ class EnsemblDatabase(GenomeDatabase):
         def _crawl_directory(target_dir):
 
             retrived_dir_list = []  # empty list to hold the callback
-
-            # Get the directory listing for the target directory.
+            # Get the directory listing for the target directory, and return it
             ftp.dir(target_dir, retrived_dir_list.append)
-
-            print(retrived_dir_list)
-            return
+            # Parse this list
+            
+            parsed_dirs = self._parse_listings(retrived_dir_list)
+            return directories, found_genomes
 
         base_uri_list = self._generate_uri()  # Create the generator of uris.
 
-        # Seems easiest to make a new ftp class for each uri?
-        ftp = FTP()
-        ftp.connect(ensebml_ftp_uri)
-        ftp.login()
-        for uri in base_uri_list:
-            # TODO: Rename PLACEVAR.
-            PLACEVAR = _crawl_directory(uri)
-            parsed = self._parse_listings(PLACEVAR)
+        ftp = FTP()  # Create the ftp class isntance
+        ftp.connect(ensebml_ftp_uri)  # connect to the ensemble ftp
+        ftp.login()  # login with anonomys and no password
 
-        ftp.quit()
-        # This function must be a sub-function for the ftp value to be used
-        # easily. It is possible to use a self.ftp() instance as well.
+        # iterate through those uri generated
+        for uri in base_uri_list:
+            # Get the directories in the base URI
+            retrieved_directories = _crawl_directory(uri)
+
+        ftp.quit()  # close the ftp connection
 
 
     def _generate_uri(self):
@@ -86,13 +84,19 @@ class EnsemblDatabase(GenomeDatabase):
                                 'drwxr-sr-x    2 ftp   ftp    4096 Jan 13  2015 EB'
 
                 @returns    binary directory: True or False
-
         """
         for dir_entry in dir_list:
-            
-            # self._parse_species_filename()
+            # Check if the entry is a directory or not
+            entry_list = dir_entry.split()  # split by whitespace into a list
+            # Check the first letter of the first word
+            if entry_list[0][0] == 'd':  # then this is a directry
+                diectory_bool = True
+            else:  # otherwise check the file
 
-        pass
+            # Get the species and assembly
+            # self._parse_species_filename(dir_entry)
+
+        return
 
     def _parse_species_filename(self, file_name):
         """<species>.<assembly>.<_version>.gff3.gz"""
@@ -110,6 +114,7 @@ class EnsemblDatabase(GenomeDatabase):
         """
         Private function that handles finding the list of genomes.
         """
+        # Start the ftp crawler
         self._crawl_ftp()
         return
 

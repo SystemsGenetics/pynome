@@ -26,6 +26,7 @@ from pynome.genome import Genome
 ##      --logging-config=FILE, --log-config=FILE
 ##      -s. --nocapture 
 ##          Does not capture print or stdout.
+###############################################################################
 
 def test_ensembl_database():
 
