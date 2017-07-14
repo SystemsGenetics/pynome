@@ -3,6 +3,7 @@ import itertools
 from ftplib import FTP
 # Imports from internal modules
 from .genomedatabase import GenomeDatabase  # import superclass
+from .genome import Genome
 
 ensebml_ftp_uri = 'ftp.ensemblgenomes.org'
 
@@ -14,39 +15,99 @@ class EnsemblDatabase(GenomeDatabase):
 
     def __init__(self, release_version=36):
         super(EnsemblDatabase, self).__init__()  # Call parent class init
-        self._release_number = None
+        self._release_number = None  # set by the release version setter
         self.release_version = release_version
         self._ftp_genomes = []
+        self.ftp = FTP()  # the ftp instance for the database
+
+    def _crawl_directory(self, target_dir):
+        """Recursively crawl a target directory! More to come soon!
+        """
+        retrived_dir_list = []  # empty list to hold the callback
+        # Get the directory listing for the target directory,
+        # and append it to the holder list.
+        self.ftp.dir(target_dir, retrived_dir_list.append)
+        # Parse this list:
+        for item in retrived_dir_list:  # For each line retrieved.
+            item = item.split()  # split the list by whitespace
+            if self._dir_check(item) == True:  # check if it is a directory
+                # Create the new target directory by joining the old
+                # and the new, which is the last listed item.
+                new_target_dir = ''.join((target_dir, item[-1]))
+                print("Found a new directory:\n\t{}\ncrawling it.".format(new_target_dir))
+                self._crawl_directory(new_target_dir)  # crawl that dir
+            elif self.genome_check(item[-1]):  # that item is not a dir, and must be parsed.
+                print('genome found: {}'.format(item))
+                self.add_genome(item)  # if so, add a genome
+                # TODO: Parse the item and find if it is a genome.
+                #       if so, then create the genome, and append it
+                #       and its ftp uri to the class genome list.
+        return
+
+    def add_genome(self, item):
+        """Creates a new genome from a dir line list, separated by whitespace"""
+        # Did we find a fasta or a gff3?
+        filename = item[-1]
+        print('checking if this is a fasta or gff3: {}'.format(filename))
+        if filename.endswith('fa.gz'):
+            print('found a new fasta!\n\t{}'.format(filename))
+            # set the fa.gz url
+        elif filename.endswith('gff3.gz'):
+            # set the gff3.gz url
+            print('found a new gff3!\n\t{}'.format(filename))
+        else:  # not a fasta or a gff3! we fucked up!
+            print("BAD BAD, error. Should never happen. (not really that bad?)")
+            return 
+        new_genome = Genome()  # create the new genome
+        # get the items species and assembly:
+        species, assembly = self._parse_species_filename(item[-1])
+        # set the assembly version, taxonomic name and the uri we found it at
+        new_genome.assembly_version = assembly
+        new_genome.taxonomic_name = species
+        # TODO: get the uri we found this item at.
+
+    def genome_check(self, item):
+        """Checks if the incoming item, which is a dir line item separated by
+        whitespace, is a 'genome' in that it must:
+            + end with fa.gz or gff3.gz
+            + not have 'chromosome' in the name
+            + must not have 'abinitio' in the name"""
+        bad_words = ('chromosome', 'abinitio')
+        # print('GENOME CHECKING: {}'.format(item))
+        if item.endswith(('fa.gz', 'gff3.gz')) and \
+            not any(word in bad_words for word in item):
+            return True
+        else:
+            return False
 
     def _crawl_ftp(self):
         """
         recursive function to crawl the ftp server to find genome files.
-        call _ftp.sendcmd function to get the current URL
-        add each file in the current directory to the _ftp_LIST dictionary
-        if a new directory is found then recurse _crawlFTP()
         """
-        def _crawl_directory(target_dir):
-
-            retrived_dir_list = []  # empty list to hold the callback
-            # Get the directory listing for the target directory, and return it
-            ftp.dir(target_dir, retrived_dir_list.append)
-            # Parse this list
-            
-            parsed_dirs = self._parse_listings(retrived_dir_list)
-            return directories, found_genomes
-
         base_uri_list = self._generate_uri()  # Create the generator of uris.
-
-        ftp = FTP()  # Create the ftp class isntance
-        ftp.connect(ensebml_ftp_uri)  # connect to the ensemble ftp
-        ftp.login()  # login with anonomys and no password
-
+        # ftp = FTP()  # Create the ftp class isntance
+        self.ftp.connect(ensebml_ftp_uri)  # connect to the ensemble ftp
+        self.ftp.login()  # login with anonomys and no password
         # iterate through those uri generated
         for uri in base_uri_list:
             # Get the directories in the base URI
-            retrieved_directories = _crawl_directory(uri)
+            print("Going to start a new clade crawl with: {}".format(uri))
+            retrieved_directories = self._crawl_directory(uri)
+        self.ftp.quit()  # close the ftp connection
 
-        ftp.quit()  # close the ftp connection
+    def _dir_check(self, dir_value):
+        """
+        @brief      Checks if the input: dir_value is a directory. Assumes
+                    the input will be in the following format:
+                        'drwxr-sr-x  2 ftp   ftp    4096 Jan 13  2015 filename'
+                    This works by checking the first letter of the input string,
+                    and returns True or False.
+        """
+        if dir_value[0][0] == 'd':
+            return True
+        else:
+            return False
+
 
 
     def _generate_uri(self):
@@ -74,29 +135,6 @@ class EnsemblDatabase(GenomeDatabase):
                             self._release_version,
                             item[0],  # the data type
                             '', ))
-
-    def _parse_listings(self, dir_list):
-        # TODO: Refactor this function into two functions? (parse, interpret)
-        """
-                @breif      Parses the list of files from the ftplib.FTP.dir()
-                            command. Output from this command comes in the form:
-
-                                'drwxr-sr-x    2 ftp   ftp    4096 Jan 13  2015 EB'
-
-                @returns    binary directory: True or False
-        """
-        for dir_entry in dir_list:
-            # Check if the entry is a directory or not
-            entry_list = dir_entry.split()  # split by whitespace into a list
-            # Check the first letter of the first word
-            if entry_list[0][0] == 'd':  # then this is a directry
-                diectory_bool = True
-            else:  # otherwise check the file
-
-            # Get the species and assembly
-            # self._parse_species_filename(dir_entry)
-
-        return
 
     def _parse_species_filename(self, file_name):
         """<species>.<assembly>.<_version>.gff3.gz"""
