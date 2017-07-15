@@ -20,51 +20,46 @@ class EnsemblDatabase(GenomeDatabase):
         self._ftp_genomes = []
         self.ftp = FTP()  # the ftp instance for the database
 
+    # TODO: Change to a yield-based function?
     def _crawl_directory(self, target_dir):
-        """Recursively crawl a target directory! More to come soon!
-        """
+        """Recursively crawl a target directory! More to come soon!"""
         retrived_dir_list = []  # empty list to hold the callback
         # Get the directory listing for the target directory,
         # and append it to the holder list.
         self.ftp.dir(target_dir, retrived_dir_list.append)
         # Parse this list:
+        # TODO: Refactor this out. Have a fn as an input var
         for item in retrived_dir_list:  # For each line retrieved.
             item = item.split()  # split the list by whitespace
-            if self._dir_check(item) == True:  # check if it is a directory
+            if self._dir_check(item):  # check if it is a directory
                 # Create the new target directory by joining the old
                 # and the new, which is the last listed item.
                 new_target_dir = ''.join((target_dir, item[-1]))
-                print("Found a new directory:\n\t{}\ncrawling it.".format(new_target_dir))
+                # print("Found a new directory:\n\t{}\ncrawling it.".format( \
+                # new_target_dir))
                 self._crawl_directory(new_target_dir)  # crawl that dir
-            elif self.genome_check(item[-1]):  # that item is not a dir, and must be parsed.
-                print('genome found: {}'.format(item))
-                self.add_genome(item)  # if so, add a genome
-                # TODO: Parse the item and find if it is a genome.
-                #       if so, then create the genome, and append it
-                #       and its ftp uri to the class genome list.
+            elif self.genome_check(item[-1]):  # that item is not a dir,
+                self.add_genome(item, target_dir)  # if so, add a genome
         return
 
-    def add_genome(self, item):
+    def add_genome(self, item, uri):
         """Creates a new genome from a dir line list, separated by whitespace"""
         # Did we find a fasta or a gff3?
         filename = item[-1]
-        print('checking if this is a fasta or gff3: {}'.format(filename))
-        if filename.endswith('fa.gz'):
-            print('found a new fasta!\n\t{}'.format(filename))
-            # set the fa.gz url
-        elif filename.endswith('gff3.gz'):
-            # set the gff3.gz url
-            print('found a new gff3!\n\t{}'.format(filename))
-        else:  # not a fasta or a gff3! we fucked up!
-            print("BAD BAD, error. Should never happen. (not really that bad?)")
-            return 
         new_genome = Genome()  # create the new genome
-        # get the items species and assembly:
-        species, assembly = self._parse_species_filename(item[-1])
         # set the assembly version, taxonomic name and the uri we found it at
+        species, assembly = self._parse_species_filename(item[-1])
         new_genome.assembly_version = assembly
         new_genome.taxonomic_name = species
-        # TODO: get the uri we found this item at.
+        # print('checking if this is a fasta or gff3: {}'.format(filename))
+        if filename.endswith('fa.gz'):
+            new_genome.gff3 = uri  # set the fa.gz url
+        elif filename.endswith('gff3.gz'):
+            new_genome.fasta = uri  # set the gff3.gz url
+        else:  # not a fasta or a gff3! we fucked up!
+            # TODO: Raise an error here.
+            return
+        self._ftp_genomes.append((new_genome, uri))
 
     def genome_check(self, item):
         """Checks if the incoming item, which is a dir line item separated by
