@@ -1,8 +1,6 @@
 # I am not sure if this should go here.
 import logging
-
-logging.basicConfig(filename='pynome.genome.log', level=logging.DEBUG)
-logging.debug("Pynome.Genome module initialized.")
+import logging.config
 
 # TODO: Docstrings are not in PEP8 format.
 
@@ -20,8 +18,10 @@ class Genome(object):  # (object) should not be needed with python3.6
         self._fasta = None  # local directory of fasta file
         self._assembly_version = None
         self._taxonomic_name = None
+        
+        logging.config.fileConfig('pynome/pynomeLog.conf')
+        self.logger = logging.getLogger('pynomeLog')
 
-        logging.debug("Genome initialized.")
 
     @property
     def assembly_version(self):

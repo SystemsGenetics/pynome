@@ -1,4 +1,5 @@
 from nose.tools import *
+import logging
 from pynome.ensembldatabase import EnsemblDatabase
 from pynome.genome import Genome
 
@@ -27,6 +28,14 @@ from pynome.genome import Genome
 ##      -s. --nocapture 
 ##          Does not capture print or stdout.
 ###############################################################################
+
+###############################################################################
+## CONFIGURE LOGGER
+###############################################################################
+
+
+
+
 
 def test_ensembl_database():
     # Generate an instance of the ensembl database

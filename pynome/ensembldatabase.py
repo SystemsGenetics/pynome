@@ -1,6 +1,12 @@
+"""The ensembl database module. A child class of the genome database class,
+this module cotains all code directly related to connecting and parsing data
+from the ensembl geneome database."""
+
 # Import standard modules
 import itertools
 from ftplib import FTP
+import logging
+import logging.config
 # Imports from internal modules
 from .genomedatabase import GenomeDatabase  # import superclass
 from .genome import Genome
@@ -9,8 +15,22 @@ ensebml_ftp_uri = 'ftp.ensemblgenomes.org'
 
 
 class EnsemblDatabase(GenomeDatabase):
-    """
-    @brief          Ensambl Genome Database class.
+    """The EnsemblDatabase class. This handles finding and downloading
+    genomes from the ensembl genome database.
+    
+    It does so by recursively walking the ftp directory. It only collects
+    those genomes that have a ``*.gff3.gz`` or a ``*.fa.gz`` file.
+
+    - **parameters**::
+
+        :param release_version: The release version specific to ensemble.
+                                This should be a number between 1 and 36.
+    
+    :Example:
+
+    Instructions on how to use this script.
+    
+    .. seealso:: :class:`GenomeDatabase`
     """
 
     def __init__(self, release_version=36):
@@ -19,10 +39,25 @@ class EnsemblDatabase(GenomeDatabase):
         self.release_version = release_version
         self._ftp_genomes = []
         self.ftp = FTP()  # the ftp instance for the database
+        logging.config.fileConfig('pynome/pynomeLog.conf')
+        self.logger = logging.getLogger('pynomeLog')
+        # Set up the logger, and note the class initialization.
 
     # TODO: Change to a yield-based function?
     def _crawl_directory(self, target_dir):
-        """Recursively crawl a target directory! More to come soon!"""
+        """Recursively crawl a target directory.
+        
+        Calls ftplib.dir for the input target_dir.
+
+        - **parameters**::
+
+            :param target_dir: The directory whos contents will be retrieved.
+
+        .. todo:: Refactor so that this function takes a parsing function as
+                  an argument. In doing this, an recursive ftp class will
+                  likely be factored out.
+        
+        """
         retrived_dir_list = []  # empty list to hold the callback
         # Get the directory listing for the target directory,
         # and append it to the holder list.
@@ -35,11 +70,13 @@ class EnsemblDatabase(GenomeDatabase):
                 # Create the new target directory by joining the old
                 # and the new, which is the last listed item.
                 new_target_dir = ''.join((target_dir, item[-1]))
-                # print("Found a new directory:\n\t{}\ncrawling it.".format( \
-                # new_target_dir))
+                self.logger.info("Found a new directory:\n\t{}\ncrawling it.".format( \
+                new_target_dir))
                 self._crawl_directory(new_target_dir)  # crawl that dir
             elif self.genome_check(item[-1]):  # that item is not a dir,
                 self.add_genome(item, target_dir)  # if so, add a genome
+            else:
+                pass
         return
 
     def add_genome(self, item, uri):
@@ -51,7 +88,7 @@ class EnsemblDatabase(GenomeDatabase):
         species, assembly = self._parse_species_filename(item[-1])
         new_genome.assembly_version = assembly
         new_genome.taxonomic_name = species
-        # print('checking if this is a fasta or gff3: {}'.format(filename))
+        self.logger.info('checking if this is a fasta or gff3: {}'.format(filename))
         if filename.endswith('fa.gz'):
             new_genome.gff3 = uri  # set the fa.gz url
         elif filename.endswith('gff3.gz'):
@@ -68,8 +105,9 @@ class EnsemblDatabase(GenomeDatabase):
             + not have 'chromosome' in the name
             + must not have 'abinitio' in the name"""
         bad_words = ('chromosome', 'abinitio')
-        # print('GENOME CHECKING: {}'.format(item))
-        if item.endswith(('fa.gz', 'gff3.gz')) and \
+        data_types = ('fa.gz', 'gff3.gz')
+        self.logger.debug('GENOME CHECKING: {}'.format(item))
+        if item.endswith(data_types) and \
             not any(word in bad_words for word in item):
             return True
         else:
@@ -77,7 +115,7 @@ class EnsemblDatabase(GenomeDatabase):
 
     def _crawl_ftp(self):
         """
-        recursive function to crawl the ftp server to find genome files.
+        handler function to crawl the ftp server to find genome files.
         """
         base_uri_list = self._generate_uri()  # Create the generator of uris.
         # ftp = FTP()  # Create the ftp class isntance
@@ -87,7 +125,7 @@ class EnsemblDatabase(GenomeDatabase):
         for uri in base_uri_list:
             # Get the directories in the base URI
             print("Going to start a new clade crawl with: {}".format(uri))
-            retrieved_directories = self._crawl_directory(uri)
+            self._crawl_directory(uri)
         self.ftp.quit()  # close the ftp connection
 
     def _dir_check(self, dir_value):
