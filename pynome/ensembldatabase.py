@@ -13,6 +13,8 @@ from .genome import Genome
 
 ensebml_ftp_uri = 'ftp.ensemblgenomes.org'
 
+# TODO: Add a method to locally store genome information so that it does
+#       not have to be re-downloaded or re-scraped with every run.
 
 class EnsemblDatabase(GenomeDatabase):
     """The EnsemblDatabase class. This handles finding and downloading
