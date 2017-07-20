@@ -148,7 +148,7 @@ class EnsemblDatabase(GenomeDatabase):
     def _generate_uri(self):
         """
         @breif      Generates the uri strings needed to download the genomes
-                    from the ensembl database. Dependant on the release
+                    from the ensembl datab # Only those attributesase. Dependant on the release
                     version provided.
 
         @returns    List of Strings of URIs for the ensembl database. eg:

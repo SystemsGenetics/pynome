@@ -70,9 +70,25 @@ def test_generate_uri():
     for uri in generated_uri:
         print('\t{}'.format(uri))
 
-def test_crawl_ftp():
-    test_ensembl_db = EnsemblDatabase()
-    test_ensembl_db.find_genomes()
+def test_sqlite_db():
+    print("\nInitializing EnsemblDatabase class.")
+    TEDB = EnsemblDatabase()
+    print('\nSaving sample genome to the database...')
+    arguments = {'genome_fasta_uri'  : 'uri/to/fasta/file.fa.gz',
+                 'genome_gff3_uri'   : 'uri/to/gff3/',
+                 'genome_local_path' : 'local/path/to/files/'}
+    TEDB.save_genome('Acyrthosiphon_pisum', **arguments)
+    print('\nTesting query/recall from the local database...')
+    print('This should display all genomes currently loaded.\n')
+    test_query = TEDB.print_genomes()
+    print(test_query)
+    
+
+
+
+# def test_crawl_ftp():
+#     test_ensembl_db = EnsemblDatabase()
+#     test_ensembl_db.find_genomes()
 
 
 
