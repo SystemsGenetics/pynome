@@ -47,7 +47,7 @@ class EnsemblDatabase(GenomeDatabase):
 
     # TODO: Change to a yield-based function?
     def _crawl_directory(self, target_dir,
-                         parsing_function=self._ensembl_dir_parser()):
+                         parsing_function):
         """Recursively crawl a target directory.
         
         Calls ftplib.dir for the input target_dir.
@@ -156,7 +156,7 @@ class EnsemblDatabase(GenomeDatabase):
         for uri in base_uri_list:
             # Get the directories in the base URI
             print("Going to start a new clade crawl with: {}".format(uri))
-            self._crawl_directory(uri)
+            self._crawl_directory(uri, self._ensembl_dir_parser(None, None))
         self.ftp.quit()  # close the ftp connection
 
     def _dir_check(self, dir_value):
