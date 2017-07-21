@@ -83,11 +83,6 @@ class GenomeDatabase(object):
         """
         @brief     Initialization of the GenomeDatabase class.
         """
-
-
-        # Create an instance of declarative_base:
-        
-
         # Create attributes that are not related to SQLAlchemy.
         self._baseGenomeDir = None
         self._genomeList = []
