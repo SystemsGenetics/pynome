@@ -46,7 +46,8 @@ class EnsemblDatabase(GenomeDatabase):
         # Set up the logger, and note the class initialization.
 
     # TODO: Change to a yield-based function?
-    def _crawl_directory(self, target_dir):
+    def _crawl_directory(self, target_dir,
+                         parsing_function=self._ensembl_dir_parser()):
         """Recursively crawl a target directory.
         
         Calls ftplib.dir for the input target_dir.
@@ -67,21 +68,49 @@ class EnsemblDatabase(GenomeDatabase):
         # Parse this list:
         # TODO: Refactor this out. Have a fn as an input var
         for item in retrived_dir_list:  # For each line retrieved.
-            item = item.split()  # split the list by whitespace
-            if self._dir_check(item):  # check if it is a directory
-                # Create the new target directory by joining the old
-                # and the new, which is the last listed item.
-                new_target_dir = ''.join((target_dir, item[-1]))
-                self.logger.info("Found a new directory:\n\t{}\ncrawling it.".format( \
-                new_target_dir))
-                self._crawl_directory(new_target_dir)  # crawl that dir
-            elif self.genome_check(item[-1]):  # that item is not a dir,
-                self.add_genome(item, target_dir)  # if so, add a genome
-            else:
-                pass
+            parsing_function(target_dir, item)
         return
 
-    def add_genome(self, item, uri):
+    def _ensembl_dir_parser(self, target_dir, item):
+        """This function parses one 'line' at a time retrieved from an ftp.dir()
+        command. An example of one such line:
+
+            `drwxr-sr-x  2 ftp   ftp    4096 Jan 13  2015 filename`        
+
+            + `[0]`:    the directory information.
+            + `[1]`:    the number of items therein?
+            + `[2]`:    unknown always 'ftp'
+            + `[3]`:    unknown always 'ftp'
+            + `[4]`:    the filesize in bytes, 4096 is one block, often a folder
+            + `[5]`:    Month
+            + `[6]`:    Day
+            + `[7]`:    Year
+            + `[8]`:    filename
+        """
+        item = item.split()  # Split the listing by whitespace.
+        dir_info = item[0]  # Get the string with dir and read/write permissions.
+        dir_items = item[1]  # Get the number of items within this dir.
+        size = item[4]  # Get the size in Bytes of this item.
+        item_name = item[-1]  # Because this should always be the last item.
+        
+        if self._dir_check(item):
+            # Then item is a directory.
+            new_target_dir = ''.join((target_dir, item_name))
+            self.logger.info("Found a new directory:\
+                \n\t{}\ncrawling it.".format(new_target_dir))
+            self._crawl_directory(new_target_dir)
+            return
+        elif self.genome_check(item_name):
+            # Then item is a genome, and must be added.
+            self.add_genome(item=item,
+                            type=None,
+                            uri=target_dir,
+                            size=size)
+            return
+        else:
+            pass  # Throw an error? I don't think this should occur.
+
+    def add_genome(self, item, type, uri, size):
         """Creates a new genome from a dir line list, separated by whitespace"""
         # Did we find a fasta or a gff3?
         filename = item[-1]
