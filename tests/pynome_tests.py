@@ -75,12 +75,25 @@ def test_sqlite_db():
     print("\nInitializing EnsemblDatabase class.")
     TEDB = EnsemblDatabase()
     print('\nSaving sample genome to the database...')
+    # The test genomes taxonomic name:
+    test_name = 'Acyrthosiphon_pisum'
+    # Create some arguments to pass through.
     arguments = {'genome_fasta_uri'  : 'uri/to/fasta/file.fa.gz',
-                 'genome_gff3_uri'   : 'uri/to/gff3/',
-                 'genome_local_path' : 'local/path/to/files/'}
+                 'fasta_size' : 1234 }
+    arguments2 = {'genome_gff3_uri'   : 'uri/to/gff3/',
+                  'gff3_size' : 4321}
+    arguments3 = {'genome_local_path' : 'local/path/to/files/'}
+    # Test by 'creating' the same genome 3 times, once for each
+    # of the fields to be updated.
     TEDB.save_genome('Acyrthosiphon_pisum', **arguments)
-    print('\nTesting query/recall from the local database...')
-    print('This should display all genomes currently loaded.\n')
+    test_query = TEDB.print_genomes()
+    print(test_query)       
+
+    TEDB.save_genome('Acyrthosiphon_pisum', **arguments2)
+    test_query = TEDB.print_genomes()    
+    print(test_query)       
+
+    TEDB.save_genome('Acyrthosiphon_pisum', **arguments3)
     test_query = TEDB.print_genomes()
     print(test_query)
     

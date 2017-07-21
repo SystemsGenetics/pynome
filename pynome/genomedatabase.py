@@ -22,7 +22,7 @@ Base = declarative_base()
 # TODO: Should this sqlalchemy stuff go here?
 # TODO: If so, they should probably be denoted as private.
 # engine = create_engine('sqlite:///local_genomes.db')
-engine = create_engine('sqlite:///:memory:')
+engine = create_engine('sqlite://///media/tylerbiggs/genomic/PYNOME.db')
 Session = sessionmaker(bind=engine)
 session = Session()
 
@@ -39,33 +39,45 @@ class GenomeEntry(Base):  # Inherit from declarative_base.
     the GenomeEntry will be added to the session, and then committed.
     """
     # TODO: Consider how this class should interact with the logger.
-    __tablename__ = "GenomeTable"  # Should this be the same as the class?
-
-    # Define the values to be stored:
-    genome_id = Column(Integer(), primary_key=True)
     # TODO: Is 150 characters a reasonable limit for taxonomic names?
     # TODO: Add a download type! This assumes only one!
     #       This should probably be done by creating another table.
-    genome_taxonomic_name = Column(String(150),
-                                   index=True,
-                                   unique=True)
+    __tablename__ = "GenomeTable"  # Should this be the same as the class?
+    genome_taxonomic_name = Column(String(150),primary_key=True)
+    download_method = Column(String(10))
     genome_fasta_uri = Column(String(1000))
     genome_gff3_uri = Column(String(1000))
     genome_local_path = Column(String(1000))
-    # TODO: Define a custom __repr__(self) function.
+    gff3_size = Column(Integer())
+    fasta_size = Column(Integer())
 
     def __init__(self, genome_taxonomic_name, **kwargs):
         """Contructor that overrides the default provided. This ensures that
         a genome_taxonomic_name is required for each GenomeEntry."""
         self.genome_taxonomic_name = genome_taxonomic_name
-        # Set the attributes found in **kwargs
-        for key, value in kwargs.items():
+        for key, value in kwargs.items():  # Set the attributes found in **kwargs
             setattr(self, key, value)
 
     def __repr__(self):
-        repr =  "{self.genome_taxonomic_name}\n \
-        fasta uri:\t{self.genome_fasta_uri}\n \
-        gff3 uri:\t{self.genome_gff3_uri}".format(self=self)
+        """Custom representation that will be pulled up when a print out
+        is requested. This will be of the form:
+
+        GENOME ENTRY
+        ============
+            __Name__:       {}
+            __fasta uri__:  {}   remote size:   {}
+            __gff3 uri__:   {}   remote size:   {}
+            __local path__: {}
+
+        """
+        repr =  "GENOME ENTRY\n============\n\tName:\t{self.genome_taxonomic_name} \
+        \n\tfasta uri:\t{self.genome_fasta_uri}\n\t\tremote size\t{self.fasta_size} \
+        \n\tgff3 uri:\t{self.genome_gff3_uri}\n\t\tremote size\t{self.gff3_size} \
+        \n\tlocal path:\t{self.genome_local_path}".format(self=self)
+        
+        # {self.genome_taxonomic_name}\n \
+        # fasta uri:\t{self.genome_fasta_uri}\n \
+        # gff3 uri:\t{self.genome_gff3_uri}".format(self=self)
         return repr
 
 Base.metadata.create_all(engine)  # Create all the tables defined above.
@@ -98,6 +110,9 @@ class GenomeDatabase(object):
         # Call the internal addition function.
         # TODO: Examine SQLAlchemy, there is a specific function to use
         #       for storing one vs many database entries.
+        # TODO: Check to see if the genome exists already if so update
+        #       it with any new information retrieved.
+
         self._save_genome(taxonomic_name, **kwargs)
         return
     
@@ -106,7 +121,7 @@ class GenomeDatabase(object):
         sqlite database."""
         new_genome = GenomeEntry(genome_taxonomic_name=taxonomic_name, **kwargs)
         # TODO: Ensure that **kwargs passes the dictionary of attributes.
-        session.add(new_genome)  # Add the instance to the session.
+        session.merge(new_genome)  # Add the instance to the session.
         session.commit()  # Commit the new entry to the database/session.
 
     def print_genomes(self):
