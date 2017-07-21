@@ -4,7 +4,10 @@ import logging
 import logging.config
 
 # TODO: Docstrings are not in PEP8 format.
-
+# TODO: Major re-factor with the inclusion of sqlalchemy.
+#       Many of the functions below are redunant with an sqlite db.
+#       The functions that handle files should proably be moved to the
+#       GenomeDatabase class.
 
 class Genome(object):  # (object) should not be needed with python3.6
     """

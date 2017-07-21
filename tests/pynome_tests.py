@@ -37,7 +37,8 @@ from pynome.genome import Genome
 # TODO: Download a sampel directory structure from the ensembl ftp site and
 #       and save it locally. Use this for the testing, since it takes about
 #       45 minutes to work through the genomes on the full site.
-
+# TODO: Implement a local/fake ftp server for testing? Find a good way to test
+#       The recursive function.
 
 def test_ensembl_database():
     # Generate an instance of the ensembl database
