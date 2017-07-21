@@ -46,11 +46,9 @@ class EnsemblDatabase(GenomeDatabase):
         # Set up the logger, and note the class initialization.
 
     # TODO: Change to a yield-based function?
-    def _crawl_directory(self, target_dir,
-                         parsing_function):
-        """Recursively crawl a target directory.
-        
-        Calls ftplib.dir for the input target_dir.
+    def _crawl_directory(self, target_dir, parsing_function):
+        """Recursively crawl a target directory. Calls ftplib.dir for the 
+        input target_dir.
 
         - **parameters**::
 
@@ -71,7 +69,7 @@ class EnsemblDatabase(GenomeDatabase):
             parsing_function(target_dir, item)
         return
 
-    def _ensembl_dir_parser(self, target_dir, item):
+    def _ensembl_dir_parser(self, base_dir, item):
         """This function parses one 'line' at a time retrieved from an ftp.dir()
         command. An example of one such line:
 
@@ -95,31 +93,53 @@ class EnsemblDatabase(GenomeDatabase):
         
         if self._dir_check(item):
             # Then item is a directory.
-            new_target_dir = ''.join((target_dir, item_name))
+            new_target_dir = ''.join((base_dir, item_name))
             self.logger.info("Found a new directory:\
                 \n\t{}\ncrawling it.".format(new_target_dir))
             self._crawl_directory(new_target_dir)
             return
         elif self.genome_check(item_name):
+            fasta_uri = None
+            gff3_uri = None
+            item_uri = ''.join(base_dir, item)
             # Then item is a genome, and must be added.
+            self.logger.info('checking if this is a fasta or gff3: {}'.format(filename))
+            if filename.endswith('fa.gz'):
+                fasta_uri = item_uri  # set the fa.gz url
+            elif filename.endswith('gff3.gz'):
+                gff3_uri = item_uri  # set the gff3.gz url
+            else:  # not a fasta or a gff3! we fucked up!
+                # TODO: Raise an error here.
+                pass
+
             self.add_genome(item=item,
-                            type=None,
-                            uri=target_dir,
+                            type=None,  # TODO: Implement the type option.
+                            fasta_uri=base_dir,
+                            gff3_uri=base_dir,
                             size=size)
-            return
         else:
             pass  # Throw an error? I don't think this should occur.
 
-    def add_genome(self, item, type, uri, size):
+    def add_genome(self, item, size, fasta_uri=None, gff3_uri=None):
         """Creates a new genome from a dir line list, separated by whitespace"""
-        # Did we find a fasta or a gff3?
-        filename = item[-1]
+
+        filename = str(item)  # ensure the item is parsed as a string.
         new_genome = Genome()  # create the new genome
+        if fasta_uri:
+            new_genome.fasta_uri = fasta_uri
+        elif gff3_uri:
+            new_genome.gff3 = fasta_uri
+        else:
+            pass  # this should probably be an error.
         # set the assembly version, taxonomic name and the uri we found it at
-        species, assembly = self._parse_species_filename(item[-1])
+        species, assembly = self._parse_species_filename(filename)
         new_genome.assembly_version = assembly
         new_genome.taxonomic_name = species
+        
+        # TODO: Move this to the parsing function! add Genome should assume its all ok.
         self.logger.info('checking if this is a fasta or gff3: {}'.format(filename))
+
+        # Did we find a fasta or a gff3?
         if filename.endswith('fa.gz'):
             new_genome.gff3 = uri  # set the fa.gz url
         elif filename.endswith('gff3.gz'):
@@ -177,8 +197,8 @@ class EnsemblDatabase(GenomeDatabase):
     def _generate_uri(self):
         """
         @breif      Generates the uri strings needed to download the genomes
-                    from the ensembl datab # Only those attributesase. Dependant on the release
-                    version provided.
+                    from the ensembl datab # Only those attributesase. Dependant 
+                    on the release version provided.
 
         @returns    List of Strings of URIs for the ensembl database. eg:
 
