@@ -15,6 +15,8 @@ ensebml_ftp_uri = 'ftp.ensemblgenomes.org'
 
 # TODO: Add a method to locally store genome information so that it does
 #       not have to be re-downloaded or re-scraped with every run.
+# TODO: Redo some docstrings, add todos. There have been some refactors.
+
 
 class EnsemblDatabase(GenomeDatabase):
     """The EnsemblDatabase class. This handles finding and downloading
@@ -84,6 +86,10 @@ class EnsemblDatabase(GenomeDatabase):
             + `[6]`:    Day
             + `[7]`:    Year
             + `[8]`:    filename
+
+        If it finds this entry to be a desired genome, by running self.genome_check(),
+        it checks to see if it is a fasta, or gff3, then submits the newly created
+        Genome instance to be appended to the database list.
         """
         item = item.split()  # Split the listing by whitespace.
         dir_info = item[0]  # Get the string with dir and read/write permissions.
@@ -243,6 +249,7 @@ class EnsemblDatabase(GenomeDatabase):
     def find_genomes(self):
         """OVERWRITES GENOMEDATABASE FUNCTION. Calls the _find_genomes() private
         function."""
+        print("Finding Genomes. This takes approximately 45 minutes...")
         self._find_genomes()
         return
 

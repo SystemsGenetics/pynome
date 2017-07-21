@@ -44,6 +44,8 @@ class GenomeEntry(Base):  # Inherit from declarative_base.
     # Define the values to be stored:
     genome_id = Column(Integer(), primary_key=True)
     # TODO: Is 150 characters a reasonable limit for taxonomic names?
+    # TODO: Add a download type! This assumes only one!
+    #       This should probably be done by creating another table.
     genome_taxonomic_name = Column(String(150),
                                    index=True,
                                    unique=True)
