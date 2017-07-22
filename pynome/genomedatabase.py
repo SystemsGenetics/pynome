@@ -22,7 +22,8 @@ Base = declarative_base()
 # TODO: Should this sqlalchemy stuff go here?
 # TODO: If so, they should probably be denoted as private.
 # engine = create_engine('sqlite:///local_genomes.db')
-engine = create_engine('sqlite://///media/tylerbiggs/genomic/PYNOME.db')
+engine = create_engine('sqlite:///:memory:')
+# engine = create_engine('sqlite://///media/tylerbiggs/genomic/PYNOME.db')
 Session = sessionmaker(bind=engine)
 session = Session()
 
@@ -74,10 +75,6 @@ class GenomeEntry(Base):  # Inherit from declarative_base.
         \n\tfasta uri:\t{self.genome_fasta_uri}\n\t\tremote size\t{self.fasta_size} \
         \n\tgff3 uri:\t{self.genome_gff3_uri}\n\t\tremote size\t{self.gff3_size} \
         \n\tlocal path:\t{self.genome_local_path}".format(self=self)
-        
-        # {self.genome_taxonomic_name}\n \
-        # fasta uri:\t{self.genome_fasta_uri}\n \
-        # gff3 uri:\t{self.genome_gff3_uri}".format(self=self)
         return repr
 
 Base.metadata.create_all(engine)  # Create all the tables defined above.
@@ -119,7 +116,7 @@ class GenomeDatabase(object):
     def _save_genome(self, taxonomic_name, **kwargs):
         """The internal function that will save a supplied genome to the
         sqlite database."""
-        new_genome = GenomeEntry(genome_taxonomic_name=taxonomic_name, **kwargs)
+        new_genome = GenomeEntry(taxonomic_name, **kwargs)
         # TODO: Ensure that **kwargs passes the dictionary of attributes.
         session.merge(new_genome)  # Add the instance to the session.
         session.commit()  # Commit the new entry to the database/session.

@@ -82,7 +82,7 @@ def test_sqlite_db():
                  'fasta_size' : 1234 }
     arguments2 = {'genome_gff3_uri'   : 'uri/to/gff3/',
                   'gff3_size' : 4321}
-    arguments3 = {'genome_local_path' : 'local/path/to/files/'}
+    arguments3 = {'genome_local_path' : 'local/path/to/TEST/'}
     # Test by 'creating' the same genome 3 times, once for each
     # of the fields to be updated.
     TEDB.save_genome('Acyrthosiphon_pisum', **arguments)
