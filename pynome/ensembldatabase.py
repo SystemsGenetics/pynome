@@ -153,9 +153,27 @@ class EnsemblDatabase(GenomeDatabase):
             'size' :           item[4],
             'item_name' :      item[-1]
         }
-        version_separator = '.{}'.format(self._release_number)
-        parsed_name = file_name.split(line_dict['item_name'])
-        return
+        # version_separator = '.{}'.format(self._release_number)
+
+        parsed_name = item[-1]
+
+        bad_words = ('chromosome', '.abinitio.')
+        data_types = ('dna.toplevel.fa.gz', 'gff3.gz')
+
+        if any( bw in parsed_name for bw in bad_words):
+            return
+
+        elif parsed_name.endswith('dna.toplevel.fa.gz'):
+            add_genome(self, parsed_name,  # TODO: Rename this function? An override?
+                       fasta_size=line_dict['size'],
+                       fasta_uri=line_dict[])
+            return
+
+        elif parsed_name.endswith('gff3.gz'):
+            add_genome(self, parsed_name,  # TODO: Rename this function? An override?
+                       gff3_size=line_dict['size'],
+                       gff3_uri=line_dict[])
+            return
 
     def genome_check(self, item):
         """Checks if the incoming item, which is a single word (string),
