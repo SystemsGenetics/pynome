@@ -1,22 +1,22 @@
-# TODO: Write module docstring.
-# TODO: Go over sqlalchemy import method. Is this the best way?
+"""
+**************
+Genomedatabase
+**************
+
+.. todo:: Check for a better way to handle the sqlalchemy session.
+
+
+The **Genomedatabase** module consists of two classes:
+
+    + :class:`GenomeEntry` - An ``sql declarative_base()`` instance.
+    + :class:`GenomeDatabase` - The handler for above, and the parent\
+        class for specific databases to be overloaded.
+
+"""
 from sqlalchemy import MetaData, Table, Column, Integer, Numeric,\
     String, DateTime, ForeignKey, create_engine
 from sqlalchemy.orm import sessionmaker, relationship, backref
 from sqlalchemy.ext.declarative import declarative_base
-
-"""
-    Using SQLAlchemy
-    ================
-
-    To store the collected genomes on a local sqlite server.
-
-    Must:   1. inherit from `declarative_base` object.
-            2. Contain the __tablename__ to be used in the database.
-            3. Contain one or more Column objects.
-            4. Ensure one or more attributes are primary keys. 
-
-"""
 
 Base = declarative_base()
 # TODO: Should this sqlalchemy stuff go here?
@@ -29,8 +29,7 @@ session = Session()
 
 
 class GenomeEntry(Base):  # Inherit from declarative_base.
-    """
-    A sqlite handler for the GenomeTable database.
+    """A sqlite handler for the GenomeTable database.
 
     This supposedly will both create the desired sql table, as well as
     act as the handler for generating new row entries into said table.
@@ -45,12 +44,19 @@ class GenomeEntry(Base):  # Inherit from declarative_base.
     #       This should probably be done by creating another table.
     __tablename__ = "GenomeTable"  # Should this be the same as the class?
     genome_taxonomic_name = Column(String(150),primary_key=True)
+    """The taxonomic name and primary key of the GenomeEntry."""
     download_method = Column(String(10))
+    """The Download method. Stored as `method name`"""
     genome_fasta_uri = Column(String(1000))
+    """The fa.gz url as a String. Max Chars = 1000"""
     genome_gff3_uri = Column(String(1000))
+    """The gff3.gz uri as a String. Max Chars = 1000"""
     genome_local_path = Column(String(1000))
+    """The local path of this genome as a String. Max Chars = 1000"""    
     gff3_size = Column(Integer())
+    """The remote size of the gff3.gz file as an Integer."""
     fasta_size = Column(Integer())
+    """The remote size of the fa.gz file as an Integer."""
 
     def __init__(self, genome_taxonomic_name, **kwargs):
         """Contructor that overrides the default provided. This ensures that
@@ -63,18 +69,16 @@ class GenomeEntry(Base):  # Inherit from declarative_base.
         """Custom representation that will be pulled up when a print out
         is requested. This will be of the form:
 
-        GENOME ENTRY
-        ============
-            __Name__:       {}
-            __fasta uri__:  {}   remote size:   {}
-            __gff3 uri__:   {}   remote size:   {}
-            __local path__: {}
+        **Name**:       {}
+        **fasta uri**:  {}   remote size:   {}
+        **gff3 uri**:   {}   remote size:   {}
+        **local path**: {}
 
         """
-        repr =  "GENOME ENTRY\n============\n\tName:\t{self.genome_taxonomic_name} \
+        repr =  "\n\tName:\t{self.genome_taxonomic_name} \
         \n\tfasta uri:\t{self.genome_fasta_uri}\n\t\tremote size\t{self.fasta_size} \
         \n\tgff3 uri:\t{self.genome_gff3_uri}\n\t\tremote size\t{self.gff3_size} \
-        \n\tlocal path:\t{self.genome_local_path}".format(self=self)
+        \n\tlocal path:\t{self.genome_local_path}\n".format(self=self)
         return repr
 
 Base.metadata.create_all(engine)  # Create all the tables defined above.
@@ -84,26 +88,23 @@ Base.metadata.create_all(engine)  # Create all the tables defined above.
 
 
 class GenomeDatabase(object):
-    """
-    @brief     Base Genome Database class.
-               Many functions will have to be overwritten by
-               the database-specific child classes.
-    """
+    """Base Genome Database class. Many functions will be overwritten by
+    the database-specific child classes.
+
+    .. warning:: **This class should not be directly called.**
+        It must be implemented with a child class to fill out certain
+        functions."""
     
     def __init__(self):
-        """
-        @brief     Initialization of the GenomeDatabase class.
-        """
+        """Initialization of the GenomeDatabase class."""
         # Create attributes that are not related to SQLAlchemy.
-        self._baseGenomeDir = None
-        self._genomeList = []
-        self._downloadProtocol = None
+        self._baseGenomeDir = None  # The local download location.
+        self._genomeList = []  # TODO: Is this list needed anymore?
+        self._downloadProtocol = None  # Placeholder for later use.
 
     def save_genome(self, taxonomic_name, **kwargs):
-        """
-        @brief     Save the genomes in this database.
-                   Save to the _baseGenomeDir location.
-        """
+        """Save the genomes in this database. Save to the _baseGenomeDir
+         location."""
         # Call the internal addition function.
         # TODO: Examine SQLAlchemy, there is a specific function to use
         #       for storing one vs many database entries.
@@ -122,25 +123,14 @@ class GenomeDatabase(object):
         session.commit()  # Commit the new entry to the database/session.
 
     def print_genomes(self):
-        """
-        @brief     Print all the Genomes in the database to the terminal.
-                   TODO: Implement.
-        """
+        """Print all the Genomes in the database to the terminal."""
         query = session.query(GenomeEntry).all()
-        # print(query)
         return query
 
     def find_genomes(self):
-        """
-        @brief     To be overwritten by child classes.
-                   Very database specific.
-
-        """
+        """To be overwritten by child classes. Very database specific."""
         pass
 
     def download_genomes(self):
-        """
-        @brief     To be overwritten by child classes.
-                   Very database specific.
-        """
+        """To be overwritten by child classes. Very database specific."""
         pass

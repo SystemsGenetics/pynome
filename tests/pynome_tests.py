@@ -1,5 +1,18 @@
+"""
+Tests for EnsemblDatabase
+=========================
+
+## Classes & Assosiated functions
+
+:class GenomeDatabse: 
+GenomeEntry
+GenomeDatabase
+EnsemblDatabase
+"""
+
 from nose.tools import *
 import logging
+from .context import pynome
 from pynome.ensembldatabase import EnsemblDatabase
 from pynome.genome import Genome
 
@@ -40,6 +53,10 @@ from pynome.genome import Genome
 # TODO: Implement a local/fake ftp server for testing? Find a good way to test
 #       The recursive function.
 
+# def test_dir_check():
+    # TEDB = EnsemblDatabase()
+
+
 def test_ensembl_database():
     # Generate an instance of the ensembl database
     TEDB = EnsemblDatabase()
@@ -52,15 +69,15 @@ def test_genome_check():
     test_ensembl_db = EnsemblDatabase()
     assert_true(test_ensembl_db.genome_check(good_hit))
 
-def test_parse_species_filename():
-    # Sample filename taken from the ftp server.
-    sample_input = 'Acyrthosiphon_pisum.GCA_000142985.2.36.gff3.gz'
-    desired_output = ('Acyrthosiphon_pisum', 'GCA_000142985.2')
-    # Generate a new instance of the ensembl database.
-    TEDB = EnsemblDatabase() 
-    # Run the function to test.
-    test_case = TEDB._parse_species_filename(sample_input)
-    assert_equal(desired_output, test_case)
+# def test_parse_species_filename():
+#     # Sample filename taken from the ftp server.
+#     sample_input = 'Acyrthosiphon_pisum.GCA_000142985.2.36.gff3.gz'
+#     desired_output = ('Acyrthosiphon_pisum', 'GCA_000142985.2')
+#     # Generate a new instance of the ensembl database.
+#     TEDB = EnsemblDatabase() 
+#     # Run the function to test.
+#     test_case = TEDB.parse_species_filename(sample_input)
+#     assert_equal(desired_output, test_case)
 
 def test_generate_uri():
     print("\nInitializing EnsemblDatabase class.")
@@ -82,7 +99,8 @@ def test_sqlite_db():
                  'fasta_size' : 1234 }
     arguments2 = {'genome_gff3_uri'   : 'uri/to/gff3/',
                   'gff3_size' : 4321}
-    arguments3 = {'genome_local_path' : 'local/path/to/TEST/'}
+    arguments3 = {'genome_local_path' : 'local/path/to/TEST/',
+                  'fasta_size' : None}
     # Test by 'creating' the same genome 3 times, once for each
     # of the fields to be updated.
     TEDB.save_genome('Acyrthosiphon_pisum', **arguments)
@@ -96,28 +114,11 @@ def test_sqlite_db():
     TEDB.save_genome('Acyrthosiphon_pisum', **arguments3)
     test_query = TEDB.print_genomes()
     print(test_query)
-    
 
-
-
-# def test_crawl_ftp():
-#     test_ensembl_db = EnsemblDatabase()
-#     test_ensembl_db.find_genomes()
-
-
-
-# def test_genome():
-
-    # Create an instance of the Genome class.
-    # test_Genome = Genome()  # default value should be 'release_version=36'
-
-    # value to be tested
-    # test_value = test_Genome.release_version()
-    # print(test_value)
-
-    # assert_equal('release-36', test_value)
-    # Test the assembly version setter
-    # test_Genome.assembly_version = "GCA_000142985.2.36"
-
-    # Test the fasta setter
-    # test_Genome.fasta = "path/to/fa.gz"
+def test_crawl_ftp():
+    crawl_test_uri = ['pub/fungi/release-36/gff3/fungi_rozellomycota1_collection/',
+    'pub/fungi/release-36/fasta/fungi_rozellomycota1_collection/']
+    TEDB = EnsemblDatabase()
+    TEDB._find_genomes(TEDB.ensemblLineParser, crawl_test_uri)
+    test_query = TEDB.print_genomes()
+    print(test_query)

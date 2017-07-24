@@ -7,10 +7,22 @@ Welcome to Pynome's documentation!
 ==================================
 
 .. toctree::
-   :maxdepth: 3
+   :maxdepth: 2
    :caption: Contents:
 
+.. automodule:: pynome.genomedatabase
+    :members:
+    :private-members:
+    :undoc-members:
+    :inherited-members:
+    :show-inheritance:
 
+.. automodule:: pynome.ensembldatabase
+    :members:
+    :private-members:
+    :undoc-members:
+    :inherited-members:
+    :show-inheritance:
 
 Indices and tables
 ==================
