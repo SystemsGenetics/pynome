@@ -1,21 +1,14 @@
 """
+=========================
 Tests for EnsemblDatabase
 =========================
-
-## Classes & Assosiated functions
-
-:class GenomeDatabse: 
-GenomeEntry
-GenomeDatabase
-EnsemblDatabase
 """
 
 from nose.tools import *
 import logging
 from .context import pynome
 from pynome.ensembldatabase import EnsemblDatabase
-from pynome.genome import Genome
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, select
 from sqlalchemy.orm import sessionmaker
 
 ###############################################################################
@@ -47,11 +40,6 @@ from sqlalchemy.orm import sessionmaker
 ## CONFIGURE LOGGER
 ## Logging Levels:
 ##  debug, info, warning, error, critical
-##
-##
-##
-##
-##
 ###############################################################################
 
 
@@ -60,26 +48,12 @@ engine = create_engine('sqlite:///:memory:')
 # engine = create_engine('sqlite://///media/tylerbiggs/genomic/PYNOME.db')
 pynome.genomedatabase.Base.metadata.create_all(engine)  # Create all the tables defined above.
 
-def test_ensembl_database():
-    # Generate an instance of the ensembl database
-    TEDB = EnsemblDatabase(engine)
-    # Test that the generated release_version is correct.
-    assert_equal(TEDB.release_version, 'release-36')
-    
-def test_genome_check():
-    good_hit = 'Colletotrichum_graminicola.GCA_000149035.1.36.gff3.gz'
-    # bad_hits = ('')
-    test_ensembl_db = EnsemblDatabase(engine)
-    assert_true(test_ensembl_db.genome_check(good_hit))
+def setup_EnsemblDB():
+    """Set up the ensemblDatabase testing sqlite server in memory."""
+    tDatabase = EnsemblDatabase(engine)
 
-def test_generate_uri():
-    print("\nInitializing EnsemblDatabase class.")
-    # Generate a new instance of the ensembl database.
-    TEDB = EnsemblDatabase(engine)
-    print("\nGenerating FTP URI for ftp crawling.")
-    generated_uri = TEDB._generate_uri()
-    for uri in generated_uri:
-        print('\t{}'.format(uri))
+def teardown_EnsemblDB():
+    pass
 
 def test_sqlite_db():
     print("\nInitializing EnsemblDatabase class.")
@@ -114,7 +88,25 @@ def test_crawl_ftp():
     TEDB = EnsemblDatabase(engine)
     TEDB._find_genomes(TEDB.ensemblLineParser, crawl_test_uri)
     test_query = TEDB.print_genomes()
-    print(test_query)
-    print(TEDB.get_mutual_genomes())
+    logging.info('Printing all Genomes in the test database...\n\n{}'.format(test_query))
 
+def test_download_genomes():
+    TEDB = EnsemblDatabase(engine)
+    crawl_test_uri = ['pub/fungi/release-36/gff3/fungi_rozellomycota1_collection/',
+    'pub/fungi/release-36/fasta/fungi_rozellomycota1_collection/']
+    # TEDB._find_genomes(TEDB.ensemblLineParser, crawl_test_uri)
+
+    mg = TEDB.get_mutual_genomes()
     
+    logging.info('Printing all genomes with both fasta and gff3 files.\n\n{}'\
+        .format(mg))
+
+    TEDB.downloadGenomes(mg, '/tmp/')
+    
+
+# def test_generate_uri():
+#     TEDB = EnsemblDatabase(engine)
+#     logging.debug("Generating FTP URI for ftp crawling.")
+#     generated_uri = TEDB._generate_uri()
+#     for uri in generated_uri:
+#         logging.debug('\t{}'.format(uri))

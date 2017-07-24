@@ -7,7 +7,6 @@ Ensembl Database
 
 .. NOTE:: Under construction.
 
-
 The ensembl database module. A child class of the genome database class,
 this module cotains all code directly related to connecting and parsing data
 from the ensembl geneome database."""
@@ -16,11 +15,10 @@ __docformat__ = 'reStructuredText'  # Set the formatting for the documentation
 
 import itertools
 from ftplib import FTP
+from sqlalchemy import select
 import logging
 import logging.config
-# Imports from internal modules
 from .genomedatabase import GenomeDatabase, GenomeEntry
-
 ensebml_ftp_uri = 'ftp.ensemblgenomes.org'
 
 
@@ -65,19 +63,20 @@ class EnsemblDatabase(GenomeDatabase):
         self.ftp.dir(top_dir, retrived_dir_list.append)
         logging.debug('crawl_dir() called with:\n\ttopdir:\t{}'\
                       .format(top_dir))
-        logging.debug('crawl_dir() call retrieved:\n{}'.format(retrived_dir_list))
+        logging.debug('crawl_dir() call retrieved:\n{}'\
+            .format(retrived_dir_list))
         for line in retrived_dir_list:
             if self.dir_check(line):
                 # Then the line is a directory and should be crawled.
                 target_dir = ''.join((top_dir, line.split()[-1], '/'))
                 self.crawl_dir(target_dir, parsing_function)
             else:  # otherwise the line must be parsed.
-                parsing_function(line)
+                parsing_function(line, top_dir)
         return
 
-    def ensemblLineParser(self, line):
-        """This function parses one 'line' at a time retrieved from an ``ftp.dir()``
-        command. 
+    def ensemblLineParser(self, line, top_dir):
+        """This function parses one 'line' at a time retrieved from an 
+        ``ftp.dir()`` command. 
         
         :param line: an input line, described in detail below.
         
@@ -86,13 +85,13 @@ class EnsemblDatabase(GenomeDatabase):
             ``"drwxr-sr-x  2 ftp   ftp    4096 Jan 13  2015 filename"``
 
         This line is split by whitespace. For future reference, the indexes
-        correspond (usually) to:
+        correspond (usually) to::
 
             + ``[0]:    the directory information.``
             + ``[1]:    the number of items therein?``
             + ``[2]:    unknown always 'ftp'``
             + ``[3]:    unknown always 'ftp'``
-            + ``[4]:    the filesize in bytes, 4096 is one block, often a folder``
+            + ``[4]:    the filesize in bytes, 4096 is one block``
             + ``[5]:    Month``
             + ``[6]:    Day``
             + ``[7]:    Year``
@@ -106,28 +105,22 @@ class EnsemblDatabase(GenomeDatabase):
             'size' :           item[4],
             'item_name' :      item[-1]
         }
-        # version_separator = '.{}'.format(self._release_number)
-
         name_list = item[-1].split('.', 2)
         parsed_name = ''.join((name_list[0:2]))
         file_type = name_list[-1]
-
         bad_words = ('chromosome', 'abinitio')
         data_types = ('dna.toplevel.fa.gz', 'gff3.gz')
-
         if any( bw in parsed_name for bw in bad_words):
             return
-
         elif file_type.endswith('dna.toplevel.fa.gz'):
-            self.add_genome(parsed_name,  # TODO: Rename this function? An override?
+            self.add_genome(parsed_name,
                        fasta_size=line_dict['size'],
-                       fasta_uri=item[-1])
+                       fasta_uri=''.join((top_dir, item[-1])))
             return
-
         elif file_type.endswith('gff3.gz'):
-            self.add_genome(parsed_name,  # TODO: Rename this function? An override?
+            self.add_genome(parsed_name,
                        gff3_size=line_dict['size'],
-                       gff3_uri=item[-1])
+                       gff3_uri=''.join((top_dir, item[-1])))
             return
 
     def genome_check(self, item):
@@ -158,11 +151,12 @@ class EnsemblDatabase(GenomeDatabase):
                    gff3_size=None,
                    fasta_uri=None,
                    gff3_uri=None):
-        """Creates a new genome. This creates a new isntance of 
+        """Creates a new genome. This creates a new isntance of \
+        :class:`GenomeEntry`.
         
         :param item: The name of the genome to be created or updated.
-        :param fasta_size: The size of the remote fasta, ``.fa.gz`` file in bytes.
-        :param gff3_size: The size of the remote gff3, ``.gff3.gz`` file in bytes.
+        :param fasta_size: The size of the remote fasta, ``.fa.gz`` in bytes.
+        :param gff3_size: The size of the remote gff3, ``.gff3.gz`` in bytes.
         :param fasta_uri: The remote uri of the fasta file.
         :param gff3_uri: The remote uri of the gff3 file."""
         genome_entry_args = {
@@ -229,8 +223,8 @@ class EnsemblDatabase(GenomeDatabase):
         return
 
     def find_genomes(self):
-        """OVERWRITES GENOMEDATABASE FUNCTION. Calls the _find_genomes() private
-        function."""
+        """OVERWRITES GENOMEDATABASE FUNCTION. Calls the _find_genomes() 
+        private function."""
         logging.info("Finding Genomes. This takes approximately 45 minutes...")
         ensembleBaseURIs = [uri for uri in self._generate_uri()]
         self._find_genomes(parsingFunction=self.ensemblLineParser,
@@ -247,29 +241,42 @@ class EnsemblDatabase(GenomeDatabase):
     def release_version(self, value):
         """Setter for the release_version. Accepts an input integer and returns
         a string in the form: 'release-##' """
-        # TODO: Add validation to ensure that the input value is an integer.
-        #       Perhaps it should also be limited to the range of available
-        #       release verions on the ensembl site. (1 through 36)
         self._release_number = value
         self._release_version = 'release-' + str(value)
 
-    def download_genomes(self):
-        """Downloads the genomes in the database that have both fasta and
-        gff3 files."""
-        self._download_genomes()
-        return
-
-    def _download_genomes(self):
-        """The internal download function, specific to ensembledatabase."""
-        # Find all entries in the sql database with both fasta and gff3 files.
-        genome_entries = self.get_mutual_genomes()
-        # Return a list of those uri values.
-        pass
-
     def get_mutual_genomes(self):
-        """Gets the genome entries that have both a fasta and gff3 uri."""
-        # Get the values with both fasta and gff3 uris.
-        mutual = self.session.query(GenomeEntry).filter(
-            GenomeEntry.fasta_uri,
-            GenomeEntry.gff3_uri).scalar() is not None
-        return mutual
+        """Gets the genome entries that have both a fasta and gff3 uri.
+        Returns a tuple that contains:
+
+            ``('taxonomic_name', 'fasta_uri', 'fasta_size',\
+               'gff3_uri', 'gff3_size')``"""
+        # TODO: Investigate a way to complete this query on the sqlite side.
+        s = select([GenomeEntry.taxonomic_name,
+                    GenomeEntry.fasta_uri,
+                    GenomeEntry.fasta_size,
+                    GenomeEntry.gff3_uri,
+                    GenomeEntry.gff3_size])
+        result = self.session.execute(s)
+        return [tup[0] for tup in result if all(tup)]
+
+    def downloadGenomes(self, download_list, download_location):
+        """This function takes an list of genome tuples. These tuples contain:
+
+            ``('taxonomic_name', 'fasta_uri', 'fasta_size',\
+               'gff3_uri', 'gff3_size')``
+        
+        :param download_list: A list of tuples (example shown above) to be
+            downloaded.
+        :param download_location: The local file location where the files
+            will be saved."""
+        self.ftp.connect(ensebml_ftp_uri)  # connect to the ensemble ftp
+        self.ftp.login()
+        for pk, furi, fsize, guri, gsize in download_list:
+            fasta_path = ''.join((download_location, pk, '.fa.gz'))
+            gff3_path = ''.join((download_location, pk, '.gff3.gz'))
+            self.ftp.retrbinary('RETR {}'.format(fasta),
+                                open(fasta_path, 'wb').write)
+            self.ftp.retrbinary('RETR {}'.format(gff3),
+                                open(gff3_path, 'wb').write)
+        self.ftp.quit()  # close the ftp connection
+        

@@ -1,20 +1,23 @@
 """
-**************
-Genomedatabase
-**************
+==========================
+The Genome Database Module
+==========================
 
 The **Genomedatabase** module consists of two classes:
 
     + :class:`GenomeEntry` - An ``sql declarative_base()`` instance.
-    + :class:`GenomeDatabase` - The handler for above, and the parent\
-        class for specific databases to be overloaded."""
+    + :py:class:`GenomeDatabase` - The handler for above, and the parent\
+        class for specific databases to be overloaded.
+"""
 
 from sqlalchemy import MetaData, Table, Column, Integer, Numeric,\
-    String, DateTime, ForeignKey, create_engine
+    String, DateTime, ForeignKey, create_engine, select
 from sqlalchemy.orm import sessionmaker, relationship, backref
 from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.sql.expression import exists
 
 # Inherit from declarative_base()
+# Required for the sqlite connection.
 Base = declarative_base()
 
 
@@ -41,6 +44,15 @@ class GenomeEntry(Base):  # Inherit from declarative_base.
     :param gff3_size: The remote size of the gff3.gz file as an Integer.
     :param fasta_size: The remote size of the fa.gz file as an Integer.
     
+    :Examples:
+
+    An instance of this class should be created whenever a genome entry
+    needs to be created or modified.
+
+        >>> newGenome = GenomeEntry(<primary_key>, **kwargs)
+
+    In deployments this will be handled by a wrapper function specific
+    to the database being examined.
     """
     __tablename__ = "GenomeTable"  # Should this be the same as the class?
     taxonomic_name = Column(String(150),primary_key=True)
@@ -60,14 +72,12 @@ class GenomeEntry(Base):  # Inherit from declarative_base.
 
     def __repr__(self):
         """Custom representation that will be pulled up when a print out
-        is requested. This will be of the form:
+        is requested. This will be of the form::
 
-        **Name**:       {}
-        **fasta uri**:  {}   remote size:   {}
-        **gff3 uri**:   {}   remote size:   {}
-        **local path**: {}
-
-        """
+            **Name**:       {}
+            **fasta uri**:  {}   remote size:   {}
+            **gff3 uri**:   {}   remote size:   {}
+            **local path**: {}"""
         repr =  "\n\tName:\t{self.taxonomic_name} \
         \n\tfasta uri:\t{self.fasta_uri}\n\t\tremote size\t{self.fasta_size} \
         \n\tgff3 uri:\t{self.gff3_uri}\n\t\tremote size\t{self.gff3_size} \

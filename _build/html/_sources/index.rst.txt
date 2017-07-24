@@ -8,9 +8,11 @@ Welcome to Pynome's documentation!
 
 .. toctree::
    :maxdepth: 2
-   :caption: Contents:
 
-.. autoclass:: pynome.genomedatabase.GenomeEntry
+.. automodule:: genomedatabase
+    :members:
+
+.. autoclass:: pynome.genomedatabase.GenomeDatabase
 
 
 .. automodule:: pynome.ensembldatabase

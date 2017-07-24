@@ -22,15 +22,13 @@ user if they would like to collect the available genomes.
 After running the ftp scraper, the script will report the 
 number of genomes found, as well as their total sizes.
 """
-
-# from .genomedatabase import GenomeDatabase
-# from .  import EnsemblDatabase
 import pynome.ensembldatabase
-# from . import EnsemblDatabase
-# from .genome import Genome
-# TODO: Define an __all__ attribute and simplify these imports.
-# from .ensembldatabase import EnsemblDatabase
+from sqlalchemy import create_engine
+
 endb = pynome.ensembldatabase.EnsemblDatabase
+
+engine = create_engine('sqlite://///media/tylerbiggs/genomic/PYNOME.db')
+pynome.genomedatabase.Base.metadata.create_all(engine)  # Create all the tables defined above.
 
 def main():
     print('#'*80)
@@ -40,8 +38,8 @@ def main():
     print('There are no options! There are no rails! Are you sure? TOO BAD.')
     crawl_test_uri = ['pub/fungi/release-36/gff3/fungi_rozellomycota1_collection/',
     'pub/fungi/release-36/fasta/fungi_rozellomycota1_collection/']
-    TEDB = endb()
-    TEDB.crawl_ftp(crawl_test_uri, TEDB.ensembl_dir_parser)
+    TEDB = endb(engine)
+    TEDB.find_genomes()
     test_query = TEDB.print_genomes()
     print(test_query)
 
