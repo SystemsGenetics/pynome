@@ -10,12 +10,8 @@ Welcome to Pynome's documentation!
    :maxdepth: 2
    :caption: Contents:
 
-.. automodule:: pynome.genomedatabase
-    :members:
-    :private-members:
-    :undoc-members:
-    :inherited-members:
-    :show-inheritance:
+.. autoclass:: pynome.genomedatabase.GenomeEntry
+
 
 .. automodule:: pynome.ensembldatabase
     :members:

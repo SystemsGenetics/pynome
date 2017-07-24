@@ -15,7 +15,8 @@ import logging
 from .context import pynome
 from pynome.ensembldatabase import EnsemblDatabase
 from pynome.genome import Genome
-
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
 
 ###############################################################################
 ## NOSETESTS USAGE NOTES
@@ -44,45 +45,37 @@ from pynome.genome import Genome
 
 ###############################################################################
 ## CONFIGURE LOGGER
+## Logging Levels:
+##  debug, info, warning, error, critical
+##
+##
+##
+##
+##
 ###############################################################################
 
 
-# TODO: Download a sampel directory structure from the ensembl ftp site and
-#       and save it locally. Use this for the testing, since it takes about
-#       45 minutes to work through the genomes on the full site.
-# TODO: Implement a local/fake ftp server for testing? Find a good way to test
-#       The recursive function.
-
-# def test_dir_check():
-    # TEDB = EnsemblDatabase()
-
+## CONFIGURE LOCAL TEST SQLITE SERVER
+engine = create_engine('sqlite:///:memory:')
+# engine = create_engine('sqlite://///media/tylerbiggs/genomic/PYNOME.db')
+pynome.genomedatabase.Base.metadata.create_all(engine)  # Create all the tables defined above.
 
 def test_ensembl_database():
     # Generate an instance of the ensembl database
-    TEDB = EnsemblDatabase()
+    TEDB = EnsemblDatabase(engine)
     # Test that the generated release_version is correct.
     assert_equal(TEDB.release_version, 'release-36')
     
 def test_genome_check():
     good_hit = 'Colletotrichum_graminicola.GCA_000149035.1.36.gff3.gz'
     # bad_hits = ('')
-    test_ensembl_db = EnsemblDatabase()
+    test_ensembl_db = EnsemblDatabase(engine)
     assert_true(test_ensembl_db.genome_check(good_hit))
-
-# def test_parse_species_filename():
-#     # Sample filename taken from the ftp server.
-#     sample_input = 'Acyrthosiphon_pisum.GCA_000142985.2.36.gff3.gz'
-#     desired_output = ('Acyrthosiphon_pisum', 'GCA_000142985.2')
-#     # Generate a new instance of the ensembl database.
-#     TEDB = EnsemblDatabase() 
-#     # Run the function to test.
-#     test_case = TEDB.parse_species_filename(sample_input)
-#     assert_equal(desired_output, test_case)
 
 def test_generate_uri():
     print("\nInitializing EnsemblDatabase class.")
     # Generate a new instance of the ensembl database.
-    TEDB = EnsemblDatabase()
+    TEDB = EnsemblDatabase(engine)
     print("\nGenerating FTP URI for ftp crawling.")
     generated_uri = TEDB._generate_uri()
     for uri in generated_uri:
@@ -90,7 +83,7 @@ def test_generate_uri():
 
 def test_sqlite_db():
     print("\nInitializing EnsemblDatabase class.")
-    TEDB = EnsemblDatabase()
+    TEDB = EnsemblDatabase(engine)
     print('\nSaving sample genome to the database...')
     # The test genomes taxonomic name:
     test_name = 'Acyrthosiphon_pisum'
@@ -118,7 +111,10 @@ def test_sqlite_db():
 def test_crawl_ftp():
     crawl_test_uri = ['pub/fungi/release-36/gff3/fungi_rozellomycota1_collection/',
     'pub/fungi/release-36/fasta/fungi_rozellomycota1_collection/']
-    TEDB = EnsemblDatabase()
+    TEDB = EnsemblDatabase(engine)
     TEDB._find_genomes(TEDB.ensemblLineParser, crawl_test_uri)
     test_query = TEDB.print_genomes()
     print(test_query)
+    print(TEDB.get_mutual_genomes())
+
+    
