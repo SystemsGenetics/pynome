@@ -15,7 +15,13 @@ from sqlalchemy import MetaData, Table, Column, Integer, Numeric,\
 from sqlalchemy.orm import sessionmaker, relationship, backref
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.sql.expression import exists
-
+try:
+    from tqdm import tqdm
+except ImportError:
+    def tqdm(*args, **kwargs):
+        if args:
+            return args[0]
+        return kwargs.get('iterable', None)
 # Inherit from declarative_base()
 # Required for the sqlite connection.
 Base = declarative_base()
@@ -132,4 +138,5 @@ class GenomeDatabase(object):
 
     def download_genomes(self):
         """To be overwritten by child classes. Very database specific."""
+
         pass

@@ -97,7 +97,7 @@ class EnsemblDatabase(GenomeDatabase):
             + ``[7]:    Year``
             + ``[8]:    filename``
         
-        Returns a dictionary of keywords?"""
+        Either adds a genome, or returns nothing."""
         item = line.split()   # Split the listing by whitespace.
         line_dict = {
             'dir_info' :       item[0],
@@ -138,7 +138,6 @@ class EnsemblDatabase(GenomeDatabase):
         """
         bad_words = ('chromosome', '.abinitio.')
         data_types = ('dna.toplevel.fa.gz', 'gff3.gz')
-        # .dna.toplevel.fa.gz
         self.logger.debug('GENOME CHECKING: {}'.format(item))
         if item.endswith(data_types) and \
             not any(word in bad_words for word in item):
@@ -205,11 +204,11 @@ class EnsemblDatabase(GenomeDatabase):
                             item[0], '', ))  # the data type
 
     def _find_genomes(self,
-                      parsingFunction,
+                      parsing_function,
                       baseURIList):
         """Private function that handles finding the list of genomes.
         
-        :param parsingFunction: This should be a function that reads an
+        :param parsing_function: This should be a function that reads an
             ``ftplib.dir()`` line output. This output should always be a
             file, not a directory.
         :param baseURIList: This should be a list of base URIs to start
@@ -217,8 +216,8 @@ class EnsemblDatabase(GenomeDatabase):
         self.ftp.connect(ensebml_ftp_uri)  # connect to the ensemble ftp
         self.ftp.login()
         for uri in baseURIList:
-            logging.debug('Parent crawl dir initialized as: {}'.format(uri))
-            self.crawl_dir(uri, parsingFunction)
+            logging.info('Parent crawl dir initialized as: {}'.format(uri))
+            self.crawl_dir(uri, parsing_function)
         self.ftp.quit()  # close the ftp connection
         return
 
@@ -226,9 +225,9 @@ class EnsemblDatabase(GenomeDatabase):
         """OVERWRITES GENOMEDATABASE FUNCTION. Calls the _find_genomes() 
         private function."""
         logging.info("Finding Genomes. This takes approximately 45 minutes...")
-        ensembleBaseURIs = [uri for uri in self._generate_uri()]
-        self._find_genomes(parsingFunction=self.ensemblLineParser,
-                           baseURIList=ensembleBaseURIs,)
+        ensemble_base_URIs = [uri for uri in self._generate_uri()]
+        self._find_genomes(parsing_function=self.ensemblLineParser,
+                           baseURIList=ensemble_base_URIs,)
         return
 
     @property
@@ -256,10 +255,15 @@ class EnsemblDatabase(GenomeDatabase):
                     GenomeEntry.fasta_size,
                     GenomeEntry.gff3_uri,
                     GenomeEntry.gff3_size])
-        result = self.session.execute(s)
-        return [tup[0] for tup in result if all(tup)]
+        s_result = self.session.execute(s)  # Run the query.
+        # Then get the name (primary key), if all of those entries exist.
+        keys_mut_genomes = [tup[0] for tup in s_result if all(tup)]
+        # Now get the entire database entry
+        query = self.session.query(GenomeEntry).all()
 
-    def downloadGenomes(self, download_list, download_location):
+        return 
+
+    def download_genomes(self, download_list, download_location):
         """This function takes an list of genome tuples. These tuples contain:
 
             ``('taxonomic_name', 'fasta_uri', 'fasta_size',\
@@ -272,11 +276,11 @@ class EnsemblDatabase(GenomeDatabase):
         self.ftp.connect(ensebml_ftp_uri)  # connect to the ensemble ftp
         self.ftp.login()
         for pk, furi, fsize, guri, gsize in download_list:
-            fasta_path = ''.join((download_location, pk, '.fa.gz'))
-            gff3_path = ''.join((download_location, pk, '.gff3.gz'))
-            self.ftp.retrbinary('RETR {}'.format(fasta),
-                                open(fasta_path, 'wb').write)
-            self.ftp.retrbinary('RETR {}'.format(gff3),
-                                open(gff3_path, 'wb').write)
+            local_fasta_path = ''.join((download_location, pk, '.fa.gz'))
+            local_gff3_path = ''.join((download_location, pk, '.gff3.gz'))
+            self.ftp.retrbinary('RETR {}'.format(furi),
+                                open(local_fasta_path, 'wb').write)
+            self.ftp.retrbinary('RETR {}'.format(guri),
+                                open(local_gff3_path, 'wb').write)
         self.ftp.quit()  # close the ftp connection
         

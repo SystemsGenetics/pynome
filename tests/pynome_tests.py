@@ -88,7 +88,8 @@ def test_crawl_ftp():
     TEDB = EnsemblDatabase(engine)
     TEDB._find_genomes(TEDB.ensemblLineParser, crawl_test_uri)
     test_query = TEDB.print_genomes()
-    logging.info('Printing all Genomes in the test database...\n\n{}'.format(test_query))
+    logging.info('Printing all Genomes in the test database...\n\n{}'\
+        .format(test_query))
 
 def test_download_genomes():
     TEDB = EnsemblDatabase(engine)
@@ -101,7 +102,7 @@ def test_download_genomes():
     logging.info('Printing all genomes with both fasta and gff3 files.\n\n{}'\
         .format(mg))
 
-    TEDB.downloadGenomes(mg, '/tmp/')
+    TEDB.download_genomes(mg, '')
     
 
 # def test_generate_uri():
