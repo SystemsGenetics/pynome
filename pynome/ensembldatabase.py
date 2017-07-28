@@ -14,11 +14,15 @@ from the ensembl geneome database."""
 __docformat__ = 'reStructuredText'  # Set the formatting for the documentation
 
 import itertools
+import os
 from ftplib import FTP
 from sqlalchemy import select
 import logging
 import logging.config
 from .genomedatabase import GenomeDatabase, GenomeEntry
+
+
+
 ensebml_ftp_uri = 'ftp.ensemblgenomes.org'
 
 
@@ -250,6 +254,7 @@ class EnsemblDatabase(GenomeDatabase):
             ``('taxonomic_name', 'fasta_uri', 'fasta_size',\
                'gff3_uri', 'gff3_size')``"""
         # TODO: Investigate a way to complete this query on the sqlite side.
+        # TODO: Find a way to return the entire sql entry? Is that what I want?
         s = select([GenomeEntry.taxonomic_name,
                     GenomeEntry.fasta_uri,
                     GenomeEntry.fasta_size,
@@ -257,11 +262,8 @@ class EnsemblDatabase(GenomeDatabase):
                     GenomeEntry.gff3_size])
         s_result = self.session.execute(s)  # Run the query.
         # Then get the name (primary key), if all of those entries exist.
-        keys_mut_genomes = [tup[0] for tup in s_result if all(tup)]
-        # Now get the entire database entry
-        query = self.session.query(GenomeEntry).all()
-
-        return 
+        keys_mut_genomes = [tup for tup in s_result if all(tup)]
+        return keys_mut_genomes
 
     def download_genomes(self, download_list, download_location):
         """This function takes an list of genome tuples. These tuples contain:
@@ -275,12 +277,27 @@ class EnsemblDatabase(GenomeDatabase):
             will be saved."""
         self.ftp.connect(ensebml_ftp_uri)  # connect to the ensemble ftp
         self.ftp.login()
-        for pk, furi, fsize, guri, gsize in download_list:
-            local_fasta_path = ''.join((download_location, pk, '.fa.gz'))
-            local_gff3_path = ''.join((download_location, pk, '.gff3.gz'))
+
+        for entry in download_list:
+            pk, furi, fsize, guri, gsize = entry
+
+            local_fasta_path = os.path.join(download_location, pk + '.fa.gz')
+            local_gff3_path = os.path.join(download_location, pk + '.gff3.gz')
+            
+            # local_fasta_path = ''.join((download_location, pk, '.fa.gz'))
+            # local_gff3_path = ''.join((download_location, pk, '.gff3.gz'))
+
+            # if the directory we are saving do does not exist, it will
+            # need to be created.
+            if not os.path.exists(download_location):
+                os.makedirs(download_location)
+
             self.ftp.retrbinary('RETR {}'.format(furi),
-                                open(local_fasta_path, 'wb').write)
+                                open(local_fasta_path, 'w').write)
+
             self.ftp.retrbinary('RETR {}'.format(guri),
-                                open(local_gff3_path, 'wb').write)
+                                open(local_gff3_path, 'w').write)
+
         self.ftp.quit()  # close the ftp connection
-        
+        return
+    

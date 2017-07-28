@@ -10,6 +10,7 @@ from .context import pynome
 from pynome.ensembldatabase import EnsemblDatabase
 from sqlalchemy import create_engine, select
 from sqlalchemy.orm import sessionmaker
+import os
 
 ###############################################################################
 ## NOSETESTS USAGE NOTES
@@ -55,32 +56,32 @@ def setup_EnsemblDB():
 def teardown_EnsemblDB():
     pass
 
-def test_sqlite_db():
-    print("\nInitializing EnsemblDatabase class.")
-    TEDB = EnsemblDatabase(engine)
-    print('\nSaving sample genome to the database...')
-    # The test genomes taxonomic name:
-    test_name = 'Acyrthosiphon_pisum'
-    # Create some arguments to pass through.
-    arguments = {'genome_fasta_uri'  : 'uri/to/fasta/file.fa.gz',
-                 'fasta_size' : 1234 }
-    arguments2 = {'genome_gff3_uri'   : 'uri/to/gff3/',
-                  'gff3_size' : 4321}
-    arguments3 = {'genome_local_path' : 'local/path/to/TEST/',
-                  'fasta_size' : None}
-    # Test by 'creating' the same genome 3 times, once for each
-    # of the fields to be updated.
-    TEDB.save_genome('Acyrthosiphon_pisum', **arguments)
-    test_query = TEDB.print_genomes()
-    print(test_query)       
+# def test_sqlite_db():
+#     print("\nInitializing EnsemblDatabase class.")
+#     TEDB = EnsemblDatabase(engine)
+#     print('\nSaving sample genome to the database...')
+#     # The test genomes taxonomic name:
+#     test_name = 'Acyrthosiphon_pisum'
+#     # Create some arguments to pass through.
+#     arguments = {'genome_fasta_uri'  : 'uri/to/fasta/file.fa.gz',
+#                  'fasta_size' : 1234 }
+#     arguments2 = {'genome_gff3_uri'   : 'uri/to/gff3/',
+#                   'gff3_size' : 4321}
+#     arguments3 = {'genome_local_path' : 'local/path/to/TEST/',
+#                   'fasta_size' : None}
+#     # Test by 'creating' the same genome 3 times, once for each
+#     # of the fields to be updated.
+#     TEDB.save_genome('Acyrthosiphon_pisum', **arguments)
+#     test_query = TEDB.print_genomes()
+#     print(test_query)       
 
-    TEDB.save_genome('Acyrthosiphon_pisum', **arguments2)
-    test_query = TEDB.print_genomes()    
-    print(test_query)       
+#     TEDB.save_genome('Acyrthosiphon_pisum', **arguments2)
+#     test_query = TEDB.print_genomes()    
+#     print(test_query)       
 
-    TEDB.save_genome('Acyrthosiphon_pisum', **arguments3)
-    test_query = TEDB.print_genomes()
-    print(test_query)
+#     TEDB.save_genome('Acyrthosiphon_pisum', **arguments3)
+#     test_query = TEDB.print_genomes()
+#     print(test_query)
 
 def test_crawl_ftp():
     crawl_test_uri = ['pub/fungi/release-36/gff3/fungi_rozellomycota1_collection/',
@@ -101,8 +102,8 @@ def test_download_genomes():
     
     logging.info('Printing all genomes with both fasta and gff3 files.\n\n{}'\
         .format(mg))
-
-    TEDB.download_genomes(mg, '')
+    curpath = os.path.abspath(os.curdir)
+    TEDB.download_genomes(mg, os.path.join(curpath, 'tmp/'))
     
 
 # def test_generate_uri():
