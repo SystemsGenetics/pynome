@@ -19,14 +19,14 @@ from ftplib import FTP
 from sqlalchemy import select
 import logging
 import logging.config
-from .genomedatabase import GenomeDatabase, GenomeEntry
+import genomedatabase
 
 
 
 ensebml_ftp_uri = 'ftp.ensemblgenomes.org'
 
 
-class EnsemblDatabase(GenomeDatabase):
+class EnsemblDatabase(genomedatabase.GenomeDatabase):
     """The EnsemblDatabase class. This handles finding and downloading
     genomes from the ensembl genome database. The database url is:
 
@@ -40,7 +40,7 @@ class EnsemblDatabase(GenomeDatabase):
     Instructions on how to use this script.
 
         >>> database = EnsemblDatabase()  # Initialize a database.
-
+ 
     .. seealso:: :class:`GenomeDatabase`
     """
 
@@ -50,7 +50,7 @@ class EnsemblDatabase(GenomeDatabase):
         self.release_version = release_version
         self._ftp_genomes = []
         self.ftp = FTP()  # the ftp instance for the database
-        logging.config.fileConfig('pynome/pynomeLog.conf')
+        # logging.config.fileConfig('pynome/pynomeLog.conf')
         self.logger = logging.getLogger(__name__)
 
     def crawl_dir(self, top_dir, parsing_function):
@@ -262,8 +262,8 @@ class EnsemblDatabase(GenomeDatabase):
                     GenomeEntry.gff3_size])
         s_result = self.session.execute(s)  # Run the query.
         # Then get the name (primary key), if all of those entries exist.
-        keys_mut_genomes = [tup for tup in s_result if all(tup)]
-        return keys_mut_genomes
+        mut_genomes = [tup for tup in s_result if all(tup)]
+        return mut_genomes
 
     def download_genomes(self, download_list, download_location):
         """This function takes an list of genome tuples. These tuples contain:
