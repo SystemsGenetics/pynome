@@ -7,15 +7,22 @@ Usage:
     pynome [--mode=download-genomes] [--download-dir=DIRECTORY]
 """
 import logging
-import ensembldatabase
 import argparse
-from sqlalchemy import create_engine, select
+from pynome.genomedatabase import GenomeEntry, GenomeDatabase, Base
+from pynome.ensembldatabase import EnsemblDatabase
+from sqlalchemy import MetaData, create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 
+metadata = MetaData()
+
+logging.basicConfig()
+logging.getLogger('sqlalchemy.engine').setLevel(logging.INFO)
+
+    
 
 
-def entry_find_genomes(database_path='sqlite:///:memory:'):
+def entry_find_genomes(database_path='sqlite:///pynome.db'):
     # get the number of genomes.
     # TODO: check if the database exists
     # build the database_path
@@ -24,7 +31,8 @@ def entry_find_genomes(database_path='sqlite:///:memory:'):
     # Base.metadata.create_all(engine)
     # Create all the tables defined above.
     # create the database instance
-    db = ensembldatabase.EnsemblDatabase(engine)
+    db = EnsemblDatabase(engine)
+    Base.metadata.create_all(engine)
     print('#'*80)
     print('This will take some time. Finding genomes...')
     db.find_genomes()

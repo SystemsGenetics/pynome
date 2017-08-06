@@ -19,14 +19,14 @@ from ftplib import FTP
 from sqlalchemy import select
 import logging
 import logging.config
-import genomedatabase
+from pynome.genomedatabase import GenomeDatabase, GenomeEntry
 
 
 
 ensebml_ftp_uri = 'ftp.ensemblgenomes.org'
 
 
-class EnsemblDatabase(genomedatabase.GenomeDatabase):
+class EnsemblDatabase(GenomeDatabase):
     """The EnsemblDatabase class. This handles finding and downloading
     genomes from the ensembl genome database. The database url is:
 

@@ -4,13 +4,13 @@ Tests for EnsemblDatabase
 =========================
 """
 
+import os
 from nose.tools import *
 import logging
 from .context import pynome
 from pynome.ensembldatabase import EnsemblDatabase
 from sqlalchemy import create_engine, select
 from sqlalchemy.orm import sessionmaker
-import os
 
 ###############################################################################
 ## NOSETESTS USAGE NOTES
