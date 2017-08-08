@@ -59,6 +59,7 @@ def main():
 
     if args.download_genomes:
         print('Downloading Genomes!')
+        entry_download_genomes()
 
 if __name__ == '__main__':
     main()
