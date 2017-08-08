@@ -2,6 +2,7 @@
 ================
 Ensembl Database
 ================
+
 :Author: Tyler Biggs <tyler.biggs@wsu.edu>
 :Date: July 2017
 
@@ -21,8 +22,6 @@ import logging
 import logging.config
 from pynome.genomedatabase import GenomeDatabase, GenomeEntry
 
-
-
 ensebml_ftp_uri = 'ftp.ensemblgenomes.org'
 
 
@@ -39,7 +38,8 @@ class EnsemblDatabase(GenomeDatabase):
 
     Instructions on how to use this script.
 
-        >>> database = EnsemblDatabase()  # Initialize a database.
+        >>> engine = create_engine(database_path)
+        >>> database = EnsemblDatabase(engine)  # Initialize a database.
  
     .. seealso:: :class:`GenomeDatabase`
     """
@@ -78,15 +78,20 @@ class EnsemblDatabase(GenomeDatabase):
                 parsing_function(line, top_dir)
         return
 
-    def ensemblLineParser(self, line, top_dir):
+    def ensembl_line_parser(self, line, top_dir):
         """This function parses one 'line' at a time retrieved from an 
-        ``ftp.dir()`` command. 
+        ``ftp.dir()`` command. This line has already been confirmed to 
+        not be a directory.
         
         :param line: an input line, described in detail below.
         
         An example of one such line:
 
             ``"drwxr-sr-x  2 ftp   ftp    4096 Jan 13  2015 filename"``
+
+        The files are consistently named following this pattern:
+
+            ``<species>.<assembly>.<_version>.gff3.gz``
 
         This line is split by whitespace. For future reference, the indexes
         correspond (usually) to::
@@ -109,22 +114,41 @@ class EnsemblDatabase(GenomeDatabase):
             'size' :           item[4],
             'item_name' :      item[-1]
         }
-        name_list = item[-1].split('.', 2)
-        parsed_name = ''.join((name_list[0:2]))
-        file_type = name_list[-1]
-        bad_words = ('chromosome', 'abinitio')
-        data_types = ('dna.toplevel.fa.gz', 'gff3.gz')
-        if any( bw in parsed_name for bw in bad_words):
+
+
+        bad_words = ('chromosome', 'abinitio')  # TODO: Factor out bad_words
+        
+        if any( bw in line_dict['item_name'] for bw in bad_words):
             return
-        elif file_type.endswith('dna.toplevel.fa.gz'):
-            self.add_genome(parsed_name,
-                       fasta_size=line_dict['size'],
-                       fasta_uri=''.join((top_dir, item[-1])))
+        elif line_dict['item_name'].endswith('dna.toplevel.fa.gz'):
+            # Gives the namelist as: genus_species, assembly, file_extension
+            name_list = item[-1].split('.', 2)
+            genus_species = name_list[0]
+            assembly_name = name_list[1]
+            
+            genus, species = genus_species.split('_', 1)
+            parsed_name = genus + '_' + species + '-' + assembly_name
+            self.add_genome(
+                parsed_name,
+                genus=genus,
+                assembly_name=assembly_name,
+                fasta_size=line_dict['size'],
+                fasta_uri=''.join((top_dir, line_dict['item_name'])))
             return
-        elif file_type.endswith('gff3.gz'):
-            self.add_genome(parsed_name,
-                       gff3_size=line_dict['size'],
-                       gff3_uri=''.join((top_dir, item[-1])))
+        elif line_dict['item_name'].endswith('gff3.gz'):
+            # Gives the namelist as: genus_species, assembly, file_extension
+            name_list = item[-1].split('.', 2)
+            genus_species = name_list[0]
+            assembly_name = name_list[1]
+
+            genus, species = genus_species.split('_', 1)
+            parsed_name = genus + '_' + species + '-' + assembly_name 
+            self.add_genome(
+                parsed_name,
+                genus=genus,
+                assembly_name=assembly_name,
+                gff3_size=line_dict['size'],
+                gff3_uri=''.join((top_dir, line_dict['item_name'])))
             return
 
     def genome_check(self, item):
@@ -137,9 +161,7 @@ class EnsemblDatabase(GenomeDatabase):
 
             + end with fa.gz or gff3.gz
             + not have 'chromosome' in the name
-            + must not have 'abinitio' in the name
-        
-        """
+            + must not have 'abinitio' in the name"""
         bad_words = ('chromosome', '.abinitio.')
         data_types = ('dna.toplevel.fa.gz', 'gff3.gz')
         self.logger.debug('GENOME CHECKING: {}'.format(item))
@@ -153,7 +175,9 @@ class EnsemblDatabase(GenomeDatabase):
                    fasta_size=None,
                    gff3_size=None,
                    fasta_uri=None,
-                   gff3_uri=None):
+                   gff3_uri=None,
+                   genus=None,
+                   assembly_name=None):
         """Creates a new genome. This creates a new isntance of \
         :class:`GenomeEntry`.
         
@@ -162,16 +186,20 @@ class EnsemblDatabase(GenomeDatabase):
         :param gff3_size: The size of the remote gff3, ``.gff3.gz`` in bytes.
         :param fasta_uri: The remote uri of the fasta file.
         :param gff3_uri: The remote uri of the gff3 file."""
+
         genome_entry_args = {
             'fasta_uri'        : fasta_uri,
             'fasta_size'       : fasta_size,
             'gff3_uri'         : gff3_uri,
             'gff3_size'        : gff3_size,
+            'genus'            : genus,
+            'assembly_name'    : assembly_name,
             'download_method'  : 'ftp ensemble'
             }
         # No values set to `None` should pass through.
         g_args = {k : v for k, v in genome_entry_args.items() if v}
         self.save_genome(item, **g_args)
+        return
 
     def dir_check(self, dir_value):
         """Checks if the input: dir_value is a directory. Assumes the input 
@@ -230,7 +258,7 @@ class EnsemblDatabase(GenomeDatabase):
         private function."""
         logging.info("Finding Genomes. This takes approximately 45 minutes...")
         ensemble_base_URIs = [uri for uri in self._generate_uri()]
-        self._find_genomes(parsing_function=self.ensemblLineParser,
+        self._find_genomes(parsing_function=self.ensembl_line_parser,
                            baseURIList=ensemble_base_URIs,)
         return
 
@@ -259,7 +287,9 @@ class EnsemblDatabase(GenomeDatabase):
                     GenomeEntry.fasta_uri,
                     GenomeEntry.fasta_size,
                     GenomeEntry.gff3_uri,
-                    GenomeEntry.gff3_size])
+                    GenomeEntry.gff3_size,
+                    GenomeEntry.genus,
+                    GenomeEntry.assembly_name])
         s_result = self.session.execute(s)  # Run the query.
         # Then get the name (primary key), if all of those entries exist.
         mut_genomes = [tup for tup in s_result if all(tup)]
@@ -268,8 +298,19 @@ class EnsemblDatabase(GenomeDatabase):
     def download_genomes(self, download_list, download_location):
         """This function takes an list of genome tuples. These tuples contain:
 
-            ``('taxonomic_name', 'fasta_uri', 'fasta_size',\
-               'gff3_uri', 'gff3_size')``
+        TODO: Ensure the tuples contain: 
+        genus, species, intraspecific_name, assembly name
+
+        The directory structure to fit the files downloaded is as follows:
+
+        ```
+        Genome/
+          [genus]_[species]{_[intraspecific_name]}/
+            [assembly_name]/
+              [genus]_[species]{_[intraspecific_name]}-[assembly_name].gff3
+              [genus]_[species]{_[intraspecific_name]}-[assembly_name].fasta
+
+        ```
         
         :param download_list: A list of tuples (example shown above) to be
             downloaded.
@@ -279,24 +320,24 @@ class EnsemblDatabase(GenomeDatabase):
         self.ftp.login()
 
         for entry in download_list:
-            pk, furi, fsize, guri, gsize = entry
+            # assign values from the input download_list
+            print(entry)
+            pk, furi, fsize, guri, gsize, genus, assembly_name = entry
 
-            local_fasta_path = os.path.join(download_location, pk + '.fa.gz')
-            local_gff3_path = os.path.join(download_location, pk + '.gff3.gz')
-            
-            # local_fasta_path = ''.join((download_location, pk, '.fa.gz'))
-            # local_gff3_path = ''.join((download_location, pk, '.gff3.gz'))
+            # Check for the paths.
+            local_path = os.path.join(
+                download_location, genus, assembly_name)
 
-            # if the directory we are saving do does not exist, it will
-            # need to be created.
-            if not os.path.exists(download_location):
-                os.makedirs(download_location)
+            if not os.path.exists(local_path):
+                os.makedirs(local_path)
 
             self.ftp.retrbinary('RETR {}'.format(furi),
-                                open(local_fasta_path, 'w').write)
+                                open(os.path.join(
+                                    local_path, pk + '.fa.gz'), 'w').write)
 
             self.ftp.retrbinary('RETR {}'.format(guri),
-                                open(local_gff3_path, 'w').write)
+                                open(os.path.join(
+                                    local_path, pk + '.gff3.gz'), 'w').write)
 
         self.ftp.quit()  # close the ftp connection
         return

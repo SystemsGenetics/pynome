@@ -55,7 +55,7 @@ class GenomeEntry(Base):  # Inherit from declarative_base.
     An instance of this class should be created whenever a genome entry
     needs to be created or modified.
 
-        >>> newGenome = GenomeEntry(<primary_key>, **kwargs)
+        >>> newGenome = GenomeEntry([primary_key], **kwargs)
 
     In deployments this will be handled by a wrapper function specific
     to the database being examined.
@@ -68,6 +68,8 @@ class GenomeEntry(Base):  # Inherit from declarative_base.
     genome_local_path = Column(String(1000))
     gff3_size = Column(Integer())
     fasta_size = Column(Integer())
+    assembly_name = Column(String(250))
+    genus = Column(String(250))
 
     def __init__(self, taxonomic_name, **kwargs):
         """Contructor that overrides the default provided. This ensures that
@@ -84,6 +86,7 @@ class GenomeEntry(Base):  # Inherit from declarative_base.
             **fasta uri**:  {}   remote size:   {}
             **gff3 uri**:   {}   remote size:   {}
             **local path**: {}"""
+            # TODO: Update repr string to include the genus and assembly_name.
         repr =  "\n\tName:\t{self.taxonomic_name} \
         \n\tfasta uri:\t{self.fasta_uri}\n\t\tremote size\t{self.fasta_size} \
         \n\tgff3 uri:\t{self.gff3_uri}\n\t\tremote size\t{self.gff3_size} \

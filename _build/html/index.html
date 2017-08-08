@@ -135,6 +135,276 @@ to the database being examined.</p>
 </dd></dl>
 
 </div>
+<dl class="class">
+<dt id="pynome.genomedatabase.GenomeDatabase">
+<em class="property">class </em><code class="descclassname">pynome.genomedatabase.</code><code class="descname">GenomeDatabase</code><span class="sig-paren">(</span><em>engine</em><span class="sig-paren">)</span><a class="headerlink" href="#pynome.genomedatabase.GenomeDatabase" title="Permalink to this definition">¶</a></dt>
+<dd><p>Base Genome Database class. Many functions will be overwritten by
+the database-specific child classes.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last"><strong>This class should not be directly called.</strong>
+It must be implemented with a child class to fill out certain
+functions.</p>
+</div>
+</dd></dl>
+
+<span class="target" id="module-pynome.ensembldatabase"></span><div class="section" id="ensembl-database">
+<h2>Ensembl Database<a class="headerlink" href="#ensembl-database" title="Permalink to this headline">¶</a></h2>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Author:</th><td class="field-body">Tyler Biggs &lt;<a class="reference external" href="mailto:tyler&#46;biggs&#37;&#52;&#48;wsu&#46;edu">tyler<span>&#46;</span>biggs<span>&#64;</span>wsu<span>&#46;</span>edu</a>&gt;</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Date:</th><td class="field-body">July 2017</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Under construction.</p>
+</div>
+<p>The ensembl database module. A child class of the genome database class,
+this module cotains all code directly related to connecting and parsing data
+from the ensembl geneome database.</p>
+<dl class="class">
+<dt id="pynome.ensembldatabase.EnsemblDatabase">
+<em class="property">class </em><code class="descclassname">pynome.ensembldatabase.</code><code class="descname">EnsemblDatabase</code><span class="sig-paren">(</span><em>engine</em>, <em>release_version=36</em><span class="sig-paren">)</span><a class="headerlink" href="#pynome.ensembldatabase.EnsemblDatabase" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pynome.genomedatabase.GenomeDatabase" title="pynome.genomedatabase.GenomeDatabase"><code class="xref py py-class docutils literal"><span class="pre">pynome.genomedatabase.GenomeDatabase</span></code></a></p>
+<p>The EnsemblDatabase class. This handles finding and downloading
+genomes from the ensembl genome database. The database url is:</p>
+<blockquote>
+<div><code class="docutils literal"><span class="pre">ftp.ensemblgenomes.org</span></code></div></blockquote>
+<p>It does so by recursively walking the ftp directory. It only collects
+those genomes that have a <code class="docutils literal"><span class="pre">*.gff3.gz</span></code> or a <code class="docutils literal"><span class="pre">*.fa.gz</span></code> file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Example:</th><td class="field-body"></td>
+</tr>
+</tbody>
+</table>
+<p>Instructions on how to use this script.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">database</span> <span class="o">=</span> <span class="n">EnsemblDatabase</span><span class="p">()</span>  <span class="c1"># Initialize a database.</span>
+</pre></div>
+</div>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><code class="xref py py-class docutils literal"><span class="pre">GenomeDatabase</span></code></p>
+</div>
+<dl class="method">
+<dt id="pynome.ensembldatabase.EnsemblDatabase._find_genomes">
+<code class="descname">_find_genomes</code><span class="sig-paren">(</span><em>parsing_function</em>, <em>baseURIList</em><span class="sig-paren">)</span><a class="headerlink" href="#pynome.ensembldatabase.EnsemblDatabase._find_genomes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Private function that handles finding the list of genomes.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>parsing_function</strong> – This should be a function that reads an
+<code class="docutils literal"><span class="pre">ftplib.dir()</span></code> line output. This output should always be a
+file, not a directory.</li>
+<li><strong>baseURIList</strong> – This should be a list of base URIs to start
+the ftp crawler from.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pynome.ensembldatabase.EnsemblDatabase._generate_uri">
+<code class="descname">_generate_uri</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pynome.ensembldatabase.EnsemblDatabase._generate_uri" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generates the uri strings needed to download the genomes
+from the ensembl database.</p>
+<p><strong>Returns</strong>: List of Strings of URIs for the ensembl database. eg:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="s1">&#39;pub/fungi/release-36/gff3/&#39;</span><span class="p">,</span>
+<span class="s1">&#39;pub/metazoa/release-36/gff3/&#39;</span><span class="p">,</span>
+<span class="o">...</span>
+</pre></div>
+</div>
+<p>This is an extremely case-sepcific function.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pynome.ensembldatabase.EnsemblDatabase._save_genome">
+<code class="descname">_save_genome</code><span class="sig-paren">(</span><em>taxonomic_name</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#pynome.ensembldatabase.EnsemblDatabase._save_genome" title="Permalink to this definition">¶</a></dt>
+<dd><p>The internal function that will save a supplied genome to the
+sqlite database.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pynome.ensembldatabase.EnsemblDatabase.add_genome">
+<code class="descname">add_genome</code><span class="sig-paren">(</span><em>item</em>, <em>fasta_size=None</em>, <em>gff3_size=None</em>, <em>fasta_uri=None</em>, <em>gff3_uri=None</em><span class="sig-paren">)</span><a class="headerlink" href="#pynome.ensembldatabase.EnsemblDatabase.add_genome" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a new genome. This creates a new isntance of         <code class="xref py py-class docutils literal"><span class="pre">GenomeEntry</span></code>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>item</strong> – The name of the genome to be created or updated.</li>
+<li><strong>fasta_size</strong> – The size of the remote fasta, <code class="docutils literal"><span class="pre">.fa.gz</span></code> in bytes.</li>
+<li><strong>gff3_size</strong> – The size of the remote gff3, <code class="docutils literal"><span class="pre">.gff3.gz</span></code> in bytes.</li>
+<li><strong>fasta_uri</strong> – The remote uri of the fasta file.</li>
+<li><strong>gff3_uri</strong> – The remote uri of the gff3 file.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pynome.ensembldatabase.EnsemblDatabase.crawl_dir">
+<code class="descname">crawl_dir</code><span class="sig-paren">(</span><em>top_dir</em>, <em>parsing_function</em><span class="sig-paren">)</span><a class="headerlink" href="#pynome.ensembldatabase.EnsemblDatabase.crawl_dir" title="Permalink to this definition">¶</a></dt>
+<dd><p>Recursively crawl a target directory. Takes as an input a
+target directory and a parsing function. The ftplib.FTP.dir()
+function is used to retrieve a directory listing, line by line,
+in string format. These are appended to a newly generated list.
+Each item in this list is subject to the parsing function.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>top_dir</strong> – The directory from which contents will be retrieved.</li>
+<li><strong>parsing_function</strong> – The function to parse each result.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pynome.ensembldatabase.EnsemblDatabase.dir_check">
+<code class="descname">dir_check</code><span class="sig-paren">(</span><em>dir_value</em><span class="sig-paren">)</span><a class="headerlink" href="#pynome.ensembldatabase.EnsemblDatabase.dir_check" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks if the input: dir_value is a directory. Assumes the input 
+will be in the following format:</p>
+<blockquote>
+<div><code class="docutils literal"><span class="pre">&quot;drwxr-sr-x</span>&#160; <span class="pre">2</span> <span class="pre">ftp</span>&#160;&#160; <span class="pre">ftp</span>&#160;&#160;&#160; <span class="pre">4096</span> <span class="pre">Jan</span> <span class="pre">13</span>&#160; <span class="pre">2015</span> <span class="pre">filename&quot;</span></code></div></blockquote>
+<p>This works by checking the first letter of the input string,
+and returns True for a directory or False otherwise.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pynome.ensembldatabase.EnsemblDatabase.download_genomes">
+<code class="descname">download_genomes</code><span class="sig-paren">(</span><em>download_list</em>, <em>download_location</em><span class="sig-paren">)</span><a class="headerlink" href="#pynome.ensembldatabase.EnsemblDatabase.download_genomes" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function takes an list of genome tuples. These tuples contain:</p>
+<blockquote>
+<div><code class="docutils literal"><span class="pre">('taxonomic_name',</span> <span class="pre">'fasta_uri',</span> <span class="pre">'fasta_size',</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">'gff3_uri',</span> <span class="pre">'gff3_size')</span></code></div></blockquote>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>download_list</strong> – A list of tuples (example shown above) to be
+downloaded.</li>
+<li><strong>download_location</strong> – The local file location where the files
+will be saved.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pynome.ensembldatabase.EnsemblDatabase.ensemblLineParser">
+<code class="descname">ensemblLineParser</code><span class="sig-paren">(</span><em>line</em>, <em>top_dir</em><span class="sig-paren">)</span><a class="headerlink" href="#pynome.ensembldatabase.EnsemblDatabase.ensemblLineParser" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function parses one ‘line’ at a time retrieved from an 
+<code class="docutils literal"><span class="pre">ftp.dir()</span></code> command.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>line</strong> – an input line, described in detail below.</td>
+</tr>
+</tbody>
+</table>
+<p>An example of one such line:</p>
+<blockquote>
+<div><code class="docutils literal"><span class="pre">&quot;drwxr-sr-x</span>&#160; <span class="pre">2</span> <span class="pre">ftp</span>&#160;&#160; <span class="pre">ftp</span>&#160;&#160;&#160; <span class="pre">4096</span> <span class="pre">Jan</span> <span class="pre">13</span>&#160; <span class="pre">2015</span> <span class="pre">filename&quot;</span></code></div></blockquote>
+<p>This line is split by whitespace. For future reference, the indexes
+correspond (usually) to:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>+ ``[0]:    the directory information.``
++ ``[1]:    the number of items therein?``
++ ``[2]:    unknown always &#39;ftp&#39;``
++ ``[3]:    unknown always &#39;ftp&#39;``
++ ``[4]:    the filesize in bytes, 4096 is one block``
++ ``[5]:    Month``
++ ``[6]:    Day``
++ ``[7]:    Year``
++ ``[8]:    filename``
+</pre></div>
+</div>
+<p>Either adds a genome, or returns nothing.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pynome.ensembldatabase.EnsemblDatabase.find_genomes">
+<code class="descname">find_genomes</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pynome.ensembldatabase.EnsemblDatabase.find_genomes" title="Permalink to this definition">¶</a></dt>
+<dd><p>OVERWRITES GENOMEDATABASE FUNCTION. Calls the _find_genomes() 
+private function.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pynome.ensembldatabase.EnsemblDatabase.genome_check">
+<code class="descname">genome_check</code><span class="sig-paren">(</span><em>item</em><span class="sig-paren">)</span><a class="headerlink" href="#pynome.ensembldatabase.EnsemblDatabase.genome_check" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks if the incoming item, which is a single string,
+is a ‘genome’ (the type of desired data).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>item</strong> – The line of text to be checked.</td>
+</tr>
+</tbody>
+</table>
+<p>in that it must:</p>
+<blockquote>
+<div><ul class="simple">
+<li>end with fa.gz or gff3.gz</li>
+<li>not have ‘chromosome’ in the name</li>
+<li>must not have ‘abinitio’ in the name</li>
+</ul>
+</div></blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="pynome.ensembldatabase.EnsemblDatabase.get_mutual_genomes">
+<code class="descname">get_mutual_genomes</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pynome.ensembldatabase.EnsemblDatabase.get_mutual_genomes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets the genome entries that have both a fasta and gff3 uri.
+Returns a tuple that contains:</p>
+<blockquote>
+<div><code class="docutils literal"><span class="pre">('taxonomic_name',</span> <span class="pre">'fasta_uri',</span> <span class="pre">'fasta_size',</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">'gff3_uri',</span> <span class="pre">'gff3_size')</span></code></div></blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="pynome.ensembldatabase.EnsemblDatabase.print_genomes">
+<code class="descname">print_genomes</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pynome.ensembldatabase.EnsemblDatabase.print_genomes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Print all the Genomes in the database to the terminal.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pynome.ensembldatabase.EnsemblDatabase.release_version">
+<code class="descname">release_version</code><a class="headerlink" href="#pynome.ensembldatabase.EnsemblDatabase.release_version" title="Permalink to this definition">¶</a></dt>
+<dd><p>Release version property. Should be in the form:
+<code class="docutils literal"><span class="pre">&quot;release-#&quot;,</span> <span class="pre">&quot;release-36&quot;</span></code></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pynome.ensembldatabase.EnsemblDatabase.save_genome">
+<code class="descname">save_genome</code><span class="sig-paren">(</span><em>taxonomic_name</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#pynome.ensembldatabase.EnsemblDatabase.save_genome" title="Permalink to this definition">¶</a></dt>
+<dd><p>Save the genomes in this database. Save to the _baseGenomeDir
+location.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
 </div>
 <div class="section" id="indices-and-tables">
 <h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>
