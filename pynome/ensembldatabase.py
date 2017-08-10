@@ -241,14 +241,23 @@ class EnsemblDatabase(GenomeDatabase):
         ``ftp.ensemblgenomes.org/pub/release-36/species_metadata.json``
 
         """
-        metadata_URI = ensebml_ftp_uri + '/' + \
-            self.release_version + 'species_metadata.json'
-        return metadata_URI
+        metadata_uri = '/pub/' + self.release_version + '/species_metadata.json'
+        return metadata_uri
 
-    def download_metadata(self, download_list, download_location):
+    def download_metadata(self, metadata_uri, download_location):
+        """Downloads the single metadata file."""
         self.ftp.connect(ensebml_ftp_uri)  # connect to the ensemble ftp
         self.ftp.login()
-        pass
+        curpath = os.path.abspath(os.curdir)
+        local_path = os.path.join(curpath, download_location)
+        filename = os.path.join(local_path, 'species_metadata.json')
+
+        if not os.path.exists(local_path):
+            os.makedirs(local_path)
+
+        self.ftp.retrbinary('RETR {}'.format(metadata_uri),
+                            open(filename, 'wb').write)
+        return
 
     def _find_genomes(self,
                       parsing_function,
@@ -317,7 +326,7 @@ class EnsemblDatabase(GenomeDatabase):
             sqlalchemy.sql.func.sum(GenomeEntry.gff3_size),
             sqlalchemy.sql.func.sum(GenomeEntry.fasta_size))
         size = sum_query.all()
-        return sum(size[0])
+        return sum(filter(None, size[0]))
 
     def download_genomes(self, download_list, download_location):
         """This function takes an list of genome tuples. These tuples contain:

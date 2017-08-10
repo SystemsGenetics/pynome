@@ -27,6 +27,24 @@ pynome.genomedatabase.Base.metadata.create_all(engine)
 #     pass
 
 
+
+def test_generate_metadata_uri():
+    """Run the metadata generator"""
+    TEDB = EnsemblDatabase(engine)
+    print(TEDB.generate_metadata_uri())
+    assert TEDB.generate_metadata_uri() ==\
+        '/pub/release-36/species_metadata.json'
+
+def test_download_metadata():
+    """Test downloading the metadata. This is a ~800 Mb file, so perhaps
+    this test should not always run."""
+    TEDB = EnsemblDatabase(engine)
+    metadata_uri = TEDB.generate_metadata_uri()
+    # TEDB.download_metadata(metadata_uri, 'tmp')
+
+
+
+
 def test_sqlite_db():
     print("\nInitializing EnsemblDatabase class.")
     TEDB = EnsemblDatabase(engine)
