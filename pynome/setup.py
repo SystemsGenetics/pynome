@@ -1,14 +1,14 @@
-from setuptools import setup
+import setuptools
 
-setup(
+setuptools.setup(
     name='Pynome',
     author='Tyler Biggs',
     author_email='biggstd@gmail.com',
     version='0.1.0',
-    packages=['pynome'],
+    packages=setuptools.find_packages(),
     entry_points={
         'console_scripts': [
-            'pynome = pynome.pynome:main'
+            'pynome = pynome.__main__:main'
         ]
     },
-    )
+)

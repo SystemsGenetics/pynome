@@ -10,29 +10,31 @@ Usage:
 import os
 import logging
 import argparse
-from pynome.genomedatabase import GenomeEntry, GenomeDatabase, Base
-from pynome.ensembldatabase import EnsemblDatabase
-from sqlalchemy import MetaData, create_engine
-from sqlalchemy.orm import sessionmaker
-from sqlalchemy.ext.declarative import declarative_base
+import sqlalchemy
 
-metadata = MetaData()
+# from pynome.genomedatabase import GenomeEntry, GenomeDatabase
+from pynome.ensembldatabase import EnsemblDatabase
+
+metadata = sqlalchemy.MetaData()
+Base = sqlalchemy.ext.declarative.Base()
 
 logging.basicConfig()
-logging.getLogger('sqlalchemy.engine').setLevel(logging.DEBUG)
+
 
 def entry_sql_connection():
     pass
 
+
 def entry_find_genomes(database_path='sqlite:///pynome.db'):
     # Create an engine for the database
-    engine = create_engine(database_path)
+    engine = sqlalchemy.create_engine(database_path)
     db = EnsemblDatabase(engine)
     Base.metadata.create_all(engine)
     db.find_genomes()
 
+
 def entry_download_genomes(database_path='sqlite:///pynome.db'):
-    engine = create_engine(database_path)
+    engine = sqlalchemy.create_engine(database_path)
     db = EnsemblDatabase(engine)
     Base.metadata.create_all(engine)
 
@@ -41,14 +43,15 @@ def entry_download_genomes(database_path='sqlite:///pynome.db'):
     curpath = os.path.abspath(os.curdir)
     db.download_genomes(mutual_genomes, os.path.join(curpath, 'Genomes/'))
 
+
 def main():
     parser = argparse.ArgumentParser()  # Create the parser
     parser.add_argument('-f', '--find-genomes', action='store_true')
     parser.add_argument('-d', '--download-genomes', action='store_true')
     parser.add_argument('-p', '-database-path')
-    parser.add_argument('-v', '--verbose',help='Set output to verbose.',
+    parser.add_argument('-v', '--verbose', help='Set output to verbose.',
                         action='store_true')
-    args = parser.parse_args() # Parse the arguments
+    args = parser.parse_args()  # Parse the arguments
 
     if args.verbose:  # Enable verbose loggin mode
         logging.basicConfig(level=logging.DEBUG)
@@ -60,6 +63,7 @@ def main():
     if args.download_genomes:
         print('Downloading Genomes!')
         entry_download_genomes()
+
 
 if __name__ == '__main__':
     main()
