@@ -20,7 +20,7 @@ import ftplib
 import sqlalchemy
 # from sqlalchemy import select
 import logging
-from pynome.genomedatabase import GenomeDatabase, GenomeEntry
+from genomedatabase import GenomeDatabase, GenomeEntry
 
 ensebml_ftp_uri = 'ftp.ensemblgenomes.org'
 

@@ -13,10 +13,12 @@ import argparse
 import sqlalchemy
 
 # from pynome.genomedatabase import GenomeEntry, GenomeDatabase
-# from pynome.ensembldatabase import EnsemblDatabase
+from ensembldatabase import EnsemblDatabase
+from sqlalchemy.ext.declarative import declarative_base
+
 
 Metadata = sqlalchemy.MetaData()
-Base = sqlalchemy.ext.declarative.declarative_base()
+Base = declarative_base()
 
 logging.basicConfig()
 
@@ -69,7 +71,7 @@ def main():
                         action='store_true')
     args = parser.parse_args()  # Parse the arguments
 
-    sqlite_database_dir = 'sqlite:///' + str(args.database_path)
+    sqlite_database_dir = 'sqlite:///' + str(args.database_path[0])
 
     if args.verbose:  # Enable verbose loggin mode
         logging.basicConfig(level=logging.DEBUG)
