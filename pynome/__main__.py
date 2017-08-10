@@ -15,46 +15,41 @@ import sqlalchemy
 # from pynome.genomedatabase import GenomeEntry, GenomeDatabase
 from ensembldatabase import EnsemblDatabase
 from sqlalchemy.ext.declarative import declarative_base
+# pynome.genomedatabase.Base.metadata.create_all(engine)
 
 
-Metadata = sqlalchemy.MetaData()
+# Metadata = sqlalchemy.MetaData()
 Base = declarative_base()
 
 logging.basicConfig()
 
 
-# def entry_sql_connection():
-#     """A wrapper function to handle connecting to the SQL database."""
-#     engine = sqlalchemy.create_engine(database_path)
-#     database = EnsemblDatabase(engine)
-#     Base.metadata.create_all(engine)
-
-def entry_download_metadata(database_path):
+def entry_download_metadata(database):
     """Entry point for the metadata retrival function. This is a single
     file that is ca. 800 Mb."""
-    engine = sqlalchemy.create_engine(database_path)
-    database = EnsemblDatabase(engine)
-    Base.metadata.create_all(engine)
+    # engine = sqlalchemy.create_engine(database_path)
+    # database = EnsemblDatabase(engine)
+    # Base.metadata.create_all(engine)
     metadata_uri = database.generate_metadata_uri()
     database.download_metadata(metadata_uri, 'Genomes')
     return
 
 
-def entry_find_genomes(database_path):
+def entry_find_genomes(database):
     """The entry point to find genomes with default options. This should
     be called from the command line."""
-    engine = sqlalchemy.create_engine(database_path)
-    database = EnsemblDatabase(engine)
-    Base.metadata.create_all(engine)
+    # engine = sqlalchemy.create_engine(database_path)
+    # database = EnsemblDatabase(engine)
+    # Base.metadata.create_all(engine)
     database.find_genomes()
 
 
-def entry_download_genomes(database_path):
+def entry_download_genomes(database, database_path):
     """The entry point to download genomes with default options. This should
     be called from the command line."""
-    engine = sqlalchemy.create_engine(database_path)
-    database = EnsemblDatabase(engine)
-    Base.metadata.create_all(engine)
+    # engine = sqlalchemy.create_engine(database_path)
+    # database = EnsemblDatabase(engine)
+    # Base.metadata.create_all(engine)
     mutual_genomes = database.get_mutual_genomes()
     genomes_path = os.path.join(database_path, 'Genomes/')
     database.download_genomes(mutual_genomes, genomes_path)
@@ -73,16 +68,20 @@ def main():
 
     sqlite_database_dir = 'sqlite:///' + str(args.database_path[0])
 
+    engine = sqlalchemy.create_engine(sqlite_database_dir)
+    database = EnsemblDatabase(engine)
+    Base.metadata.create_all(engine)
+
     if args.verbose:  # Enable verbose loggin mode
         logging.basicConfig(level=logging.DEBUG)
 
     if args.find_genomes:
         print('Finding Genomes!')
-        entry_find_genomes(sqlite_database_dir)
+        entry_find_genomes(database)
 
     if args.download_genomes:
         print('Downloading Genomes!')
-        entry_download_genomes(sqlite_database_dir)
+        entry_download_genomes(database, sqlite_database_dir)
 
 
 if __name__ == '__main__':
