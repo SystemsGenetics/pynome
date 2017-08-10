@@ -13,7 +13,7 @@ import argparse
 import sqlalchemy
 
 # from pynome.genomedatabase import GenomeEntry, GenomeDatabase
-from .ensembldatabase import EnsemblDatabase
+# from pynome.ensembldatabase import EnsemblDatabase
 
 Metadata = sqlalchemy.MetaData()
 Base = sqlalchemy.ext.declarative.declarative_base()

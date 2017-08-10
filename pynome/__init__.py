@@ -7,3 +7,5 @@
 
 # # load the configuration file
 # logging.config.fileConfig('pynome/pynomeLog.conf')
+from pynome.genomedatabase import GenomeEntry, GenomeDatabase
+from pynome.ensembldatabase import EnsemblDatabase
