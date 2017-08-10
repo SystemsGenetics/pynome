@@ -12,14 +12,14 @@ import logging
 import argparse
 import sqlalchemy
 
-# from pynome.genomedatabase import GenomeEntry, GenomeDatabase
+from genomedatabase import GenomeEntry, GenomeDatabase, Base
 from ensembldatabase import EnsemblDatabase
-from sqlalchemy.ext.declarative import declarative_base
+# from sqlalchemy.ext.declarative import declarative_base
 # pynome.genomedatabase.Base.metadata.create_all(engine)
 
 
 # Metadata = sqlalchemy.MetaData()
-Base = declarative_base()
+# Base = declarative_base()
 
 logging.basicConfig()
 
