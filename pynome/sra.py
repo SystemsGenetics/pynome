@@ -26,7 +26,7 @@ class SRADatabase(genomedatabase.GenomeDatabase):
     SRA Database
     ------------
     """
-    def find_genomes():
+    def get_sra_id():
     	"""
 		Find the SRA identifiers.
 
