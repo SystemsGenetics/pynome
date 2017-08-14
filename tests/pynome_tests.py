@@ -11,10 +11,17 @@ To run tests. The ``-s`` option allows output to be printed to the terminal.
 """
 
 import logging
-from pynome.genomedatabase import GenomeTuple 
-from pynome.ensembldatabase import EnsemblDatabase
-# from .context import pynome
+from .context import pynome
 
+# Set up the logger file
+logging.basicConfig(
+    filename='tests.log',
+    filemode='w', 
+    level=logging.DEBUG)
+
+# Assign shorter namespaces while maintaing cleaner imports.
+Genometuple = pynome.genomedatabase.GenomeTuple
+Ensebledb = pynome.ensembldatabase.EnsemblDatabase
 
 """
 =====================
@@ -23,11 +30,9 @@ Tests for GenomeTuple
 """
 
 
-def test_genometuple():
+def create_genome_tuple():
     """Test an implemenation of the genometuple"""
-    logging.info('Testing initiation of a genometuple...\n')
     test_data = {
-        # 'taxonomic_name': 'Pyrenophora_teres',
         'download_method': 'ensemble_ftp',
         'fasta_uri': ('ftp://ftp.ensemblgenomes.org/pub/fungi/release-36/'
                       'fasta/pyrenophora_teres/dna/Pyrenophora_teres.'
@@ -40,10 +45,19 @@ def test_genometuple():
         'gff3_remote_size': 23456789,
         'assembly_name': 'GCA_000166005',
         'genus': 'Pyrenophora',
-        'sra_ID': 'sra_identifier'
+        'species': 'teres',
+        'sra_ID': 'sra_identifier',
     }
-    test_genome = GenomeTuple('Pyrenophora_teres', **test_data)
-    print(test_genome)
+    test_genome = Genometuple('Pyrenophora_teres', **test_data)
+    return test_genome
+
+
+def test_genometuple():
+    """Test an implemenation of the genometuple"""
+    logging.info('Testing initiation of a genometuple...\n')
+    test_genome = create_genome_tuple()
+    logging.info(test_genome)
+
 
 
 """
@@ -53,14 +67,54 @@ Tests for EnsemblDatabase
 """
 
 
+def ensembl_init_wrapper(function):
+    """Creates an ensembldatabase class instance for testing."""
+    ensemble_test_db = Ensebledb()
+
+    def wrapper():
+        """The wrapped function to be returned."""
+        function(database=ensemble_test_db)
+    return wrapper
 
 
-
+@ensembl_init_wrapper
 def test_generate_metadata_uri(database):
     """Run the metadata generator"""
+    logging.info('Generating metadata URI...\n')
     logging.info(database.generate_metadata_uri())
     assert database.generate_metadata_uri() ==\
         '/pub/release-36/species_metadata.json'
+
+
+@ensembl_init_wrapper
+def test_save_genome(database):
+    """Create and save a sample geneome to the database."""
+    logging.info('Testing saving a genome to the database list...')
+    new_genome = create_genome_tuple()
+    database.save_genome(new_genome)
+    return
+
+
+@ensembl_init_wrapper
+def test_print_genome_list(database):
+    """Test the console printing of GenomeDatabase."""
+    logging.info('Testing the custom __repr__ method for the database...')
+    logging.info(repr(database))
+    return
+
+
+# @ensembl_init_wrapper
+# def test_crawl_ftp(database):
+#     """Test the ftp crawler with some sample uris"""
+#     crawl_test_uri = [
+#         'pub/fungi/release-36/gff3/fungi_rozellomycota1_collection/',
+#         'pub/fungi/release-36/fasta/fungi_rozellomycota1_collection/'
+#     ]
+#     database._find_genomes(database.ensembl_line_parser, crawl_test_uri)
+#     test_query = database.print_genomes()
+#     logging.info('Printing all Genomes in the test database...\n\n{}'\
+#         .format(test_query))
+
 
 
 # def test_download_metadata():
@@ -70,41 +124,6 @@ def test_generate_metadata_uri(database):
 #     # metadata_uri = TEDB.generate_metadata_uri()
 
 
-# def test_sqlite_db():
-#     print("\nInitializing EnsemblDatabase class.")
-#     TEDB = EnsemblDatabase(engine)
-#     print('\nSaving sample genome to the database...')
-#     # The test genomes taxonomic name:
-#     test_name = 'Acyrthosiphon_pisum'
-#     # Create some arguments to pass through.
-#     arguments = {'genome_fasta_uri'  : 'uri/to/fasta/file.fa.gz',
-#                  'fasta_size' : 1234 }
-#     arguments2 = {'genome_gff3_uri'   : 'uri/to/gff3/',
-#                   'gff3_size' : 4321}
-#     arguments3 = {'genome_local_path' : 'local/path/to/TEST/',
-#                   'fasta_size' : None}
-#     # Test by 'creating' the same genome 3 times, once for each
-#     # of the fields to be updated.
-#     TEDB.save_genome('Acyrthosiphon_pisum', **arguments)
-#     test_query = TEDB.print_genomes()
-#     print(test_query)       
-
-#     TEDB.save_genome('Acyrthosiphon_pisum', **arguments2)
-#     test_query = TEDB.print_genomes()    
-#     print(test_query)       
-
-#     TEDB.save_genome('Acyrthosiphon_pisum', **arguments3)
-#     test_query = TEDB.print_genomes()
-#     print(test_query)
-
-# # def test_crawl_ftp():
-# #     crawl_test_uri = ['pub/fungi/release-36/gff3/fungi_rozellomycota1_collection/',
-# #     'pub/fungi/release-36/fasta/fungi_rozellomycota1_collection/']
-# #     TEDB = EnsemblDatabase(engine)
-# #     TEDB._find_genomes(TEDB.ensembl_line_parser, crawl_test_uri)
-# #     test_query = TEDB.print_genomes()
-# #     logging.info('Printing all Genomes in the test database...\n\n{}'\
-# #         .format(test_query))
 
 # # def test_download_genomes():
 # #     TEDB = EnsemblDatabase(engine)

@@ -11,6 +11,7 @@ The **Genomedatabase** module consists of two classes:
 """
 
 import collections
+import json
 
 try:
     from tqdm import tqdm
@@ -22,11 +23,11 @@ except ImportError:
 
 
 class GenomeTuple(collections.namedtuple(
-    'Genome',  # The typename
-    # The field_names
-    ['taxonomic_name', 'download_method', 'fasta_uri', 'gff3_uri',
-     'local_path', 'fasta_remote_size', 'gff3_remote_size',
-     'assembly_name', 'genus', 'sra_ID'])):
+        'Genome',  # The typename
+        # The field_names
+        ['taxonomic_name', 'download_method', 'fasta_uri', 'gff3_uri',
+         'local_path', 'fasta_remote_size', 'gff3_remote_size',
+         'assembly_name', 'genus', 'species', 'sra_ID'])):
     """The namedtuble subclass that will act as the holder for
     desired genomic data."""
 
@@ -53,22 +54,30 @@ class GenomeDatabase(object):
 
     def __init__(self):
         """Initialization of the GenomeDatabase class."""
-        # Create attributes that are not related to SQLAlchemy.
-        pass
+        self.genome_list = []
 
-    def save_genome(self, taxonomic_name, **kwargs):
+    # def __repr__(self):
+    #     out_list = []
+    #     for genome in self.genome_list:
+    #         out_list.append(genome)
+    #     out_str = '\n'.join(out_list)
+    #     return out_str
+
+    def save_genome(self, genome):
         """Save the genomes in this database. Save to the _baseGenomeDir
          location."""
-        self._save_genome(taxonomic_name, **kwargs)
+        self._save_genome(genome)
         return
 
-    def _save_genome(self, taxonomic_name, **kwargs):
-        """TODO:"""
-        pass
+    def _save_genome(self, genome):
+        """Appends a genome tuple to the list."""
+        self.genome_list.append(genome)
 
-    def print_genomes(self):
-        """Print all the Genomes in the database to the terminal."""
-        pass
+    # def print_genomes(self):
+    #     """Print all the Genomes in the database to the terminal."""
+    #     for genome in self.genome_list:
+    #         print(genome)
+    #     return
 
     def find_genomes(self):
         """To be overwritten by child classes. Very database specific."""
