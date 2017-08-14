@@ -44,8 +44,8 @@ class EnsemblDatabase(GenomeDatabase):
     .. seealso:: :class:`GenomeDatabase`
     """
 
-    def __init__(self, engine, release_version=36):
-        super(EnsemblDatabase, self).__init__(engine)  # Call parent class init
+    def __init__(self, release_version=36):
+        super(EnsemblDatabase, self).__init__()  # Call parent class init
         self._release_number = None  # set by the release version setter
         self.release_version = release_version
         self._ftp_genomes = []

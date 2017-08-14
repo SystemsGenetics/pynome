@@ -1,48 +1,61 @@
 """
+================
+Tests for Pynome
+================
+
+Testing is handled with pytest.
+
+    $ pytest -s tests/pynome_tests.py
+
+To run tests. The ``-s`` option allows output to be printed to the terminal.
+"""
+
+import logging
+from pynome.genomedatabase import GenomeTuple 
+from pynome.ensembldatabase import EnsemblDatabase
+# from .context import pynome
+
+
+"""
+=====================
+Tests for GenomeTuple
+=====================
+"""
+
+
+def test_genometuple():
+    """Test an implemenation of the genometuple"""
+    logging.info('Testing initiation of a genometuple...\n')
+    test_data = {
+        # 'taxonomic_name': 'Pyrenophora_teres',
+        'download_method': 'ensemble_ftp',
+        'fasta_uri': ('ftp://ftp.ensemblgenomes.org/pub/fungi/release-36/'
+                      'fasta/pyrenophora_teres/dna/Pyrenophora_teres.'
+                      'GCA_000166005.1.dna.toplevel.fa.gz'),
+        'gff3_uri': ('ftp://ftp.ensemblgenomes.org/pub/fungi/release-36/'
+                     'gff3/pyrenophora_teres/Pyrenophora_teres'
+                     '.GCA_000166005.1.36.gff3.gz'),
+        'local_path': 'local/directory',
+        'fasta_remote_size': 123456,
+        'gff3_remote_size': 23456789,
+        'assembly_name': 'GCA_000166005',
+        'genus': 'Pyrenophora',
+        'sra_ID': 'sra_identifier'
+    }
+    test_genome = GenomeTuple('Pyrenophora_teres', **test_data)
+    print(test_genome)
+
+
+"""
 =========================
 Tests for EnsemblDatabase
 =========================
 """
 
-import os
-# from nose.tools import *
-import logging
-from .context import pynome
-from pynome.ensembldatabase import EnsemblDatabase
-from sqlalchemy import create_engine
-# from sqlalchemy.orm import sessionmaker
 
 
-# CONFIGURE LOCAL TEST SQLITE SERVER
-# engine = create_engine('sqlite:///:memory:')
-# engine = create_engine('sqlite://///media/tylerbiggs/genomic/PYNOME.db')
-# Create all the tables defined above.
-pynome.genomedatabase.Base.metadata.create_all(engine)
-
-# def setup_EnsemblDB():
-#     """Set up the ensemblDatabase testing sqlite server in memory."""
-#     tDatabase = EnsemblDatabase(engine)
-
-# def teardown_EnsemblDB():
-#     pass
 
 
-def generate_database(function, engine_URI='sqlite:///:memory'):
-    """
-    This is a wrapper function that generates the sqlite connection
-    for other functions. These functions must
-    """
-    engine = create_engine(engine_URI)
-    database = EnsemblDatabase(engine)
-
-    def wrapper():
-        """Wrap the incoming function. Incoming functions must take
-        a ensemble database class instance as an argument."""
-        function(database=database)
-    return wrapper
-
-
-@generate_database
 def test_generate_metadata_uri(database):
     """Run the metadata generator"""
     logging.info(database.generate_metadata_uri())
