@@ -16,7 +16,7 @@ from .context import pynome
 # Set up the logger file
 logging.basicConfig(
     filename='tests.log',
-    filemode='w', 
+    filemode='w',
     level=logging.DEBUG)
 
 # Assign shorter namespaces while maintaing cleaner imports.
@@ -59,7 +59,6 @@ def test_genometuple():
     logging.info(test_genome)
 
 
-
 """
 =========================
 Tests for EnsemblDatabase
@@ -99,7 +98,9 @@ def test_save_genome(database):
 def test_print_genome_list(database):
     """Test the console printing of GenomeDatabase."""
     logging.info('Testing the custom __repr__ method for the database...')
-    logging.info(repr(database))
+    new_genome = create_genome_tuple()
+    database.save_genome(new_genome)
+    logging.info(database)
     return
 
 

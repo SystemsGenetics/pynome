@@ -17,8 +17,6 @@ __docformat__ = 'reStructuredText'  # Set the formatting for the documentation
 import itertools
 import os
 import ftplib
-import sqlalchemy
-# from sqlalchemy import select
 import logging
 from .genomedatabase import GenomeDatabase, GenomeTuple
 
@@ -47,11 +45,11 @@ class EnsemblDatabase(GenomeDatabase):
     def __init__(self, release_version=36):
         super(EnsemblDatabase, self).__init__()  # Call parent class init
         self._release_number = None  # set by the release version setter
+        self._release_version = None
         self.release_version = release_version
         self._ftp_genomes = []
         self.ftp = ftplib.FTP()  # the ftp instance for the database
-        # logging.config.fileConfig('pynome/pynomeLog.conf')
-        self.logger = logging.getLogger(__name__)
+        # self.logger = logging.getLogger(__name__)
 
     def crawl_dir(self, top_dir, parsing_function):
         """Recursively crawl a target directory. Takes as an input a
@@ -62,13 +60,12 @@ class EnsemblDatabase(GenomeDatabase):
 
         :param top_dir: The directory from which contents will be retrieved.
         :param parsing_function: The function to parse each result."""
+
         # TODO: Investigate how to turn this into a yield based function.
         retrived_dir_list = []  # empty list to hold the callback
         self.ftp.dir(top_dir, retrived_dir_list.append)
         logging.debug('crawl_dir() called with:\n\ttopdir:\t{}'
                       .format(top_dir))
-        logging.debug('crawl_dir() call retrieved:\n{}'
-                      .format(retrived_dir_list))
         for line in retrived_dir_list:
             if self.dir_check(line):
                 # Then the line is a directory and should be crawled.
@@ -119,6 +116,7 @@ class EnsemblDatabase(GenomeDatabase):
 
         if any(bw in line_dict['item_name'] for bw in bad_words):
             return
+
         elif line_dict['item_name'].endswith('dna.toplevel.fa.gz'):
             # Gives the namelist as: genus_species, assembly, file_extension
             name_list = item[-1].split('.', 2)
@@ -126,6 +124,7 @@ class EnsemblDatabase(GenomeDatabase):
             assembly_name = name_list[1]
 
             genus, species = genus_species.split('_', 1)
+
             parsed_name = genus + '_' + species + '-' + assembly_name
             self.add_genome(
                 parsed_name,
@@ -134,6 +133,7 @@ class EnsemblDatabase(GenomeDatabase):
                 fasta_size=line_dict['size'],
                 fasta_uri=''.join((top_dir, line_dict['item_name'])))
             return
+
         elif line_dict['item_name'].endswith('gff3.gz'):
             # Gives the namelist as: genus_species, assembly, file_extension
             name_list = item[-1].split('.', 2)
@@ -142,6 +142,7 @@ class EnsemblDatabase(GenomeDatabase):
 
             genus, species = genus_species.split('_', 1)
             parsed_name = genus + '_' + species + '-' + assembly_name
+            # TODO: Fix this function below, it should add a genomeTuple
             self.add_genome(
                 parsed_name,
                 genus=genus,
@@ -149,6 +150,7 @@ class EnsemblDatabase(GenomeDatabase):
                 gff3_size=line_dict['size'],
                 gff3_uri=''.join((top_dir, line_dict['item_name'])))
             return
+
 
     def genome_check(self, item):
         """Checks if the incoming item, which is a single string,
@@ -163,12 +165,11 @@ class EnsemblDatabase(GenomeDatabase):
             + must not have 'abinitio' in the name"""
         bad_words = ('chromosome', '.abinitio.')
         data_types = ('dna.toplevel.fa.gz', 'gff3.gz')
-        self.logger.debug('GENOME CHECKING: {}'.format(item))
+        logging.debug('GENOME CHECKING: {}'.format(item))
         if item.endswith(data_types) and \
                 not any(word in bad_words for word in item):
             return True
-        else:
-            return False
+
 
     def add_genome(self, item,  # TODO: Rename this function? An override?
                    fasta_size=None,
@@ -200,6 +201,7 @@ class EnsemblDatabase(GenomeDatabase):
         self.save_genome(item, **g_args)
         return
 
+
     def dir_check(self, dir_value):
         """Checks if the input: dir_value is a directory. Assumes the input
         will be in the following format:
@@ -212,6 +214,7 @@ class EnsemblDatabase(GenomeDatabase):
             return True
         else:
             return False
+
 
     def _generate_uri(self):
         """Generates the uri strings needed to download the genomes
@@ -234,6 +237,7 @@ class EnsemblDatabase(GenomeDatabase):
                             self._release_version,
                             item[0], '', ))  # the data type
 
+
     def generate_metadata_uri(self):
         """Generates a URI that will locate the metadata. This URI is of the
         form:
@@ -243,6 +247,7 @@ class EnsemblDatabase(GenomeDatabase):
         """
         metadata_uri = '/pub/' + self.release_version + '/species_metadata.json'
         return metadata_uri
+
 
     def download_metadata(self, metadata_uri, download_location):
         """Downloads the single metadata file."""
@@ -255,23 +260,27 @@ class EnsemblDatabase(GenomeDatabase):
         if not os.path.exists(local_path):
             os.makedirs(local_path)
 
+        # try this
         self.ftp.retrbinary('RETR {}'.format(metadata_uri),
                             open(filename, 'wb').write)
+        # except timeout error
+        # wait some time, then try again.
+        # Another failure, skip and log the file.
         return
 
     def _find_genomes(self,
                       parsing_function,
-                      baseURIList):
+                      uri_list):
         """Private function that handles finding the list of genomes.
 
         :param parsing_function: This should be a function that reads an
             ``ftplib.dir()`` line output. This output should always be a
             file, not a directory.
-        :param baseURIList: This should be a list of base URIs to start
+        :param uri_list: This should be a list of base URIs to start
             the ftp crawler from."""
         self.ftp.connect(ensebml_ftp_uri)  # connect to the ensemble ftp
         self.ftp.login()
-        for uri in baseURIList:
+        for uri in uri_list:
             logging.info('Parent crawl dir initialized as: {}'.format(uri))
             self.crawl_dir(uri, parsing_function)
         self.ftp.quit()  # close the ftp connection
@@ -281,10 +290,11 @@ class EnsemblDatabase(GenomeDatabase):
         """OVERWRITES GENOMEDATABASE FUNCTION. Calls the _find_genomes()
         private function."""
         logging.info("Finding Genomes. This takes approximately 45 minutes...")
-        ensemble_base_URIs = [uri for uri in self._generate_uri()]
+        ensemble_base_uri_list = [uri for uri in self._generate_uri()]
         self._find_genomes(parsing_function=self.ensembl_line_parser,
-                           baseURIList=ensemble_base_URIs,)
+                           uri_list=ensemble_base_uri_list,)
         return
+
 
     @property
     def release_version(self):
@@ -299,33 +309,19 @@ class EnsemblDatabase(GenomeDatabase):
         self._release_number = value
         self._release_version = 'release-' + str(value)
 
+
     def get_mutual_genomes(self):
         """Gets the genome entries that have both a fasta and gff3 uri.
         Returns a tuple that contains:
 
             ``('taxonomic_name', 'fasta_uri', 'fasta_size',\
                'gff3_uri', 'gff3_size')``"""
-        # TODO: Investigate a way to complete this query on the sqlite side.
-        # TODO: Find a way to return the entire sql entry? Is that what I want?
-        s = sqlalchemy.select([
-            GenomeEntry.taxonomic_name,
-            GenomeEntry.fasta_uri,
-            GenomeEntry.fasta_size,
-            GenomeEntry.gff3_uri,
-            GenomeEntry.gff3_size,
-            GenomeEntry.genus,
-            GenomeEntry.assembly_name])
-        s_result = self.session.execute(s)  # Run the query.
-        # Then get the name (primary key), if all of those entries exist.
-        mut_genomes = [tup for tup in s_result if all(tup)]
+        mut_genomes = []
         return mut_genomes
 
     def estimate_download_size(self):
         """Sum the filesizes for the ensembleDatabase class."""
-        sum_query = self.session.query(
-            sqlalchemy.sql.func.sum(GenomeEntry.gff3_size),
-            sqlalchemy.sql.func.sum(GenomeEntry.fasta_size))
-        size = sum_query.all()
+        size = []  # sum_query.all()
         return sum(filter(None, size[0]))
 
     def download_genomes(self, download_list, download_location):
@@ -354,8 +350,7 @@ class EnsemblDatabase(GenomeDatabase):
 
         for entry in download_list:
             # assign values from the input download_list
-            print(entry)
-            pk, furi, fsize, guri, gsize, genus, assembly_name = entry
+            # pk, furi, fsize, guri, gsize, genus, assembly_name = entry
 
             # Check for the paths.
             local_path = os.path.join(

@@ -12,6 +12,8 @@ The **Genomedatabase** module consists of two classes:
 
 import collections
 import json
+import logging
+
 
 try:
     from tqdm import tqdm
@@ -56,12 +58,8 @@ class GenomeDatabase(object):
         """Initialization of the GenomeDatabase class."""
         self.genome_list = []
 
-    # def __repr__(self):
-    #     out_list = []
-    #     for genome in self.genome_list:
-    #         out_list.append(genome)
-    #     out_str = '\n'.join(out_list)
-    #     return out_str
+    def __repr__(self):
+        return self.genome_list
 
     def save_genome(self, genome):
         """Save the genomes in this database. Save to the _baseGenomeDir
@@ -72,12 +70,6 @@ class GenomeDatabase(object):
     def _save_genome(self, genome):
         """Appends a genome tuple to the list."""
         self.genome_list.append(genome)
-
-    # def print_genomes(self):
-    #     """Print all the Genomes in the database to the terminal."""
-    #     for genome in self.genome_list:
-    #         print(genome)
-    #     return
 
     def find_genomes(self):
         """To be overwritten by child classes. Very database specific."""
