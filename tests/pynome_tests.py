@@ -100,7 +100,7 @@ def test_print_genome_list(database):
     logging.info('Testing the custom __repr__ method for the database...')
     new_genome = create_genome_tuple()
     database.save_genome(new_genome)
-    logging.info(database)
+    logging.info('{}'.format(database.genome_list))
     return
 
 

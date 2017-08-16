@@ -18,7 +18,7 @@ import itertools
 import os
 import ftplib
 import logging
-from .genomedatabase import GenomeDatabase, GenomeTuple
+from .genomedatabase import GenomeDatabase
 
 ensebml_ftp_uri = 'ftp.ensemblgenomes.org'
 
@@ -61,7 +61,6 @@ class EnsemblDatabase(GenomeDatabase):
         :param top_dir: The directory from which contents will be retrieved.
         :param parsing_function: The function to parse each result."""
 
-        # TODO: Investigate how to turn this into a yield based function.
         retrived_dir_list = []  # empty list to hold the callback
         self.ftp.dir(top_dir, retrived_dir_list.append)
         logging.debug('crawl_dir() called with:\n\ttopdir:\t{}'
@@ -104,51 +103,69 @@ class EnsemblDatabase(GenomeDatabase):
             + ``[8]:    filename``
 
         Either adds a genome, or returns nothing."""
-        item = line.split()   # Split the listing by whitespace.
-        line_dict = {
-            'dir_info': item[0],
-            'dir_subfolders': item[1],
-            'size': item[4],
-            'item_name': item[-1]
-        }
 
-        bad_words = ('chromosome', 'abinitio')  # TODO: Factor out bad_words
+        bad_words = ('chromosome', 'abinitio')
+
+        def split_line(item):
+            """Parse an individual item line from an ftp.dir() call.
+            This function handles splitting, without assuming the line
+            contains a valid genomem file."""
+            item = line.split()   # Split the listing by whitespace.
+            line_dict = {
+                'dir_info': item[0],
+                'dir_subfolders': item[1],
+                'size': item[4],
+                'item_name': item[-1]
+            }
+            return line_dict
+
+        def parse_genome_name(line_dict):
+            """Takes an item line dictionary and splits the genomes name
+            to get the desired values from it."""
+            name_list = line_dict[-1].split('.', 2)
+            genus_species = name_list[0]
+            assembly_name = name_list[1]
+            genus, species = genus_species.split('_', 1)
+            parsed_name = genus + '_' + species + '-' + assembly_name
+            return (parsed_name, {
+                'taxonomic_name': genus_species,
+                'genus': genus,
+                'assembly_name': assembly_name,
+                'species': species
+                })
+
+        def add_fasta(line_dict):
+            fasta_genome = parse_genome_name(line_dict)
+            update_dict = {
+                'fasta_remote_size': line_dict['size'],
+                'fasta_uri': ''.join((top_dir, line_dict['item_name'])),
+            }
+            fasta_genome[1].update(update_dict)
+            self.add_genome(fasta_genome[0], **fasta_genome[1])
+            return
+
+        def add_gff3(line_dict):
+            gff3_genome = parse_genome_name(line_dict)
+            update_dict = {
+                'gff3_remote_size': line_dict['size'],
+                'gff3_uri': ''.join((top_dir, line_dict['item_name'])),
+            }
+            gff3_genome[1].update(update_dict)
+            self.add_genome(gff3_genome[0], **gff3_genome[1])
+            return
+
+        line_dict = split_line(line)
 
         if any(bw in line_dict['item_name'] for bw in bad_words):
+            # This means that one of the undesired files has been located.
             return
 
         elif line_dict['item_name'].endswith('dna.toplevel.fa.gz'):
-            # Gives the namelist as: genus_species, assembly, file_extension
-            name_list = item[-1].split('.', 2)
-            genus_species = name_list[0]
-            assembly_name = name_list[1]
-
-            genus, species = genus_species.split('_', 1)
-
-            parsed_name = genus + '_' + species + '-' + assembly_name
-            self.add_genome(
-                parsed_name,
-                genus=genus,
-                assembly_name=assembly_name,
-                fasta_size=line_dict['size'],
-                fasta_uri=''.join((top_dir, line_dict['item_name'])))
+            add_fasta(line_dict)
             return
 
         elif line_dict['item_name'].endswith('gff3.gz'):
-            # Gives the namelist as: genus_species, assembly, file_extension
-            name_list = item[-1].split('.', 2)
-            genus_species = name_list[0]
-            assembly_name = name_list[1]
-
-            genus, species = genus_species.split('_', 1)
-            parsed_name = genus + '_' + species + '-' + assembly_name
-            # TODO: Fix this function below, it should add a genomeTuple
-            self.add_genome(
-                parsed_name,
-                genus=genus,
-                assembly_name=assembly_name,
-                gff3_size=line_dict['size'],
-                gff3_uri=''.join((top_dir, line_dict['item_name'])))
+            add_gff3(line_dict)
             return
 
 
@@ -171,34 +188,12 @@ class EnsemblDatabase(GenomeDatabase):
             return True
 
 
-    def add_genome(self, item,  # TODO: Rename this function? An override?
-                   fasta_size=None,
-                   gff3_size=None,
-                   fasta_uri=None,
-                   gff3_uri=None,
-                   genus=None,
-                   assembly_name=None):
+    def add_genome(self, genome, **kwargs):
         """Creates a new genome. This creates a new isntance of \
-        :class:`GenomeEntry`.
-
-        :param item: The name of the genome to be created or updated.
-        :param fasta_size: The size of the remote fasta, ``.fa.gz`` in bytes.
-        :param gff3_size: The size of the remote gff3, ``.gff3.gz`` in bytes.
-        :param fasta_uri: The remote uri of the fasta file.
-        :param gff3_uri: The remote uri of the gff3 file."""
-
-        genome_entry_args = {
-            'fasta_uri': fasta_uri,
-            'fasta_size': fasta_size,
-            'gff3_uri': gff3_uri,
-            'gff3_size': gff3_size,
-            'genus': genus,
-            'assembly_name': assembly_name,
-            'download_method': 'ftp ensemble'
-        }
+        :class:`GenomeTuple`."""
+        g_args = {k: v for k, v in kwargs.items() if v}
         # No values set to `None` should pass through.
-        g_args = {k: v for k, v in genome_entry_args.items() if v}
-        self.save_genome(item, **g_args)
+        self.save_genome(genome, **g_args)
         return
 
 

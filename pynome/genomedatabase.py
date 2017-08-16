@@ -31,7 +31,12 @@ class GenomeTuple(collections.namedtuple(
          'local_path', 'fasta_remote_size', 'gff3_remote_size',
          'assembly_name', 'genus', 'species', 'sra_ID'])):
     """The namedtuble subclass that will act as the holder for
-    desired genomic data."""
+    desired genomic data. It is based on the Python builtin namedtuple.
+
+    New genomes can be created in the following way:
+
+        >>> new_genome = GenomeTuple('<Genome_name>', [**kwargs])
+    """
 
     def __repr__(self):
         """The function that determines the format and content of
