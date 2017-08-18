@@ -20,19 +20,20 @@ logging.basicConfig(
     level=logging.DEBUG)
 
 # Assign shorter namespaces while maintaing cleaner imports.
-Genometuple = pynome.genomedatabase.GenomeTuple
+GenomeEntry = pynome.genomedatabase.GenomeEntry
 Ensebledb = pynome.ensembldatabase.EnsemblDatabase
 
 """
 =====================
-Tests for GenomeTuple
+Tests for GenomeEntry
 =====================
 """
 
 
-def create_genome_tuple():
+def create_genome_entry():
     """Test an implemenation of the genometuple"""
     test_data = {
+        'taxonomic_name': 'Pyrenophora_teres',
         'download_method': 'ensemble_ftp',
         'fasta_uri': ('ftp://ftp.ensemblgenomes.org/pub/fungi/release-36/'
                       'fasta/pyrenophora_teres/dna/Pyrenophora_teres.'
@@ -48,14 +49,14 @@ def create_genome_tuple():
         'species': 'teres',
         'sra_ID': 'sra_identifier',
     }
-    test_genome = Genometuple('Pyrenophora_teres', **test_data)
+    test_genome = GenomeEntry(**test_data)
     return test_genome
 
 
-def test_genometuple():
+def test_genome_entry():
     """Test an implemenation of the genometuple"""
     logging.info('Testing initiation of a genometuple...\n')
-    test_genome = create_genome_tuple()
+    test_genome = create_genome_entry()
     logging.info(test_genome)
 
 
@@ -89,7 +90,7 @@ def test_generate_metadata_uri(database):
 def test_save_genome(database):
     """Create and save a sample geneome to the database."""
     logging.info('Testing saving a genome to the database list...')
-    new_genome = create_genome_tuple()
+    new_genome = create_genome_entry()
     database.save_genome(new_genome)
     return
 
@@ -98,23 +99,22 @@ def test_save_genome(database):
 def test_print_genome_list(database):
     """Test the console printing of GenomeDatabase."""
     logging.info('Testing the custom __repr__ method for the database...')
-    new_genome = create_genome_tuple()
+    new_genome = create_genome_entry()
     database.save_genome(new_genome)
     logging.info('{}'.format(database.genome_list))
     return
 
 
-# @ensembl_init_wrapper
-# def test_crawl_ftp(database):
-#     """Test the ftp crawler with some sample uris"""
-#     crawl_test_uri = [
-#         'pub/fungi/release-36/gff3/fungi_rozellomycota1_collection/',
-#         'pub/fungi/release-36/fasta/fungi_rozellomycota1_collection/'
-#     ]
-#     database._find_genomes(database.ensembl_line_parser, crawl_test_uri)
-#     test_query = database.print_genomes()
-#     logging.info('Printing all Genomes in the test database...\n\n{}'\
-#         .format(test_query))
+@ensembl_init_wrapper
+def test_crawl_ftp(database):
+    """Test the ftp crawler with some sample uris"""
+    crawl_test_uri = [
+        'pub/fungi/release-36/gff3/fungi_rozellomycota1_collection/',
+        'pub/fungi/release-36/fasta/fungi_rozellomycota1_collection/'
+    ]
+    database._find_genomes(database.ensembl_line_parser, crawl_test_uri)
+    logging.info('Printing all Genomes in the test database...\n\n{}'
+                 .format(database))
 
 
 

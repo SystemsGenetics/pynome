@@ -18,7 +18,7 @@ import itertools
 import os
 import ftplib
 import logging
-from .genomedatabase import GenomeDatabase
+from .genomedatabase import GenomeDatabase, GenomeEntry
 
 ensebml_ftp_uri = 'ftp.ensemblgenomes.org'
 
@@ -122,17 +122,16 @@ class EnsemblDatabase(GenomeDatabase):
         def parse_genome_name(line_dict):
             """Takes an item line dictionary and splits the genomes name
             to get the desired values from it."""
-            name_list = line_dict[-1].split('.', 2)
+            name_list = line_dict['item_name'].split('.', 2)
             genus_species = name_list[0]
             assembly_name = name_list[1]
             genus, species = genus_species.split('_', 1)
-            parsed_name = genus + '_' + species + '-' + assembly_name
-            return (parsed_name, {
+            # parsed_name = genus + '_' + species + '-' + assembly_name
+            return {
                 'taxonomic_name': genus_species,
                 'genus': genus,
                 'assembly_name': assembly_name,
-                'species': species
-                })
+                'species': species}
 
         def add_fasta(line_dict):
             fasta_genome = parse_genome_name(line_dict)
@@ -140,8 +139,8 @@ class EnsemblDatabase(GenomeDatabase):
                 'fasta_remote_size': line_dict['size'],
                 'fasta_uri': ''.join((top_dir, line_dict['item_name'])),
             }
-            fasta_genome[1].update(update_dict)
-            self.add_genome(fasta_genome[0], **fasta_genome[1])
+            fasta_genome.update(update_dict)
+            self.add_genome(fasta_genome)
             return
 
         def add_gff3(line_dict):
@@ -150,8 +149,8 @@ class EnsemblDatabase(GenomeDatabase):
                 'gff3_remote_size': line_dict['size'],
                 'gff3_uri': ''.join((top_dir, line_dict['item_name'])),
             }
-            gff3_genome[1].update(update_dict)
-            self.add_genome(gff3_genome[0], **gff3_genome[1])
+            gff3_genome.update(update_dict)
+            self.add_genome(gff3_genome)
             return
 
         line_dict = split_line(line)
@@ -167,7 +166,6 @@ class EnsemblDatabase(GenomeDatabase):
         elif line_dict['item_name'].endswith('gff3.gz'):
             add_gff3(line_dict)
             return
-
 
     def genome_check(self, item):
         """Checks if the incoming item, which is a single string,
@@ -187,15 +185,14 @@ class EnsemblDatabase(GenomeDatabase):
                 not any(word in bad_words for word in item):
             return True
 
-
-    def add_genome(self, genome, **kwargs):
+    def add_genome(self, genome):
         """Creates a new genome. This creates a new isntance of \
         :class:`GenomeTuple`."""
-        g_args = {k: v for k, v in kwargs.items() if v}
+        # g_args = {k: v for k, v in kwargs.items() if v}
         # No values set to `None` should pass through.
-        self.save_genome(genome, **g_args)
+        new_genome = GenomeEntry(**genome)
+        self.save_genome(new_genome)
         return
-
 
     def dir_check(self, dir_value):
         """Checks if the input: dir_value is a directory. Assumes the input
@@ -209,7 +206,6 @@ class EnsemblDatabase(GenomeDatabase):
             return True
         else:
             return False
-
 
     def _generate_uri(self):
         """Generates the uri strings needed to download the genomes
@@ -232,7 +228,6 @@ class EnsemblDatabase(GenomeDatabase):
                             self._release_version,
                             item[0], '', ))  # the data type
 
-
     def generate_metadata_uri(self):
         """Generates a URI that will locate the metadata. This URI is of the
         form:
@@ -240,9 +235,8 @@ class EnsemblDatabase(GenomeDatabase):
         ``ftp.ensemblgenomes.org/pub/release-36/species_metadata.json``
 
         """
-        metadata_uri = '/pub/' + self.release_version + '/species_metadata.json'
-        return metadata_uri
-
+        uri = '/pub/' + self.release_version + '/species_metadata.json'
+        return uri
 
     def download_metadata(self, metadata_uri, download_location):
         """Downloads the single metadata file."""
@@ -290,7 +284,6 @@ class EnsemblDatabase(GenomeDatabase):
                            uri_list=ensemble_base_uri_list,)
         return
 
-
     @property
     def release_version(self):
         """Release version property. Should be in the form:
@@ -303,7 +296,6 @@ class EnsemblDatabase(GenomeDatabase):
         a string in the form: 'release-##' """
         self._release_number = value
         self._release_version = 'release-' + str(value)
-
 
     def get_mutual_genomes(self):
         """Gets the genome entries that have both a fasta and gff3 uri.
@@ -320,10 +312,7 @@ class EnsemblDatabase(GenomeDatabase):
         return sum(filter(None, size[0]))
 
     def download_genomes(self, download_list, download_location):
-        """This function takes an list of genome tuples. These tuples contain:
-
-        TODO: Ensure the tuples contain:
-        genus, species, intraspecific_name, assembly name
+        """This function takes an list of genome tuples.
 
         The directory structure to fit the files downloaded is as follows:
 
@@ -343,24 +332,25 @@ class EnsemblDatabase(GenomeDatabase):
         self.ftp.connect(ensebml_ftp_uri)  # connect to the ensemble ftp
         self.ftp.login()
 
-        for entry in download_list:
-            # assign values from the input download_list
-            # pk, furi, fsize, guri, gsize, genus, assembly_name = entry
-
+        for genome in download_list:
             # Check for the paths.
             local_path = os.path.join(
-                download_location, genus, assembly_name)
+                download_location, genome.genus, genome.assembly_name)
 
             if not os.path.exists(local_path):
                 os.makedirs(local_path)
 
-            self.ftp.retrbinary('RETR {}'.format(furi),
+            self.ftp.retrbinary('RETR {}'.format(genome.fasta_uri),
                                 open(os.path.join(
-                                    local_path, pk + '.fa.gz'), 'wb').write)
+                                    local_path,
+                                    genome.taxonomic_name + '.fa.gz'),
+                                'wb').write)
 
-            self.ftp.retrbinary('RETR {}'.format(guri),
+            self.ftp.retrbinary('RETR {}'.format(genome.gff3_uri),
                                 open(os.path.join(
-                                    local_path, pk + '.gff3.gz'), 'wb').write)
+                                    local_path,
+                                    genome.taxonomic_name + '.gff3.gz'),
+                                'wb').write)
 
         self.ftp.quit()  # close the ftp connection
         return

@@ -5,7 +5,7 @@ The Genome Database Module
 
 The **Genomedatabase** module consists of two classes:
 
-    + :class:`GenomeEntry` - An ``sql declarative_base()`` instance.
+    + :class:`GenomeEntry`
     + :py:class:`GenomeDatabase` - The handler for above, and the parent\
         class for specific databases to be overloaded.
 """
@@ -13,41 +13,55 @@ The **Genomedatabase** module consists of two classes:
 import collections
 import json
 import logging
+# from tqdm import tqdm
 
 
-try:
-    from tqdm import tqdm
-except ImportError:
-    def tqdm(*args, **kwargs):
-        if args:
-            return args[0]
-        return kwargs.get('iterable', None)
+# GenomeDict = dict({
+#     'taxonomic_name': None,
+#     'download_method': None,
+#     'fasta_uri': None,
+#     'gff3_uri': None,
+#     'local_path': None,
+#     'fasta_remote_size': None,
+#     'gff3_remote_size': None,
+#     'assembly_name': None,
+#     'genus': None,
+#     'species': None,
+#     'sra_ID': None
+# })
 
 
-class GenomeTuple(collections.namedtuple(
-        'Genome',  # The typename
-        # The field_names
-        ['taxonomic_name', 'download_method', 'fasta_uri', 'gff3_uri',
-         'local_path', 'fasta_remote_size', 'gff3_remote_size',
-         'assembly_name', 'genus', 'species', 'sra_ID'])):
-    """The namedtuble subclass that will act as the holder for
-    desired genomic data. It is based on the Python builtin namedtuple.
+class GenomeEntry(object):
+    __slots__ = [
+        'taxonomic_name',
+        'download_method',
+        'fasta_uri',
+        'gff3_uri',
+        'local_path',
+        'fasta_remote_size',
+        'gff3_remote_size',
+        'assembly_name',
+        'genus',
+        'species',
+        'sra_ID',
+    ]
 
-    New genomes can be created in the following way:
-
-        >>> new_genome = GenomeTuple('<Genome_name>', [**kwargs])
-    """
+    def __init__(self,
+                 taxonomic_name=None,
+                 download_method=None,
+                 fasta_uri=None,
+                 gff3_uri=None,
+                 local_path=None,
+                 fasta_remote_size=None,
+                 gff3_remote_size=None,
+                 assembly_name=None,
+                 genus=None,
+                 species=None,
+                 sra_ID=None):
+        """Create the funciton with optional arguments..."""
 
     def __repr__(self):
-        """The function that determines the format and content of
-        terminal print calls."""
-        field_name_repr = [
-            '{0:25} : {1}\n'.format(name, getattr(self, name))
-            for name in self._fields
-        ]
-
-        out_str = '\n===={}====\n'.format(
-            self.taxonomic_name) + ''.join(field_name_repr)
+        out_str = '{}'.format(self.taxonomic_name)
         return out_str
 
 
@@ -64,7 +78,8 @@ class GenomeDatabase(object):
         self.genome_list = []
 
     def __repr__(self):
-        return self.genome_list
+        # [str(item) for item in mylist]
+        return str(self.genome_list)
 
     def save_genome(self, genome):
         """Save the genomes in this database. Save to the _baseGenomeDir
@@ -74,6 +89,9 @@ class GenomeDatabase(object):
 
     def _save_genome(self, genome):
         """Appends a genome tuple to the list."""
+        if genome in self.genome_list:
+            genome._replace(**genome.asdict())
+            # update the list with the arguments from genome.
         self.genome_list.append(genome)
 
     def find_genomes(self):
