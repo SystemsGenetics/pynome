@@ -63,8 +63,8 @@ class EnsemblDatabase(GenomeDatabase):
 
         retrived_dir_list = []  # empty list to hold the callback
         self.ftp.dir(top_dir, retrived_dir_list.append)
-        logging.debug('crawl_dir() called with:\n\ttopdir:\t{}'
-                      .format(top_dir))
+        # logging.debug('crawl_dir() called with:\n\ttopdir:\t{}'
+                      # .format(top_dir))
         for line in retrived_dir_list:
             if self.dir_check(line):
                 # Then the line is a directory and should be crawled.
@@ -270,7 +270,7 @@ class EnsemblDatabase(GenomeDatabase):
         self.ftp.connect(ensebml_ftp_uri)  # connect to the ensemble ftp
         self.ftp.login()
         for uri in uri_list:
-            logging.info('Parent crawl dir initialized as: {}'.format(uri))
+            # logging.info('Parent crawl dir initialized as: {}'.format(uri))
             self.crawl_dir(uri, parsing_function)
         self.ftp.quit()  # close the ftp connection
         return

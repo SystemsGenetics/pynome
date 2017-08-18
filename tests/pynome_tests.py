@@ -47,7 +47,7 @@ def create_genome_entry():
         'assembly_name': 'GCA_000166005',
         'genus': 'Pyrenophora',
         'species': 'teres',
-        'sra_ID': 'sra_identifier',
+        'sra_id': 'sra_identifier',
     }
     test_genome = GenomeEntry(**test_data)
     return test_genome
