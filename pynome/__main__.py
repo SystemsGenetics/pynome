@@ -1,58 +1,33 @@
 """Retrieves genome data files & metadata form online databases.
-
 In this version (0.1.0) only the Ensembl database is implemented.
-
-Usage:
-    pynome [--mode=find-genomes]
-    pynome [--mode=download-genomes] [--download-dir=DIRECTORY]
 """
 
-import os
 import logging
 import argparse
-import sqlalchemy
-
-from genomedatabase import GenomeEntry, GenomeDatabase, Base
-from ensembldatabase import EnsemblDatabase
-# from sqlalchemy.ext.declarative import declarative_base
-# pynome.genomedatabase.Base.metadata.create_all(engine)
+from pynome.ensembl import EnsemblDatabase
 
 
-# Metadata = sqlalchemy.MetaData()
-# Base = declarative_base()
-
-logging.basicConfig()
-
-
-def entry_download_metadata(database):
-    """Entry point for the metadata retrival function. This is a single
-    file that is ca. 800 Mb."""
-    # engine = sqlalchemy.create_engine(database_path)
-    # database = EnsemblDatabase(engine)
-    # Base.metadata.create_all(engine)
-    metadata_uri = database.generate_metadata_uri()
-    database.download_metadata(metadata_uri, 'Genomes')
-    return
+logging.getLogger(__name__)
+logging.basicConfig(
+    filename='main.log',
+    filemode='w',
+    level='DEBUG'
+)
 
 
 def entry_find_genomes(database):
     """The entry point to find genomes with default options. This should
     be called from the command line."""
-    # engine = sqlalchemy.create_engine(database_path)
-    # database = EnsemblDatabase(engine)
-    # Base.metadata.create_all(engine)
-    database.find_genomes()
+    # Generate the base uri list:
+    uri_list = database.generate_uri()
+    database.find_genomes(
+        uri_list=uri_list
+    )
 
 
-def entry_download_genomes(database, database_path):
-    """The entry point to download genomes with default options. This should
-    be called from the command line."""
-    # engine = sqlalchemy.create_engine(database_path)
-    # database = EnsemblDatabase(engine)
-    # Base.metadata.create_all(engine)
-    mutual_genomes = database.get_mutual_genomes()
-    genomes_path = os.path.join(database_path, 'Genomes/')
-    database.download_genomes(mutual_genomes, genomes_path)
+def entry_download_genomes(database):
+    print("Downloading in progresss!\n")
+    database.download_genomes()
 
 
 def main():
@@ -60,28 +35,42 @@ def main():
     parser = argparse.ArgumentParser()  # Create the parser
     parser.add_argument('database_path',   # required positional argument
                         metavar='database-path', nargs=1)
+    parser.add_argument('download_path',   # required positional argument
+                        metavar='download-path', nargs=1)
     parser.add_argument('-f', '--find-genomes', action='store_true')
+    parser.add_argument('-p', '--print-genomes', action='store_true')
     parser.add_argument('-d', '--download-genomes', action='store_true')
     parser.add_argument('-v', '--verbose', help='Set output to verbose.',
                         action='store_true')
     args = parser.parse_args()  # Parse the arguments
+    logging.info('\nChecking for or creating the database.\n')
 
-    sqlite_database_dir = 'sqlite:///' + str(args.database_path[0])
+    try:
+        main_database = EnsemblDatabase(
+            database_path=args.database_path[0],
+            download_path=args.download_path[0],)
+    except:
+        print("Unable to create or read the database!")
+        exit()
 
-    engine = sqlalchemy.create_engine(sqlite_database_dir)
-    database = EnsemblDatabase(engine)
-    Base.metadata.create_all(engine)
-
-    if args.verbose:  # Enable verbose loggin mode
+    if args.verbose:  # Enable verbose logging mode
         logging.basicConfig(level=logging.DEBUG)
+
+    # check if the database is populated:
+    # if not, and find gemoes is not enabled
+    # exit and print a
 
     if args.find_genomes:
         print('Finding Genomes!')
-        entry_find_genomes(database)
+        entry_find_genomes(main_database)
 
-    if args.download_genomes:
-        print('Downloading Genomes!')
-        entry_download_genomes(database, sqlite_database_dir)
+    if args.print_genomes:
+        print('Printing Genomes!')
+        print(main_database.get_found_genomes())
+
+    # if args.download_genomes:
+    #     print('Downloading Genomes!')
+    #     entry_download_genomes(database, sqlite_database_dir)
 
 
 if __name__ == '__main__':

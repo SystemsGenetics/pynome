@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/pynome.iml" filepath="$PROJECT_DIR$/.idea/pynome.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/pynomedev.iml" filepath="$PROJECT_DIR$/.idea/pynomedev.iml" />
     </modules>
   </component>
 </project>
