@@ -1,0 +1,43 @@
+INFO:root:
+Checking for or creating the database.
+
+DEBUG:root:FTP CRAWL INITIALIZED WITH
+	database: []
+	top_dir: pub/fungi/release-36/gff3/
+	parsing_function: <function EnsemblDatabase.ensembl_line_parser at 0x00000241E1AD1F28>
+
+DEBUG:root:FTP CRAWL INITIALIZED WITH
+	database: []
+	top_dir: pub/fungi/release-36/gff3/ashbya_gossypii/
+	parsing_function: <function EnsemblDatabase.ensembl_line_parser at 0x00000241E1AD1F28>
+
+INFO:root:Genome Ashbya_gossypii found and added to the database.
+DEBUG:root:FTP CRAWL INITIALIZED WITH
+	database: ['\nTaxonomic Name: Ashbya_gossypii\n\tfasta URI: None\n\tgff3 URI: pub/fungi/release-36/gff3/ashbya_gossypii/Ashbya_gossypii.ASM9102v1.36.gff3.gz\n']
+	top_dir: pub/fungi/release-36/gff3/aspergillus_clavatus/
+	parsing_function: <function EnsemblDatabase.ensembl_line_parser at 0x00000241E1AD1F28>
+
+INFO:root:Genome Aspergillus_clavatus found and added to the database.
+DEBUG:root:FTP CRAWL INITIALIZED WITH
+	database: ['\nTaxonomic Name: Ashbya_gossypii\n\tfasta URI: None\n\tgff3 URI: pub/fungi/release-36/gff3/ashbya_gossypii/Ashbya_gossypii.ASM9102v1.36.gff3.gz\n', '\nTaxonomic Name: Aspergillus_clavatus\n\tfasta URI: None\n\tgff3 URI: pub/fungi/release-36/gff3/aspergillus_clavatus/Aspergillus_clavatus.CADRE.36.gff3.gz\n']
+	top_dir: pub/fungi/release-36/gff3/aspergillus_flavus/
+	parsing_function: <function EnsemblDatabase.ensembl_line_parser at 0x00000241E1AD1F28>
+
+INFO:root:Genome Aspergillus_flavus found and added to the database.
+DEBUG:root:FTP CRAWL INITIALIZED WITH
+	database: ['\nTaxonomic Name: Ashbya_gossypii\n\tfasta URI: None\n\tgff3 URI: pub/fungi/release-36/gff3/ashbya_gossypii/Ashbya_gossypii.ASM9102v1.36.gff3.gz\n', '\nTaxonomic Name: Aspergillus_clavatus\n\tfasta URI: None\n\tgff3 URI: pub/fungi/release-36/gff3/aspergillus_clavatus/Aspergillus_clavatus.CADRE.36.gff3.gz\n', '\nTaxonomic Name: Aspergillus_flavus\n\tfasta URI: None\n\tgff3 URI: pub/fungi/release-36/gff3/aspergillus_flavus/Aspergillus_flavus.JCVI-afl1-v2.0.36.gff3.gz\n']
+	top_dir: pub/fungi/release-36/gff3/aspergillus_fumigatus/
+	parsing_function: <function EnsemblDatabase.ensembl_line_parser at 0x00000241E1AD1F28>
+
+INFO:root:Genome Aspergillus_fumigatus found and added to the database.
+DEBUG:root:FTP CRAWL INITIALIZED WITH
+	database: ['\nTaxonomic Name: Ashbya_gossypii\n\tfasta URI: None\n\tgff3 URI: pub/fungi/release-36/gff3/ashbya_gossypii/Ashbya_gossypii.ASM9102v1.36.gff3.gz\n', '\nTaxonomic Name: Aspergillus_clavatus\n\tfasta URI: None\n\tgff3 URI: pub/fungi/release-36/gff3/aspergillus_clavatus/Aspergillus_clavatus.CADRE.36.gff3.gz\n', '\nTaxonomic Name: Aspergillus_flavus\n\tfasta URI: None\n\tgff3 URI: pub/fungi/release-36/gff3/aspergillus_flavus/Aspergillus_flavus.JCVI-afl1-v2.0.36.gff3.gz\n', '\nTaxonomic Name: Aspergillus_fumigatus\n\tfasta URI: None\n\tgff3 URI: pub/fungi/release-36/gff3/aspergillus_fumigatus/Aspergillus_fumigatus.CADRE.36.gff3.gz\n']
+	top_dir: pub/fungi/release-36/gff3/aspergillus_fumigatusa1163/
+	parsing_function: <function EnsemblDatabase.ensembl_line_parser at 0x00000241E1AD1F28>
+
+INFO:root:Genome Aspergillus_fumigatusa1163 found and added to the database.
+DEBUG:root:FTP CRAWL INITIALIZED WITH
+	database: ['\nTaxonomic Name: Ashbya_gossypii\n\tfasta URI: None\n\tgff3 URI: pub/fungi/release-36/gff3/ashbya_gossypii/Ashbya_gossypii.ASM9102v1.36.gff3.gz\n', '\nTaxonomic Name: Aspergillus_clavatus\n\tfasta URI: None\n\tgff3 URI: pub/fungi/release-36/gff3/aspergillus_clavatus/Aspergillus_clavatus.CADRE.36.gff3.gz\n', '\nTaxonomic Name: Aspergillus_flavus\n\tfasta URI: None\n\tgff3 URI: pub/fungi/release-36/gff3/aspergillus_flavus/Aspergillus_flavus.JCVI-afl1-v2.0.36.gff3.gz\n', '\nTaxonomic Name: Aspergillus_fumigatus\n\tfasta URI: None\n\tgff3 URI: pub/fungi/release-36/gff3/aspergillus_fumigatus/Aspergillus_fumigatus.CADRE.36.gff3.gz\n', '\nTaxonomic Name: Aspergillus_fumigatusa1163\n\tfasta URI: None\n\tgff3 URI: pub/fungi/release-36/gff3/aspergillus_fumigatusa1163/Aspergillus_fumigatusa1163.CADRE.36.gff3.gz\n']
+	top_dir: pub/fungi/release-36/gff3/aspergillus_nidulans/
+	parsing_function: <function EnsemblDatabase.ensembl_line_parser at 0x00000241E1AD1F28>
+
