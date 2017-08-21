@@ -1,6 +1,14 @@
 """Retrieves genome data files & metadata form online databases.
 In this version (0.1.0) only the Ensembl database is implemented.
 
+**SCIDAS**: On SciDAS pynome is located under:
+    /data/ficklin/modulefiles/pynome_deploy
+
+So to run it, and download to a directory on SciDAS storage::
+
+    $ python -m /data/ficklin/software/pynome_deploy/pynome -fdm /scidas /scidas/genomes
+
+
 **Usage Examples**::
 
     $ python -m pynome -fdm
@@ -54,6 +62,7 @@ def main():
             download_path=args.download_path[0],)
     except:
         print("Unable to create or read the database!")
+        print('Database Path: {0}'.format(args.database_path[0]))
         exit()
 
     if args.verbose:  # Enable verbose logging mode
