@@ -96,6 +96,7 @@ class GenomeDatabase(object):
         self.download_path = download_path  # The local download location.
         self.database_path = os.path.join('sqlite:///', database_path)
         # engine is the path that our database is stored.
+        logging.debug('Generating database at: {}'.format(self.database_path))
         engine = create_engine(self.database_path)
         # metadata.create_all ensures that the table defined in GenomeEntry
         Base.metadata.create_all(engine)
