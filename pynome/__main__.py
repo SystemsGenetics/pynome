@@ -14,6 +14,7 @@ So to run it, and download to a directory on SciDAS storage::
     $ python -m pynome -fdm
 """
 
+import os
 import logging
 import argparse
 from pynome.ensembl import EnsemblDatabase
@@ -55,6 +56,10 @@ def main():
                         action='store_true')
     args = parser.parse_args()  # Parse the arguments
     logging.info('\nChecking for or creating the database.\n')
+
+    # create the database path if it does not already exist
+    if not os.path.exists(args.download_path[0]):
+        os.makedirs(args.download_path[0])
 
     try:
         main_database = EnsemblDatabase(
