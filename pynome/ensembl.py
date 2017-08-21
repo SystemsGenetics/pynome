@@ -16,6 +16,8 @@ from pynome.ftpHelper import crawl_ftp_dir
 from tqdm import tqdm
 
 ENSEMBL_FTP_URI = 'ftp.ensemblgenomes.org'
+ENSEMBL_DATA_TYPES = ['gff3', 'fasta']
+ENSEMBL_KINGDOMS = ['fungi', 'metazoa', 'plants', 'protists']
 
 
 class EnsemblDatabase(GenomeDatabase):
@@ -52,10 +54,45 @@ class EnsemblDatabase(GenomeDatabase):
         """Generates a URI that will locate the metadata. This URI is of the
         form:
 
-        ``ftp.ensemblgenomes.org/pub/release-36/species_metadata.json``
+        ``/pub/release-36/species.txt``
         """
-        uri = '/pub/' + self.release_version + '/species_metadata.json'
-        return uri
+        uri_dict = {}
+        species_txt = 'species.txt'
+        uri = '/'.join(('pub', self._release_version, species_txt))
+        uri_dict[uri] = species_txt
+        return uri_dict
+
+    def download_metadata(self):
+        """Downloads the 'species_EnsemblKINGDOM.txt files. These are smaller, more
+        usable metadata file found in each """
+
+        metadata_uri_dict = self.generate_metadata_uri()
+
+        self.ftp.connect(ENSEMBL_FTP_URI)
+        self.ftp.login()
+
+        for uri, file_name in metadata_uri_dict.items():
+
+            size_estimate = self.ftp.size(uri) / 8.192
+            target_dir = os.path.join(self.download_path, file_name)
+
+            with tqdm(total=int(size_estimate), unit_scale=True,
+                      unit='MB') as meta_pbar:
+
+                with open(target_dir, 'wb') as curr_file:
+
+                    def callback(data):
+                        update_size = len(data) / 8.192
+                        meta_pbar.update(int(update_size))
+                        curr_file.write(data)
+
+                    try:
+                        self.ftp.retrbinary(
+                            cmd='RETR {}'.format(uri),
+                            callback=callback)
+                    except:
+                        logging.warning('UNABLE TO DOWNLOAD METADATA!')
+        return
 
     def generate_uri(self):
         """Generates the uri strings needed to download the genomes
@@ -67,12 +104,10 @@ class EnsemblDatabase(GenomeDatabase):
             'pub/metazoa/release-36/gff3/',
             ...
 
-        This is an extremely case-sepcific function."""
+        This is an extremely case-specific function."""
         uri_list = []
-        ensembl_data_types = ['gff3', 'fasta']
-        ensembl_kingdoms = ['fungi', 'metazoa', 'plants', 'protists']
         # Unique permutations of data types and kingdoms.
-        uri_gen = itertools.product(ensembl_data_types, ensembl_kingdoms)
+        uri_gen = itertools.product(ENSEMBL_DATA_TYPES, ENSEMBL_KINGDOMS)
         # For each iteration, return the desired URI.
         for item in uri_gen:
             uri = '/'.join(('pub', item[1],  # the clade or kingdom
@@ -104,7 +139,7 @@ class EnsemblDatabase(GenomeDatabase):
             + ``[1]:    the number of items therein?``
             + ``[2]:    unknown always 'ftp'``
             + ``[3]:    unknown always 'ftp'``
-            + ``[4]:    the filesize in bytes, 4096 is one block``
+            + ``[4]:    the file size in bytes, 4096 is one block``
             + ``[5]:    Month``
             + ``[6]:    Day``
             + ``[7]:    Year``

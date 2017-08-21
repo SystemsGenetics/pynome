@@ -1,5 +1,9 @@
 """Retrieves genome data files & metadata form online databases.
 In this version (0.1.0) only the Ensembl database is implemented.
+
+**Usage Examples**::
+
+    $ python -m pynome -fdm
 """
 
 import logging
@@ -20,9 +24,7 @@ def entry_find_genomes(database):
     be called from the command line."""
     # Generate the base uri list:
     uri_list = database.generate_uri()
-    database.find_genomes(
-        uri_list=uri_list
-    )
+    database.find_genomes(uri_list=uri_list)
 
 
 def entry_download_genomes(database):
@@ -40,6 +42,7 @@ def main():
     parser.add_argument('-f', '--find-genomes', action='store_true')
     parser.add_argument('-p', '--print-genomes', action='store_true')
     parser.add_argument('-d', '--download-genomes', action='store_true')
+    parser.add_argument('-m', '--download-metadata', action='store_true')
     parser.add_argument('-v', '--verbose', help='Set output to verbose.',
                         action='store_true')
     args = parser.parse_args()  # Parse the arguments
@@ -68,9 +71,13 @@ def main():
         print('Printing Genomes!')
         print(main_database.get_found_genomes())
 
-    # if args.download_genomes:
-    #     print('Downloading Genomes!')
-    #     entry_download_genomes(database, sqlite_database_dir)
+    if args.download_metadata:
+        print("Downloading Metadata!")
+        main_database.download_metadata()
+
+    if args.download_genomes:
+        print('Downloading Genomes!')
+        entry_download_genomes(main_database)
 
 
 if __name__ == '__main__':

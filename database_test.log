@@ -23,55 +23,55 @@ INFO:root:pub/protists/release-36/fasta/
 DEBUG:root:FTP CRAWL INITIALIZED WITH
 	database: []
 	top_dir: pub/fungi/release-36/gff3/fungi_rozellomycota1_collection/
-	parsing_function: <function EnsemblDatabase.ensembl_line_parser at 0x000002503CF90AE8>
+	parsing_function: <function EnsemblDatabase.ensembl_line_parser at 0x7f122d7a96a8>
 
 DEBUG:root:FTP CRAWL INITIALIZED WITH
 	database: []
 	top_dir: pub/fungi/release-36/gff3/fungi_rozellomycota1_collection/rozella_allomycis_csf55/
-	parsing_function: <function EnsemblDatabase.ensembl_line_parser at 0x000002503CF90AE8>
+	parsing_function: <function EnsemblDatabase.ensembl_line_parser at 0x7f122d7a96a8>
 
 INFO:root:Genome Rozella_allomycis_csf55 found and added to the database.
 DEBUG:root:FTP CRAWL INITIALIZED WITH
 	database: ['\nTaxonomic Name: Rozella_allomycis_csf55\n\tfasta URI: None\n\tgff3 URI: pub/fungi/release-36/gff3/fungi_rozellomycota1_collection/rozella_allomycis_csf55/Rozella_allomycis_csf55.Rozella_k41_t100.36.gff3.gz\n']
 	top_dir: pub/fungi/release-36/fasta/fungi_rozellomycota1_collection/
-	parsing_function: <function EnsemblDatabase.ensembl_line_parser at 0x000002503CF90AE8>
+	parsing_function: <function EnsemblDatabase.ensembl_line_parser at 0x7f122d7a96a8>
 
 DEBUG:root:FTP CRAWL INITIALIZED WITH
 	database: ['\nTaxonomic Name: Rozella_allomycis_csf55\n\tfasta URI: None\n\tgff3 URI: pub/fungi/release-36/gff3/fungi_rozellomycota1_collection/rozella_allomycis_csf55/Rozella_allomycis_csf55.Rozella_k41_t100.36.gff3.gz\n']
 	top_dir: pub/fungi/release-36/fasta/fungi_rozellomycota1_collection/rozella_allomycis_csf55/
-	parsing_function: <function EnsemblDatabase.ensembl_line_parser at 0x000002503CF90AE8>
+	parsing_function: <function EnsemblDatabase.ensembl_line_parser at 0x7f122d7a96a8>
 
 DEBUG:root:FTP CRAWL INITIALIZED WITH
 	database: ['\nTaxonomic Name: Rozella_allomycis_csf55\n\tfasta URI: None\n\tgff3 URI: pub/fungi/release-36/gff3/fungi_rozellomycota1_collection/rozella_allomycis_csf55/Rozella_allomycis_csf55.Rozella_k41_t100.36.gff3.gz\n']
 	top_dir: pub/fungi/release-36/fasta/fungi_rozellomycota1_collection/rozella_allomycis_csf55/cdna/
-	parsing_function: <function EnsemblDatabase.ensembl_line_parser at 0x000002503CF90AE8>
+	parsing_function: <function EnsemblDatabase.ensembl_line_parser at 0x7f122d7a96a8>
 
 DEBUG:root:FTP CRAWL INITIALIZED WITH
 	database: ['\nTaxonomic Name: Rozella_allomycis_csf55\n\tfasta URI: None\n\tgff3 URI: pub/fungi/release-36/gff3/fungi_rozellomycota1_collection/rozella_allomycis_csf55/Rozella_allomycis_csf55.Rozella_k41_t100.36.gff3.gz\n']
 	top_dir: pub/fungi/release-36/fasta/fungi_rozellomycota1_collection/rozella_allomycis_csf55/cds/
-	parsing_function: <function EnsemblDatabase.ensembl_line_parser at 0x000002503CF90AE8>
+	parsing_function: <function EnsemblDatabase.ensembl_line_parser at 0x7f122d7a96a8>
 
 DEBUG:root:FTP CRAWL INITIALIZED WITH
 	database: ['\nTaxonomic Name: Rozella_allomycis_csf55\n\tfasta URI: None\n\tgff3 URI: pub/fungi/release-36/gff3/fungi_rozellomycota1_collection/rozella_allomycis_csf55/Rozella_allomycis_csf55.Rozella_k41_t100.36.gff3.gz\n']
 	top_dir: pub/fungi/release-36/fasta/fungi_rozellomycota1_collection/rozella_allomycis_csf55/dna/
-	parsing_function: <function EnsemblDatabase.ensembl_line_parser at 0x000002503CF90AE8>
+	parsing_function: <function EnsemblDatabase.ensembl_line_parser at 0x7f122d7a96a8>
 
 INFO:root:Genome Rozella_allomycis_csf55 found and added to the database.
 DEBUG:root:FTP CRAWL INITIALIZED WITH
 	database: ['\nTaxonomic Name: Rozella_allomycis_csf55\n\tfasta URI: pub/fungi/release-36/fasta/fungi_rozellomycota1_collection/rozella_allomycis_csf55/dna/Rozella_allomycis_csf55.Rozella_k41_t100.dna.toplevel.fa.gz\n\tgff3 URI: pub/fungi/release-36/gff3/fungi_rozellomycota1_collection/rozella_allomycis_csf55/Rozella_allomycis_csf55.Rozella_k41_t100.36.gff3.gz\n']
 	top_dir: pub/fungi/release-36/fasta/fungi_rozellomycota1_collection/rozella_allomycis_csf55/dna_index/
-	parsing_function: <function EnsemblDatabase.ensembl_line_parser at 0x000002503CF90AE8>
+	parsing_function: <function EnsemblDatabase.ensembl_line_parser at 0x7f122d7a96a8>
 
 INFO:root:Genome Rozella_allomycis_csf55 found and added to the database.
 DEBUG:root:FTP CRAWL INITIALIZED WITH
 	database: ['\nTaxonomic Name: Rozella_allomycis_csf55\n\tfasta URI: pub/fungi/release-36/fasta/fungi_rozellomycota1_collection/rozella_allomycis_csf55/dna_index/Rozella_allomycis_csf55.Rozella_k41_t100.dna.toplevel.fa.gz\n\tgff3 URI: pub/fungi/release-36/gff3/fungi_rozellomycota1_collection/rozella_allomycis_csf55/Rozella_allomycis_csf55.Rozella_k41_t100.36.gff3.gz\n']
 	top_dir: pub/fungi/release-36/fasta/fungi_rozellomycota1_collection/rozella_allomycis_csf55/ncrna/
-	parsing_function: <function EnsemblDatabase.ensembl_line_parser at 0x000002503CF90AE8>
+	parsing_function: <function EnsemblDatabase.ensembl_line_parser at 0x7f122d7a96a8>
 
 DEBUG:root:FTP CRAWL INITIALIZED WITH
 	database: ['\nTaxonomic Name: Rozella_allomycis_csf55\n\tfasta URI: pub/fungi/release-36/fasta/fungi_rozellomycota1_collection/rozella_allomycis_csf55/dna_index/Rozella_allomycis_csf55.Rozella_k41_t100.dna.toplevel.fa.gz\n\tgff3 URI: pub/fungi/release-36/gff3/fungi_rozellomycota1_collection/rozella_allomycis_csf55/Rozella_allomycis_csf55.Rozella_k41_t100.36.gff3.gz\n']
 	top_dir: pub/fungi/release-36/fasta/fungi_rozellomycota1_collection/rozella_allomycis_csf55/pep/
-	parsing_function: <function EnsemblDatabase.ensembl_line_parser at 0x000002503CF90AE8>
+	parsing_function: <function EnsemblDatabase.ensembl_line_parser at 0x7f122d7a96a8>
 
 INFO:root:
 Taxonomic Name: Rozella_allomycis_csf55
@@ -79,3 +79,6 @@ Taxonomic Name: Rozella_allomycis_csf55
 	gff3 URI: pub/fungi/release-36/gff3/fungi_rozellomycota1_collection/rozella_allomycis_csf55/Rozella_allomycis_csf55.Rozella_k41_t100.36.gff3.gz
 
 INFO:root:Size estimate: 4666607
+INFO:root:Printing metadata information.
+INFO:root:('pub/release-36/species.txt', 'species.txt')
+INFO:root:Downloading metadata.

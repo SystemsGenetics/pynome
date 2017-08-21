@@ -18,6 +18,7 @@ logging.basicConfig(
     level='DEBUG'
 )
 
+
 @pytest.fixture(scope='module')
 def create_database(database_path=':memory:', download_path='/tmp'):
     """Create a database instance. The empty path should create the database
@@ -29,10 +30,12 @@ def create_database(database_path=':memory:', download_path='/tmp'):
     )
     yield database_instance
 
+
 def test_generate_uri(create_database):
     uri_list = create_database.generate_uri()
     for uri in uri_list:
         logging.info(uri)
+
 
 def test_ensemble_crawl(create_database):
     crawl_test_uri = [
@@ -46,11 +49,25 @@ def test_ensemble_crawl(create_database):
     for q in genomes:
         logging.info(str(q))
 
+
 def test_estimate_download_size(create_database):
     size_estimate = create_database.estimate_download_size()
     logging.info('Size estimate: {}'.format(size_estimate))
 
-def test_download_genomes(create_database):
-    genomes = create_database.get_found_genomes()
-    create_database.download_genomes()
+
+def test_generate_metadata_uri(create_database):
+    uri_list = create_database.generate_metadata_uri()
+    logging.info("Printing metadata information.")
+    for uri in uri_list.items():
+        logging.info(uri)
+
+
+def test_download_metadata(create_database):
+    logging.info("Downloading metadata.")
+    create_database.download_metadata()
+
+
+# def test_download_genomes(create_database):
+#     genomes = create_database.get_found_genomes()
+#     create_database.download_genomes()
 
