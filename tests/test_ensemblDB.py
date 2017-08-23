@@ -67,9 +67,9 @@ def test_generate_metadata_uri(create_database):
         logging.info(uri)
 
 
-# def test_download_metadata(create_database):
-#     logging.info("Downloading metadata.")
-#     create_database.download_metadata()
+def test_download_metadata(create_database):
+    logging.info("Downloading metadata.")
+    create_database.download_metadata()
 
 
 def test_download_genomes(create_database):

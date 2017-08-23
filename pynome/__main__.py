@@ -7,7 +7,7 @@ In this version (0.1.0) only the Ensembl database is implemented.
 So to run it, and download to a directory on SciDAS storage (from
 the pynome dir)::
 
-    $ python3 -m pynome -fdm /scidas /scidas/genomes
+    $ python3 -m pynome -fdm /scidas/genomes2/genome.db /scidas/genomes2
     $ python3 -m pynome -dm /scidas /scidas/genomes
 
 
