@@ -20,7 +20,8 @@ logging.basicConfig(
 
 
 @pytest.fixture(scope='module')
-def create_database(database_path=':memory:', download_path='/tmp'):
+def create_database(database_path='/media/tylerbiggs/genomic//test.db',
+                    download_path='/media/tylerbiggs/genomic/'):
     """Create a database instance. The empty path should create the database
     in memory. Without scope='module', this would be run for every test."""
     logging.info('\nCreating the database.\n')
@@ -37,11 +38,15 @@ def test_generate_uri(create_database):
         logging.info(uri)
 
 
+crawl_test_uri = [
+    'pub/fungi/release-36/gff3/fungi_rozellomycota1_collection/',
+    'pub/fungi/release-36/fasta/fungi_rozellomycota1_collection/',
+    'pub/fungi/release-36/gff3/fungi_ascomycota1_collection/_candida_glabrata/',
+    'pub/fungi/release-36/fasta/fungi_ascomycota1_collection/_candida_glabrata/',
+    # 'pub/fungi/release-36/gff3/fungi_ascomycota1_collection/',
+    # 'pub/fungi/release-36/fasta/fungi_ascomycota1_collection/'
+]
 def test_ensemble_crawl(create_database):
-    crawl_test_uri = [
-        'pub/fungi/release-36/gff3/fungi_rozellomycota1_collection/',
-        'pub/fungi/release-36/fasta/fungi_rozellomycota1_collection/'
-    ]
     create_database.find_genomes(
         crawl_test_uri
     )
@@ -62,12 +67,11 @@ def test_generate_metadata_uri(create_database):
         logging.info(uri)
 
 
-def test_download_metadata(create_database):
-    logging.info("Downloading metadata.")
-    create_database.download_metadata()
+# def test_download_metadata(create_database):
+#     logging.info("Downloading metadata.")
+#     create_database.download_metadata()
 
 
-# def test_download_genomes(create_database):
-#     genomes = create_database.get_found_genomes()
-#     create_database.download_genomes()
-
+def test_download_genomes(create_database):
+    genomes = create_database.get_found_genomes()
+    create_database.download_genomes()

@@ -4,9 +4,11 @@ In this version (0.1.0) only the Ensembl database is implemented.
 **SCIDAS**: On SciDAS pynome is located under:
     /data/ficklin/modulefiles/pynome_deploy
 
-So to run it, and download to a directory on SciDAS storage::
+So to run it, and download to a directory on SciDAS storage (from
+the pynome dir)::
 
-    $ python -m /data/ficklin/software/pynome_deploy/pynome -fdm /scidas /scidas/genomes
+    $ python3 -m pynome -fdm /scidas /scidas/genomes
+    $ python3 -m pynome -dm /scidas /scidas/genomes
 
 
 **Usage Examples**::
@@ -93,6 +95,7 @@ def main():
         print('Downloading Genomes!')
         entry_download_genomes(main_database)
 
+    exit()
 
 if __name__ == '__main__':
     main()

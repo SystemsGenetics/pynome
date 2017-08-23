@@ -168,10 +168,31 @@ class EnsemblDatabase(GenomeDatabase):
             name_list = line_dict['item_name'].split('.', 2)
             genus_species = name_list[0]
             assembly_name = name_list[1]
-            genus, species = genus_species.split('_', 1)
-            # parsed_name = genus + '_' + species + '-' + assembly_name
+            # Some species have sub-names
+            # genus, species = genus_species.split('_', 1)
+            try:
+                gen_species_list = genus_species.split('_')
+                gen_species_list = list(filter(None, gen_species_list))
+                logging.debug('filtered_gen_species_list')
+                logging.debug(gen_species_list)
+                # The first element should be the genus
+                genus = gen_species_list[0]
+                # The second should be the species
+                species = gen_species_list[1]
+                # The remainder should be the intra-specific name
+                if len(gen_species_list) > 2:
+                    intra_name = '_'.join(gen_species_list[2:])
+                    taxonomic_name = '_'.join((genus, species, intra_name))
+                else:
+                    taxonomic_name = '_'.join((genus, species))
+
+            except:
+                taxonomic_name = name_list[0]
+                assembly_name = name_list[1]
+                genus, species = genus_species.split('_', 1)
+
             return {
-                'taxonomic_name': genus_species,
+                'taxonomic_name': taxonomic_name,
                 'genus': genus,
                 'assembly_name': assembly_name,
                 'species': species}
@@ -256,18 +277,18 @@ class EnsemblDatabase(GenomeDatabase):
         self.ftp.login()
 
         with tqdm(total=int(size_estimate), unit_scale=True,
-                  unit='MB') as total_pbar:
+                  unit='B') as total_pbar:
             # Iterate through the list of acquired genomes.
             for genome in genomes:
                 # Create a dictionary. This is kind of awkward.
                 download_dict = {
-                    genome.fasta_uri: 'fa.gz',
-                    genome.gff3_uri: 'gff3.gz',
+                    genome.fasta_uri: '.fa.gz',
+                    genome.gff3_uri: '.gff3.gz',
                 }
                 # Create the target directory.
                 target_dir = os.path.join(
                     self.download_path,
-                    genome.genus,
+                    # genome.genus,
                     genome.taxonomic_name
                 )
                 if not os.path.exists(target_dir):
@@ -275,7 +296,8 @@ class EnsemblDatabase(GenomeDatabase):
 
                 # Iterate through the download dictionary
                 for uri, file_ext in download_dict.items():
-                    target_file = target_dir + file_ext
+                    target_file = os.path.join(
+                        target_dir, genome.taxonomic_name +  file_ext)
                     with open(target_file, 'wb') as curr_file:
 
                         def callback(data):
