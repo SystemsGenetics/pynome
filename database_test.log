@@ -25,12 +25,12 @@ INFO:root:pub/protists/release-36/fasta/
 DEBUG:root:FTP CRAWL INITIALIZED WITH
 	database: ['\nTaxonomic Name: Rozella_allomycis_csf55\n\tfasta URI: pub/fungi/release-36/fasta/fungi_rozellomycota1_collection/rozella_allomycis_csf55/dna_index/Rozella_allomycis_csf55.Rozella_k41_t100.dna.toplevel.fa.gz\n\tgff3 URI: pub/fungi/release-36/gff3/fungi_rozellomycota1_collection/rozella_allomycis_csf55/Rozella_allomycis_csf55.Rozella_k41_t100.36.gff3.gz\n', '\nTaxonomic Name: candida_glabrata\n\tfasta URI: pub/fungi/release-36/fasta/fungi_ascomycota1_collection/_candida_glabrata/dna_index/_candida_glabrata.ASM254v2.dna.toplevel.fa.gz\n\tgff3 URI: pub/fungi/release-36/gff3/fungi_ascomycota1_collection/_candida_glabrata/_candida_glabrata.ASM254v2.36.gff3.gz\n']
 	top_dir: pub/fungi/release-36/gff3/fungi_rozellomycota1_collection/
-	parsing_function: <function EnsemblDatabase.ensembl_line_parser at 0x7feb30042598>
+	parsing_function: <function EnsemblDatabase.ensembl_line_parser at 0x7fad8ecaa378>
 
 DEBUG:root:FTP CRAWL INITIALIZED WITH
 	database: ['\nTaxonomic Name: Rozella_allomycis_csf55\n\tfasta URI: pub/fungi/release-36/fasta/fungi_rozellomycota1_collection/rozella_allomycis_csf55/dna_index/Rozella_allomycis_csf55.Rozella_k41_t100.dna.toplevel.fa.gz\n\tgff3 URI: pub/fungi/release-36/gff3/fungi_rozellomycota1_collection/rozella_allomycis_csf55/Rozella_allomycis_csf55.Rozella_k41_t100.36.gff3.gz\n', '\nTaxonomic Name: candida_glabrata\n\tfasta URI: pub/fungi/release-36/fasta/fungi_ascomycota1_collection/_candida_glabrata/dna_index/_candida_glabrata.ASM254v2.dna.toplevel.fa.gz\n\tgff3 URI: pub/fungi/release-36/gff3/fungi_ascomycota1_collection/_candida_glabrata/_candida_glabrata.ASM254v2.36.gff3.gz\n']
 	top_dir: pub/fungi/release-36/gff3/fungi_rozellomycota1_collection/rozella_allomycis_csf55/
-	parsing_function: <function EnsemblDatabase.ensembl_line_parser at 0x7feb30042598>
+	parsing_function: <function EnsemblDatabase.ensembl_line_parser at 0x7fad8ecaa378>
 
 DEBUG:root:filtered_gen_species_list
 DEBUG:root:['Rozella', 'allomycis', 'csf55']
@@ -38,27 +38,27 @@ INFO:root:Genome Rozella_allomycis_csf55 found and added to the database.
 DEBUG:root:FTP CRAWL INITIALIZED WITH
 	database: ['\nTaxonomic Name: Rozella_allomycis_csf55\n\tfasta URI: pub/fungi/release-36/fasta/fungi_rozellomycota1_collection/rozella_allomycis_csf55/dna_index/Rozella_allomycis_csf55.Rozella_k41_t100.dna.toplevel.fa.gz\n\tgff3 URI: pub/fungi/release-36/gff3/fungi_rozellomycota1_collection/rozella_allomycis_csf55/Rozella_allomycis_csf55.Rozella_k41_t100.36.gff3.gz\n', '\nTaxonomic Name: candida_glabrata\n\tfasta URI: pub/fungi/release-36/fasta/fungi_ascomycota1_collection/_candida_glabrata/dna_index/_candida_glabrata.ASM254v2.dna.toplevel.fa.gz\n\tgff3 URI: pub/fungi/release-36/gff3/fungi_ascomycota1_collection/_candida_glabrata/_candida_glabrata.ASM254v2.36.gff3.gz\n']
 	top_dir: pub/fungi/release-36/fasta/fungi_rozellomycota1_collection/
-	parsing_function: <function EnsemblDatabase.ensembl_line_parser at 0x7feb30042598>
+	parsing_function: <function EnsemblDatabase.ensembl_line_parser at 0x7fad8ecaa378>
 
 DEBUG:root:FTP CRAWL INITIALIZED WITH
 	database: ['\nTaxonomic Name: Rozella_allomycis_csf55\n\tfasta URI: pub/fungi/release-36/fasta/fungi_rozellomycota1_collection/rozella_allomycis_csf55/dna_index/Rozella_allomycis_csf55.Rozella_k41_t100.dna.toplevel.fa.gz\n\tgff3 URI: pub/fungi/release-36/gff3/fungi_rozellomycota1_collection/rozella_allomycis_csf55/Rozella_allomycis_csf55.Rozella_k41_t100.36.gff3.gz\n', '\nTaxonomic Name: candida_glabrata\n\tfasta URI: pub/fungi/release-36/fasta/fungi_ascomycota1_collection/_candida_glabrata/dna_index/_candida_glabrata.ASM254v2.dna.toplevel.fa.gz\n\tgff3 URI: pub/fungi/release-36/gff3/fungi_ascomycota1_collection/_candida_glabrata/_candida_glabrata.ASM254v2.36.gff3.gz\n']
 	top_dir: pub/fungi/release-36/fasta/fungi_rozellomycota1_collection/rozella_allomycis_csf55/
-	parsing_function: <function EnsemblDatabase.ensembl_line_parser at 0x7feb30042598>
+	parsing_function: <function EnsemblDatabase.ensembl_line_parser at 0x7fad8ecaa378>
 
 DEBUG:root:FTP CRAWL INITIALIZED WITH
 	database: ['\nTaxonomic Name: Rozella_allomycis_csf55\n\tfasta URI: pub/fungi/release-36/fasta/fungi_rozellomycota1_collection/rozella_allomycis_csf55/dna_index/Rozella_allomycis_csf55.Rozella_k41_t100.dna.toplevel.fa.gz\n\tgff3 URI: pub/fungi/release-36/gff3/fungi_rozellomycota1_collection/rozella_allomycis_csf55/Rozella_allomycis_csf55.Rozella_k41_t100.36.gff3.gz\n', '\nTaxonomic Name: candida_glabrata\n\tfasta URI: pub/fungi/release-36/fasta/fungi_ascomycota1_collection/_candida_glabrata/dna_index/_candida_glabrata.ASM254v2.dna.toplevel.fa.gz\n\tgff3 URI: pub/fungi/release-36/gff3/fungi_ascomycota1_collection/_candida_glabrata/_candida_glabrata.ASM254v2.36.gff3.gz\n']
 	top_dir: pub/fungi/release-36/fasta/fungi_rozellomycota1_collection/rozella_allomycis_csf55/cdna/
-	parsing_function: <function EnsemblDatabase.ensembl_line_parser at 0x7feb30042598>
+	parsing_function: <function EnsemblDatabase.ensembl_line_parser at 0x7fad8ecaa378>
 
 DEBUG:root:FTP CRAWL INITIALIZED WITH
 	database: ['\nTaxonomic Name: Rozella_allomycis_csf55\n\tfasta URI: pub/fungi/release-36/fasta/fungi_rozellomycota1_collection/rozella_allomycis_csf55/dna_index/Rozella_allomycis_csf55.Rozella_k41_t100.dna.toplevel.fa.gz\n\tgff3 URI: pub/fungi/release-36/gff3/fungi_rozellomycota1_collection/rozella_allomycis_csf55/Rozella_allomycis_csf55.Rozella_k41_t100.36.gff3.gz\n', '\nTaxonomic Name: candida_glabrata\n\tfasta URI: pub/fungi/release-36/fasta/fungi_ascomycota1_collection/_candida_glabrata/dna_index/_candida_glabrata.ASM254v2.dna.toplevel.fa.gz\n\tgff3 URI: pub/fungi/release-36/gff3/fungi_ascomycota1_collection/_candida_glabrata/_candida_glabrata.ASM254v2.36.gff3.gz\n']
 	top_dir: pub/fungi/release-36/fasta/fungi_rozellomycota1_collection/rozella_allomycis_csf55/cds/
-	parsing_function: <function EnsemblDatabase.ensembl_line_parser at 0x7feb30042598>
+	parsing_function: <function EnsemblDatabase.ensembl_line_parser at 0x7fad8ecaa378>
 
 DEBUG:root:FTP CRAWL INITIALIZED WITH
 	database: ['\nTaxonomic Name: Rozella_allomycis_csf55\n\tfasta URI: pub/fungi/release-36/fasta/fungi_rozellomycota1_collection/rozella_allomycis_csf55/dna_index/Rozella_allomycis_csf55.Rozella_k41_t100.dna.toplevel.fa.gz\n\tgff3 URI: pub/fungi/release-36/gff3/fungi_rozellomycota1_collection/rozella_allomycis_csf55/Rozella_allomycis_csf55.Rozella_k41_t100.36.gff3.gz\n', '\nTaxonomic Name: candida_glabrata\n\tfasta URI: pub/fungi/release-36/fasta/fungi_ascomycota1_collection/_candida_glabrata/dna_index/_candida_glabrata.ASM254v2.dna.toplevel.fa.gz\n\tgff3 URI: pub/fungi/release-36/gff3/fungi_ascomycota1_collection/_candida_glabrata/_candida_glabrata.ASM254v2.36.gff3.gz\n']
 	top_dir: pub/fungi/release-36/fasta/fungi_rozellomycota1_collection/rozella_allomycis_csf55/dna/
-	parsing_function: <function EnsemblDatabase.ensembl_line_parser at 0x7feb30042598>
+	parsing_function: <function EnsemblDatabase.ensembl_line_parser at 0x7fad8ecaa378>
 
 DEBUG:root:filtered_gen_species_list
 DEBUG:root:['Rozella', 'allomycis', 'csf55']
@@ -66,7 +66,7 @@ INFO:root:Genome Rozella_allomycis_csf55 found and added to the database.
 DEBUG:root:FTP CRAWL INITIALIZED WITH
 	database: ['\nTaxonomic Name: Rozella_allomycis_csf55\n\tfasta URI: pub/fungi/release-36/fasta/fungi_rozellomycota1_collection/rozella_allomycis_csf55/dna/Rozella_allomycis_csf55.Rozella_k41_t100.dna.toplevel.fa.gz\n\tgff3 URI: pub/fungi/release-36/gff3/fungi_rozellomycota1_collection/rozella_allomycis_csf55/Rozella_allomycis_csf55.Rozella_k41_t100.36.gff3.gz\n', '\nTaxonomic Name: candida_glabrata\n\tfasta URI: pub/fungi/release-36/fasta/fungi_ascomycota1_collection/_candida_glabrata/dna_index/_candida_glabrata.ASM254v2.dna.toplevel.fa.gz\n\tgff3 URI: pub/fungi/release-36/gff3/fungi_ascomycota1_collection/_candida_glabrata/_candida_glabrata.ASM254v2.36.gff3.gz\n']
 	top_dir: pub/fungi/release-36/fasta/fungi_rozellomycota1_collection/rozella_allomycis_csf55/dna_index/
-	parsing_function: <function EnsemblDatabase.ensembl_line_parser at 0x7feb30042598>
+	parsing_function: <function EnsemblDatabase.ensembl_line_parser at 0x7fad8ecaa378>
 
 DEBUG:root:filtered_gen_species_list
 DEBUG:root:['Rozella', 'allomycis', 'csf55']
@@ -74,17 +74,17 @@ INFO:root:Genome Rozella_allomycis_csf55 found and added to the database.
 DEBUG:root:FTP CRAWL INITIALIZED WITH
 	database: ['\nTaxonomic Name: Rozella_allomycis_csf55\n\tfasta URI: pub/fungi/release-36/fasta/fungi_rozellomycota1_collection/rozella_allomycis_csf55/dna_index/Rozella_allomycis_csf55.Rozella_k41_t100.dna.toplevel.fa.gz\n\tgff3 URI: pub/fungi/release-36/gff3/fungi_rozellomycota1_collection/rozella_allomycis_csf55/Rozella_allomycis_csf55.Rozella_k41_t100.36.gff3.gz\n', '\nTaxonomic Name: candida_glabrata\n\tfasta URI: pub/fungi/release-36/fasta/fungi_ascomycota1_collection/_candida_glabrata/dna_index/_candida_glabrata.ASM254v2.dna.toplevel.fa.gz\n\tgff3 URI: pub/fungi/release-36/gff3/fungi_ascomycota1_collection/_candida_glabrata/_candida_glabrata.ASM254v2.36.gff3.gz\n']
 	top_dir: pub/fungi/release-36/fasta/fungi_rozellomycota1_collection/rozella_allomycis_csf55/ncrna/
-	parsing_function: <function EnsemblDatabase.ensembl_line_parser at 0x7feb30042598>
+	parsing_function: <function EnsemblDatabase.ensembl_line_parser at 0x7fad8ecaa378>
 
 DEBUG:root:FTP CRAWL INITIALIZED WITH
 	database: ['\nTaxonomic Name: Rozella_allomycis_csf55\n\tfasta URI: pub/fungi/release-36/fasta/fungi_rozellomycota1_collection/rozella_allomycis_csf55/dna_index/Rozella_allomycis_csf55.Rozella_k41_t100.dna.toplevel.fa.gz\n\tgff3 URI: pub/fungi/release-36/gff3/fungi_rozellomycota1_collection/rozella_allomycis_csf55/Rozella_allomycis_csf55.Rozella_k41_t100.36.gff3.gz\n', '\nTaxonomic Name: candida_glabrata\n\tfasta URI: pub/fungi/release-36/fasta/fungi_ascomycota1_collection/_candida_glabrata/dna_index/_candida_glabrata.ASM254v2.dna.toplevel.fa.gz\n\tgff3 URI: pub/fungi/release-36/gff3/fungi_ascomycota1_collection/_candida_glabrata/_candida_glabrata.ASM254v2.36.gff3.gz\n']
 	top_dir: pub/fungi/release-36/fasta/fungi_rozellomycota1_collection/rozella_allomycis_csf55/pep/
-	parsing_function: <function EnsemblDatabase.ensembl_line_parser at 0x7feb30042598>
+	parsing_function: <function EnsemblDatabase.ensembl_line_parser at 0x7fad8ecaa378>
 
 DEBUG:root:FTP CRAWL INITIALIZED WITH
 	database: ['\nTaxonomic Name: Rozella_allomycis_csf55\n\tfasta URI: pub/fungi/release-36/fasta/fungi_rozellomycota1_collection/rozella_allomycis_csf55/dna_index/Rozella_allomycis_csf55.Rozella_k41_t100.dna.toplevel.fa.gz\n\tgff3 URI: pub/fungi/release-36/gff3/fungi_rozellomycota1_collection/rozella_allomycis_csf55/Rozella_allomycis_csf55.Rozella_k41_t100.36.gff3.gz\n', '\nTaxonomic Name: candida_glabrata\n\tfasta URI: pub/fungi/release-36/fasta/fungi_ascomycota1_collection/_candida_glabrata/dna_index/_candida_glabrata.ASM254v2.dna.toplevel.fa.gz\n\tgff3 URI: pub/fungi/release-36/gff3/fungi_ascomycota1_collection/_candida_glabrata/_candida_glabrata.ASM254v2.36.gff3.gz\n']
 	top_dir: pub/fungi/release-36/gff3/fungi_ascomycota1_collection/_candida_glabrata/
-	parsing_function: <function EnsemblDatabase.ensembl_line_parser at 0x7feb30042598>
+	parsing_function: <function EnsemblDatabase.ensembl_line_parser at 0x7fad8ecaa378>
 
 DEBUG:root:filtered_gen_species_list
 DEBUG:root:['candida', 'glabrata']
@@ -92,22 +92,22 @@ INFO:root:Genome candida_glabrata found and added to the database.
 DEBUG:root:FTP CRAWL INITIALIZED WITH
 	database: ['\nTaxonomic Name: Rozella_allomycis_csf55\n\tfasta URI: pub/fungi/release-36/fasta/fungi_rozellomycota1_collection/rozella_allomycis_csf55/dna_index/Rozella_allomycis_csf55.Rozella_k41_t100.dna.toplevel.fa.gz\n\tgff3 URI: pub/fungi/release-36/gff3/fungi_rozellomycota1_collection/rozella_allomycis_csf55/Rozella_allomycis_csf55.Rozella_k41_t100.36.gff3.gz\n', '\nTaxonomic Name: candida_glabrata\n\tfasta URI: pub/fungi/release-36/fasta/fungi_ascomycota1_collection/_candida_glabrata/dna_index/_candida_glabrata.ASM254v2.dna.toplevel.fa.gz\n\tgff3 URI: pub/fungi/release-36/gff3/fungi_ascomycota1_collection/_candida_glabrata/_candida_glabrata.ASM254v2.36.gff3.gz\n']
 	top_dir: pub/fungi/release-36/fasta/fungi_ascomycota1_collection/_candida_glabrata/
-	parsing_function: <function EnsemblDatabase.ensembl_line_parser at 0x7feb30042598>
+	parsing_function: <function EnsemblDatabase.ensembl_line_parser at 0x7fad8ecaa378>
 
 DEBUG:root:FTP CRAWL INITIALIZED WITH
 	database: ['\nTaxonomic Name: Rozella_allomycis_csf55\n\tfasta URI: pub/fungi/release-36/fasta/fungi_rozellomycota1_collection/rozella_allomycis_csf55/dna_index/Rozella_allomycis_csf55.Rozella_k41_t100.dna.toplevel.fa.gz\n\tgff3 URI: pub/fungi/release-36/gff3/fungi_rozellomycota1_collection/rozella_allomycis_csf55/Rozella_allomycis_csf55.Rozella_k41_t100.36.gff3.gz\n', '\nTaxonomic Name: candida_glabrata\n\tfasta URI: pub/fungi/release-36/fasta/fungi_ascomycota1_collection/_candida_glabrata/dna_index/_candida_glabrata.ASM254v2.dna.toplevel.fa.gz\n\tgff3 URI: pub/fungi/release-36/gff3/fungi_ascomycota1_collection/_candida_glabrata/_candida_glabrata.ASM254v2.36.gff3.gz\n']
 	top_dir: pub/fungi/release-36/fasta/fungi_ascomycota1_collection/_candida_glabrata/cdna/
-	parsing_function: <function EnsemblDatabase.ensembl_line_parser at 0x7feb30042598>
+	parsing_function: <function EnsemblDatabase.ensembl_line_parser at 0x7fad8ecaa378>
 
 DEBUG:root:FTP CRAWL INITIALIZED WITH
 	database: ['\nTaxonomic Name: Rozella_allomycis_csf55\n\tfasta URI: pub/fungi/release-36/fasta/fungi_rozellomycota1_collection/rozella_allomycis_csf55/dna_index/Rozella_allomycis_csf55.Rozella_k41_t100.dna.toplevel.fa.gz\n\tgff3 URI: pub/fungi/release-36/gff3/fungi_rozellomycota1_collection/rozella_allomycis_csf55/Rozella_allomycis_csf55.Rozella_k41_t100.36.gff3.gz\n', '\nTaxonomic Name: candida_glabrata\n\tfasta URI: pub/fungi/release-36/fasta/fungi_ascomycota1_collection/_candida_glabrata/dna_index/_candida_glabrata.ASM254v2.dna.toplevel.fa.gz\n\tgff3 URI: pub/fungi/release-36/gff3/fungi_ascomycota1_collection/_candida_glabrata/_candida_glabrata.ASM254v2.36.gff3.gz\n']
 	top_dir: pub/fungi/release-36/fasta/fungi_ascomycota1_collection/_candida_glabrata/cds/
-	parsing_function: <function EnsemblDatabase.ensembl_line_parser at 0x7feb30042598>
+	parsing_function: <function EnsemblDatabase.ensembl_line_parser at 0x7fad8ecaa378>
 
 DEBUG:root:FTP CRAWL INITIALIZED WITH
 	database: ['\nTaxonomic Name: Rozella_allomycis_csf55\n\tfasta URI: pub/fungi/release-36/fasta/fungi_rozellomycota1_collection/rozella_allomycis_csf55/dna_index/Rozella_allomycis_csf55.Rozella_k41_t100.dna.toplevel.fa.gz\n\tgff3 URI: pub/fungi/release-36/gff3/fungi_rozellomycota1_collection/rozella_allomycis_csf55/Rozella_allomycis_csf55.Rozella_k41_t100.36.gff3.gz\n', '\nTaxonomic Name: candida_glabrata\n\tfasta URI: pub/fungi/release-36/fasta/fungi_ascomycota1_collection/_candida_glabrata/dna_index/_candida_glabrata.ASM254v2.dna.toplevel.fa.gz\n\tgff3 URI: pub/fungi/release-36/gff3/fungi_ascomycota1_collection/_candida_glabrata/_candida_glabrata.ASM254v2.36.gff3.gz\n']
 	top_dir: pub/fungi/release-36/fasta/fungi_ascomycota1_collection/_candida_glabrata/dna/
-	parsing_function: <function EnsemblDatabase.ensembl_line_parser at 0x7feb30042598>
+	parsing_function: <function EnsemblDatabase.ensembl_line_parser at 0x7fad8ecaa378>
 
 DEBUG:root:filtered_gen_species_list
 DEBUG:root:['candida', 'glabrata']
@@ -115,7 +115,7 @@ INFO:root:Genome candida_glabrata found and added to the database.
 DEBUG:root:FTP CRAWL INITIALIZED WITH
 	database: ['\nTaxonomic Name: Rozella_allomycis_csf55\n\tfasta URI: pub/fungi/release-36/fasta/fungi_rozellomycota1_collection/rozella_allomycis_csf55/dna_index/Rozella_allomycis_csf55.Rozella_k41_t100.dna.toplevel.fa.gz\n\tgff3 URI: pub/fungi/release-36/gff3/fungi_rozellomycota1_collection/rozella_allomycis_csf55/Rozella_allomycis_csf55.Rozella_k41_t100.36.gff3.gz\n', '\nTaxonomic Name: candida_glabrata\n\tfasta URI: pub/fungi/release-36/fasta/fungi_ascomycota1_collection/_candida_glabrata/dna/_candida_glabrata.ASM254v2.dna.toplevel.fa.gz\n\tgff3 URI: pub/fungi/release-36/gff3/fungi_ascomycota1_collection/_candida_glabrata/_candida_glabrata.ASM254v2.36.gff3.gz\n']
 	top_dir: pub/fungi/release-36/fasta/fungi_ascomycota1_collection/_candida_glabrata/dna_index/
-	parsing_function: <function EnsemblDatabase.ensembl_line_parser at 0x7feb30042598>
+	parsing_function: <function EnsemblDatabase.ensembl_line_parser at 0x7fad8ecaa378>
 
 DEBUG:root:filtered_gen_species_list
 DEBUG:root:['candida', 'glabrata']
@@ -123,12 +123,12 @@ INFO:root:Genome candida_glabrata found and added to the database.
 DEBUG:root:FTP CRAWL INITIALIZED WITH
 	database: ['\nTaxonomic Name: Rozella_allomycis_csf55\n\tfasta URI: pub/fungi/release-36/fasta/fungi_rozellomycota1_collection/rozella_allomycis_csf55/dna_index/Rozella_allomycis_csf55.Rozella_k41_t100.dna.toplevel.fa.gz\n\tgff3 URI: pub/fungi/release-36/gff3/fungi_rozellomycota1_collection/rozella_allomycis_csf55/Rozella_allomycis_csf55.Rozella_k41_t100.36.gff3.gz\n', '\nTaxonomic Name: candida_glabrata\n\tfasta URI: pub/fungi/release-36/fasta/fungi_ascomycota1_collection/_candida_glabrata/dna_index/_candida_glabrata.ASM254v2.dna.toplevel.fa.gz\n\tgff3 URI: pub/fungi/release-36/gff3/fungi_ascomycota1_collection/_candida_glabrata/_candida_glabrata.ASM254v2.36.gff3.gz\n']
 	top_dir: pub/fungi/release-36/fasta/fungi_ascomycota1_collection/_candida_glabrata/ncrna/
-	parsing_function: <function EnsemblDatabase.ensembl_line_parser at 0x7feb30042598>
+	parsing_function: <function EnsemblDatabase.ensembl_line_parser at 0x7fad8ecaa378>
 
 DEBUG:root:FTP CRAWL INITIALIZED WITH
 	database: ['\nTaxonomic Name: Rozella_allomycis_csf55\n\tfasta URI: pub/fungi/release-36/fasta/fungi_rozellomycota1_collection/rozella_allomycis_csf55/dna_index/Rozella_allomycis_csf55.Rozella_k41_t100.dna.toplevel.fa.gz\n\tgff3 URI: pub/fungi/release-36/gff3/fungi_rozellomycota1_collection/rozella_allomycis_csf55/Rozella_allomycis_csf55.Rozella_k41_t100.36.gff3.gz\n', '\nTaxonomic Name: candida_glabrata\n\tfasta URI: pub/fungi/release-36/fasta/fungi_ascomycota1_collection/_candida_glabrata/dna_index/_candida_glabrata.ASM254v2.dna.toplevel.fa.gz\n\tgff3 URI: pub/fungi/release-36/gff3/fungi_ascomycota1_collection/_candida_glabrata/_candida_glabrata.ASM254v2.36.gff3.gz\n']
 	top_dir: pub/fungi/release-36/fasta/fungi_ascomycota1_collection/_candida_glabrata/pep/
-	parsing_function: <function EnsemblDatabase.ensembl_line_parser at 0x7feb30042598>
+	parsing_function: <function EnsemblDatabase.ensembl_line_parser at 0x7fad8ecaa378>
 
 INFO:root:
 Taxonomic Name: Rozella_allomycis_csf55

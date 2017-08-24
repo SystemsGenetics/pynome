@@ -75,3 +75,9 @@ def test_download_metadata(create_database):
 def test_download_genomes(create_database):
     genomes = create_database.get_found_genomes()
     create_database.download_genomes()
+
+
+def test_read_species_metadata(create_database):
+    create_database.read_species_metadata()
+    for entry in create_database.species_metadata.itertuples():
+        logging.info(entry['taxonomy_id'])

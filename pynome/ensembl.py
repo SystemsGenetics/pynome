@@ -37,6 +37,7 @@ class EnsemblDatabase(GenomeDatabase):
         self._release_number = None  # set by the release version setter
         self.release_version = release_version
         self.ftp = ftplib.FTP()  # the ftp instance for the database
+        self.species_metadata = None
 
     @property
     def release_version(self):
@@ -317,52 +318,55 @@ class EnsemblDatabase(GenomeDatabase):
         self.ftp.quit()  # close the ftp connection
         return
 
+    def read_species_metadata(self, file_name="species.txt"):
+        """
+        Reads the downloaded metadata file: ``species.txt`` file and returns a
+        pandas data frame.
 
-def read_species_metadata(file_path, file_name="species.txt"):
-    """
-    Reads the downloaded metadata file: ``species.txt`` file and returns a
-    pandas data frame.
+        :param file_name: The name of ``species.txt``.
 
-    :param file_path: The path where species.txt is located.
-    :param file_name: The name of ``species.txt``.
-    :return: A pandas data frame of the contents of ``file_name``.
+        The following are the column names in the dataframe:
 
-    The following are the column names in the dataframe:
+        #name
+        species
+        division
+        **taxonomy_id** <-- The one we are interested in.
+        assembly
+        assembly_accession
+        genebuild
+        variation
+        pan_compara
+        peptide_compara
+        genome_alignments
+        other_alignments
+        core_db
+        species_id
+        """
+        # Build the path of the target file.
+        species_path = os.path.join(self.download_path, file_name)
+        # Read the csv.
+        metadata_df = pandas.read_csv(
+            filepath_or_buffer=species_path,
+            error_bad_lines=False,
+            sep="\t",
+            index_col=False,
+        )
+        self.species_metadata = metadata_df
+        return
 
-    #name
-    species
-    division
-    **taxonomy_id** <-- The one we are interested in.
-    assembly
-    assembly_accession
-    genebuild
-    variation
-    pan_compara
-    peptide_compara
-    genome_alignments
-    other_alignments
-    core_db
-    species_id
-    """
-    # Build the path of the target file.
-    species_path = os.path.join(file_path, file_name)
-    # Read the csv.
-    metadata_df = pandas.read.csv(
-        filepath_or_buffer=species_path,
-        error_bad_lines=False,
-        sep="\t",
-        index_col=False,
-    )
-    return metadata_df
+    def get_taxonomy_id(self, species, pandas_df):
+        """
+        Looks up the taxonomy_id in the given pandas data frame.
 
+        :param species:
+        :param pandas_df:
+        :return:
+        """
+        taxonomy_id = pandas_df[
+            pandas_df['species'].str.match(
+                species.lower())]['taxonomy_id'].values[0]
+        return taxonomy_id
 
-def get_taxonomy_id(species, pandas_df):
-    """
-    Looks up the taxonomy_id in the given pandas data frame.
-
-    :param species:
-    :param pandas_df:
-    :return:
-    """
-    taxonomy_id = pandas_df[pandas_df['species'].str.match(species.lower())]['taxonomy_id'].values[0]
-    return taxonomy_id
+    def add_taxonomy_ids(self):
+        # Read the metadata file to get the pandas dataframe:
+        self.read_species_metadata()

@@ -7,7 +7,6 @@ The **Genomedatabase** module consists of two classes:
 """
 
 import logging
-import os
 from pynome import Session
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column, Integer, String, create_engine
@@ -61,7 +60,7 @@ class GenomeEntry(Base):  # Inherit from declarative_base.
     fasta_size = Column(Integer())
     assembly_name = Column(String(250))
     genus = Column(String(250))
-    SRA_id = Column(String(100))
+    taxonomy_id = Column(String(100))
 
     def __init__(self, taxonomic_name, **kwargs):
         """Constructor that overrides the default provided. This ensures that
