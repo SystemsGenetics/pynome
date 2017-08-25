@@ -26,7 +26,7 @@ logging.getLogger(__name__)
 logging.basicConfig(
     filename='main.log',
     filemode='w',
-    level='DEBUG'
+    level='INFO'
 )
 
 
@@ -54,6 +54,7 @@ def main():
     parser.add_argument('-p', '--print-genomes', action='store_true')
     parser.add_argument('-d', '--download-genomes', action='store_true')
     parser.add_argument('-m', '--download-metadata', action='store_true')
+    parser.add_argument('-r', '--read-metadata', action='store_true')
     parser.add_argument('-v', '--verbose', help='Set output to verbose.',
                         action='store_true')
     args = parser.parse_args()  # Parse the arguments
@@ -94,6 +95,13 @@ def main():
     if args.download_genomes:
         print('Downloading Genomes!')
         entry_download_genomes(main_database)
+
+    if args.read_metadata:
+        try:
+            main_database.read_species_metadata()
+            main_database.add_taxonomy_ids()
+        except:
+            print('Unable to read the metadata file: species.txt')
 
     exit()
 

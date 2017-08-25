@@ -171,7 +171,6 @@ class EnsemblDatabase(GenomeDatabase):
             genus_species = name_list[0]
             assembly_name = name_list[1]
             # Some species have sub-names
-            # genus, species = genus_species.split('_', 1)
             try:
                 gen_species_list = genus_species.split('_')
                 gen_species_list = list(filter(None, gen_species_list))
@@ -306,7 +305,6 @@ class EnsemblDatabase(GenomeDatabase):
                             update_size = len(data) / 8.192
                             total_pbar.update(int(update_size))
                             curr_file.write(data)
-
                         try:
                             self.ftp.retrbinary(
                                 cmd='RETR {}'.format(uri),
@@ -314,7 +312,6 @@ class EnsemblDatabase(GenomeDatabase):
                         except:
                             logging.warning('UNABLE TO DOWNLOAD A GENOME')
                             logging.warning(genome.taxonomic_name)
-
         self.ftp.quit()  # close the ftp connection
         return
 
@@ -354,7 +351,7 @@ class EnsemblDatabase(GenomeDatabase):
         self.species_metadata = metadata_df
         return
 
-    def get_taxonomy_id(self, species, pandas_df):
+    def get_taxonomy_id(self, species):
         """
         Looks up the taxonomy_id in the given pandas data frame.
 
@@ -362,11 +359,23 @@ class EnsemblDatabase(GenomeDatabase):
         :param pandas_df:
         :return:
         """
-        taxonomy_id = pandas_df[
-            pandas_df['species'].str.match(
-                species.lower())]['taxonomy_id'].values[0]
-        return taxonomy_id
+        taxonomy_id = self.species_metadata[
+            self.species_metadata['species'].str.match(
+                species.lower())]['taxonomy_id'].values
+        if taxonomy_id.size == 0:
+            logging.error('Unable to find a taxonomy id for {}'.format(species))
+            return None
+        logging.debug('Found taxonomy id: {0}'.format(taxonomy_id))
+        logging.debug('Found taxonomy id type: {0}'.format(type(taxonomy_id)))
+        return str(taxonomy_id[0])
 
     def add_taxonomy_ids(self):
         # Read the metadata file to get the pandas dataframe:
         self.read_species_metadata()
+        for genome in tqdm(self.get_found_genomes()):
+            taxonomy_id = self.get_taxonomy_id(genome.taxonomic_name)
+            update_dict = {
+                'taxonomic_name': genome.taxonomic_name,
+                'taxonomy_id': taxonomy_id
+            }
+            self.save_genome(**update_dict)

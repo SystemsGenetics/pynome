@@ -50,14 +50,11 @@ class GenomeEntry(Base):  # Inherit from declarative_base.
     """
     __tablename__ = "GenomeTable"  # Should this be the same as the class?
     taxonomic_name = Column(String(150), primary_key=True)
-    download_method = Column(String(10))
-    local_path = Column(String(300))
     species = Column(String(150))
     fasta_uri = Column(String(1000))
-    gff3_uri = Column(String(1000))
-    genome_local_path = Column(String(1000))
-    gff3_size = Column(Integer())
     fasta_size = Column(Integer())
+    gff3_uri = Column(String(1000))
+    gff3_size = Column(Integer())
     assembly_name = Column(String(250))
     genus = Column(String(250))
     taxonomy_id = Column(String(100))

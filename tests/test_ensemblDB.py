@@ -4,7 +4,7 @@ Tests for ftpHelper
 ==================
 
 Run from the top dir via::
-    ``pytest -sv tests\database_test.py``
+    ``pytest -sv``
 """
 
 import pytest
@@ -41,10 +41,10 @@ def test_generate_uri(create_database):
 crawl_test_uri = [
     'pub/fungi/release-36/gff3/fungi_rozellomycota1_collection/',
     'pub/fungi/release-36/fasta/fungi_rozellomycota1_collection/',
-    'pub/fungi/release-36/gff3/fungi_ascomycota1_collection/_candida_glabrata/',
-    'pub/fungi/release-36/fasta/fungi_ascomycota1_collection/_candida_glabrata/',
-    # 'pub/fungi/release-36/gff3/fungi_ascomycota1_collection/',
-    # 'pub/fungi/release-36/fasta/fungi_ascomycota1_collection/'
+    # 'pub/fungi/release-36/gff3/fungi_ascomycota1_collection/_candida_glabrata/',
+    # 'pub/fungi/release-36/fasta/fungi_ascomycota1_collection/_candida_glabrata/',
+    'pub/fungi/release-36/gff3/fungi_ascomycota1_collection/',
+    'pub/fungi/release-36/fasta/fungi_ascomycota1_collection/'
 ]
 def test_ensemble_crawl(create_database):
     create_database.find_genomes(
@@ -79,5 +79,6 @@ def test_download_genomes(create_database):
 
 def test_read_species_metadata(create_database):
     create_database.read_species_metadata()
-    for entry in create_database.species_metadata.itertuples():
-        logging.info(entry['taxonomy_id'])
+
+def test_add_taxonomy_ids(create_database):
+    create_database.add_taxonomy_ids()
