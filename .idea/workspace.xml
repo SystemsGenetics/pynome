@@ -62,7 +62,7 @@
             <entry file="file://$PROJECT_DIR$/tests/test_ensemblDB.py">
               <provider selected="true" editor-type-id="text-editor">
                 <state relative-caret-position="1260">
-                  <caret line="84" column="0" lean-forward="true" selection-start-line="84" selection-start-column="0" selection-end-line="84" selection-end-column="0" />
+                  <caret line="84" column="0" lean-forward="false" selection-start-line="84" selection-start-column="0" selection-end-line="84" selection-end-column="0" />
                   <folding>
                     <element signature="e#114#127#0" expanded="true" />
                   </folding>
@@ -70,23 +70,23 @@
               </provider>
             </entry>
           </file>
-          <file leaf-file-name="__main__.py" pinned="false" current-in-tab="false">
+          <file leaf-file-name="__main__.py" pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/pynome/__main__.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="480">
-                  <caret line="106" column="0" lean-forward="true" selection-start-line="106" selection-start-column="0" selection-end-line="106" selection-end-column="0" />
+                <state relative-caret-position="240">
+                  <caret line="86" column="30" lean-forward="true" selection-start-line="86" selection-start-column="30" selection-end-line="86" selection-end-column="30" />
                   <folding>
-                    <element signature="e#491#500#0" expanded="true" />
+                    <element signature="e#463#472#0" expanded="true" />
                   </folding>
                 </state>
               </provider>
             </entry>
           </file>
-          <file leaf-file-name=".gitignore" pinned="false" current-in-tab="true">
+          <file leaf-file-name=".gitignore" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/.gitignore">
               <provider selected="true" editor-type-id="text-editor">
                 <state relative-caret-position="240">
-                  <caret line="16" column="5" lean-forward="true" selection-start-line="16" selection-start-column="5" selection-end-line="16" selection-end-column="5" />
+                  <caret line="16" column="5" lean-forward="false" selection-start-line="16" selection-start-column="5" selection-end-line="16" selection-end-column="5" />
                   <folding />
                 </state>
               </provider>
@@ -133,8 +133,8 @@
         <option value="$PROJECT_DIR$/pynome/ensembl.py" />
         <option value="$PROJECT_DIR$/pynome/database.py" />
         <option value="$PROJECT_DIR$/tests/test_ensemblDB.py" />
-        <option value="$PROJECT_DIR$/pynome/__main__.py" />
         <option value="$PROJECT_DIR$/.gitignore" />
+        <option value="$PROJECT_DIR$/pynome/__main__.py" />
       </list>
     </option>
   </component>
@@ -344,7 +344,7 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="87" y="188" width="1760" height="799" extended-state="1" />
+    <frame x="87" y="188" width="1760" height="799" extended-state="0" />
     <editor active="true" />
     <layout>
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.15519254" sideWeight="0.4943274" order="1" side_tool="false" content_ui="combo" />
@@ -404,7 +404,7 @@
         <state relative-caret-position="1035">
           <caret line="71" column="39" lean-forward="false" selection-start-line="71" selection-start-column="39" selection-end-line="71" selection-end-column="39" />
           <folding>
-            <element signature="e#491#500#0" expanded="true" />
+            <element signature="e#463#472#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -496,7 +496,7 @@
         <state relative-caret-position="1173">
           <caret line="71" column="39" lean-forward="true" selection-start-line="71" selection-start-column="39" selection-end-line="71" selection-end-column="39" />
           <folding>
-            <element signature="e#491#500#0" expanded="true" />
+            <element signature="e#463#472#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -571,7 +571,7 @@
         <state relative-caret-position="884">
           <caret line="54" column="0" lean-forward="false" selection-start-line="54" selection-start-column="0" selection-end-line="54" selection-end-column="0" />
           <folding>
-            <element signature="e#491#500#0" expanded="true" />
+            <element signature="e#463#472#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -650,7 +650,7 @@
         <state relative-caret-position="527">
           <caret line="34" column="11" lean-forward="true" selection-start-line="34" selection-start-column="11" selection-end-line="34" selection-end-column="11" />
           <folding>
-            <element signature="e#491#500#0" expanded="true" />
+            <element signature="e#463#472#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -762,7 +762,7 @@
     <entry file="file://$PROJECT_DIR$/tests/test_ensemblDB.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1260">
-          <caret line="84" column="0" lean-forward="true" selection-start-line="84" selection-start-column="0" selection-end-line="84" selection-end-column="0" />
+          <caret line="84" column="0" lean-forward="false" selection-start-line="84" selection-start-column="0" selection-end-line="84" selection-end-column="0" />
           <folding>
             <element signature="e#114#127#0" expanded="true" />
           </folding>
@@ -779,21 +779,21 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/pynome/__main__.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="480">
-          <caret line="106" column="0" lean-forward="true" selection-start-line="106" selection-start-column="0" selection-end-line="106" selection-end-column="0" />
-          <folding>
-            <element signature="e#491#500#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/.gitignore">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="240">
-          <caret line="16" column="5" lean-forward="true" selection-start-line="16" selection-start-column="5" selection-end-line="16" selection-end-column="5" />
+          <caret line="16" column="5" lean-forward="false" selection-start-line="16" selection-start-column="5" selection-end-line="16" selection-end-column="5" />
           <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pynome/__main__.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="240">
+          <caret line="86" column="30" lean-forward="true" selection-start-line="86" selection-start-column="30" selection-end-line="86" selection-end-column="30" />
+          <folding>
+            <element signature="e#463#472#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
