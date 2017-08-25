@@ -70,7 +70,7 @@
               </provider>
             </entry>
           </file>
-          <file leaf-file-name="__main__.py" pinned="false" current-in-tab="true">
+          <file leaf-file-name="__main__.py" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/pynome/__main__.py">
               <provider selected="true" editor-type-id="text-editor">
                 <state relative-caret-position="480">
@@ -78,6 +78,16 @@
                   <folding>
                     <element signature="e#491#500#0" expanded="true" />
                   </folding>
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file leaf-file-name=".gitignore" pinned="false" current-in-tab="true">
+            <entry file="file://$PROJECT_DIR$/.gitignore">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="240">
+                  <caret line="16" column="5" lean-forward="true" selection-start-line="16" selection-start-column="5" selection-end-line="16" selection-end-column="5" />
+                  <folding />
                 </state>
               </provider>
             </entry>
@@ -118,13 +128,13 @@
         <option value="$PROJECT_DIR$/conf.py" />
         <option value="$PROJECT_DIR$/index.rst" />
         <option value="$PROJECT_DIR$/pynome/ftpHelper.py" />
-        <option value="$PROJECT_DIR$/.gitignore" />
         <option value="$PROJECT_DIR$/pynome/sra.py" />
         <option value="$PROJECT_DIR$/database_test.log" />
         <option value="$PROJECT_DIR$/pynome/ensembl.py" />
         <option value="$PROJECT_DIR$/pynome/database.py" />
         <option value="$PROJECT_DIR$/tests/test_ensemblDB.py" />
         <option value="$PROJECT_DIR$/pynome/__main__.py" />
+        <option value="$PROJECT_DIR$/.gitignore" />
       </list>
     </option>
   </component>
@@ -334,7 +344,7 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="87" y="188" width="1760" height="799" extended-state="0" />
+    <frame x="87" y="188" width="1760" height="799" extended-state="1" />
     <editor active="true" />
     <layout>
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.15519254" sideWeight="0.4943274" order="1" side_tool="false" content_ui="combo" />
@@ -710,13 +720,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/.gitignore">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="30">
-          <caret line="2" column="19" lean-forward="true" selection-start-line="2" selection-start-column="19" selection-end-line="2" selection-end-column="19" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/pynome/sra.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="420">
@@ -783,6 +786,14 @@
           <folding>
             <element signature="e#491#500#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/.gitignore">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="240">
+          <caret line="16" column="5" lean-forward="true" selection-start-line="16" selection-start-column="5" selection-end-line="16" selection-end-column="5" />
+          <folding />
         </state>
       </provider>
     </entry>
