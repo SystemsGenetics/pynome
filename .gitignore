@@ -15,3 +15,4 @@ tests/__pycache__/pynome_tests.cpython-35-PYTEST.pyc
 tests/__pycache__/test_database.cpython-35-PYTEST.pyc
 tests/__pycache__/test_ensemblDB.cpython-35-PYTEST.pyc
 *.log
+.idea/workspace.xml
