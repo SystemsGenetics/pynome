@@ -55,6 +55,7 @@ def main():
     parser.add_argument('-d', '--download-genomes', action='store_true')
     parser.add_argument('-m', '--download-metadata', action='store_true')
     parser.add_argument('-r', '--read-metadata', action='store_true')
+    parser.add_argument('-u', '--uncompress', action='store_true')
     parser.add_argument('-v', '--verbose', help='Set output to verbose.',
                         action='store_true')
     args = parser.parse_args()  # Parse the arguments
@@ -102,6 +103,9 @@ def main():
             main_database.add_taxonomy_ids()
         except:
             print('Unable to read the metadata file: species.txt')
+
+    if args.uncompress:
+        main_database.decompress_genomes()
 
     exit()
 

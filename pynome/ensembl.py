@@ -12,7 +12,9 @@ import os
 import logging
 import itertools
 import pandas
+import subprocess
 from pynome.database import GenomeDatabase
+from pynome.utils import cd
 from pynome.ftpHelper import crawl_ftp_dir
 from tqdm import tqdm
 
@@ -379,3 +381,28 @@ class EnsemblDatabase(GenomeDatabase):
                 'taxonomy_id': taxonomy_id
             }
             self.save_genome(**update_dict)
+
+    def decompress_genomes(self):
+        """
+        Decompresses the genomes that have been downloaded.
+
+        :return:
+        """
+        # Get all the genomes that have been found and saved in the SQLite db.
+        genomes = self.get_found_genomes()
+
+        # Iterate over the list of genomes
+        for genome in genomes:
+            # Build the path in the same way as the download function.
+            # TODO: Consider factoring this out, or storing the path in the db
+            target_dir = os.path.join(
+                self.download_path,
+                genome.taxonomic_name
+            )
+            # Go to the target directory and unzip the files therein.
+            with cd(target_dir):
+                # TODO: Consider removing the star and specifying the files
+                subprocess.run('gunzip *', shell=True)
+        return
+
+    def 
