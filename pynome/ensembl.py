@@ -405,4 +405,67 @@ class EnsemblDatabase(GenomeDatabase):
                 subprocess.run('gunzip *', shell=True)
         return
 
-    def 
+    def generate_file_paths(self, req_list):
+        """
+        Generates the file paths of all genomes in the data base.
+        There are, at one point or another, the following files per genome:
+
+            + [genome.taxonomic_name].fa.gz
+            + [genome.taxonomic_name].fa
+            + [genome.taxonomic_name].gff3.gz
+            + [genome.taxonomic_name].gff3
+            + [genome.taxonomic_name].gtf
+            + [genome.taxonomic_name].ht2
+            + Splice_sites.txt
+
+        This funciton wll supply a list of filepaths based on the list input.
+        """
+
+        # Get all the genomes in the sqlite database.
+        genomes = self.get_found_genomes()
+
+        # Build a list of the base file path.
+        path_list = []
+        for gen in genomes:
+            for req in req_list:
+                new_path = os.path.join(
+                    self.download_path,
+                    gen.taxonomic_name,
+                    gen.taxonomic_name + req)
+                path_list.append(new_path)
+
+        return path_list
+
+
+    def run_hisat(self, in_list):
+        """
+        Run the hisat conversion tool on the supplied path list.
+
+        HISAT tool options:
+
+        -f
+
+        Reads (specified with <m1>, <m2>, <s>) are FASTA files. FASTA files usually 
+        have extension .fa, .fasta, .mfa, .fna or similar. FASTA files do not have a
+        way of specifying quality values, so when -f is set, the result is as 
+        if --ignore-quals is also set.
+
+        If your computer has multiple processors/cores, use -p
+
+        The -p option causes HISAT to launch a specified number of parallel search threads.
+        Each thread runs on a different processor/core and all threads find alignments in 
+        parallel, increasing alignment throughput by approximately a multiple of the number
+        of threads (though in practice, speedup is somewhat worse than linear).
+
+        """
+
+        for fa_path in in_list:
+            try:
+                cmd = 'hisat2-build {}'.format(fa_path)
+            except Exception as e:
+                logging.warning('Unable to build ht2 index of {}'.format(fa_path))
+                pass
+
+        return
+
+        
