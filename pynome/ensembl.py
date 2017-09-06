@@ -479,7 +479,7 @@ class EnsemblDatabase(GenomeDatabase):
             path = os.path.join(self.download_path, gen.taxonomic_name)
             # build the file name
             gff3_file = gen.taxonomic_name + '.gff3'
-            gff_out_file = gen.taxonomic_name + 'gtf'
+            gff_out_file = gen.taxonomic_name + '.gtf'
             # Build the command:
             cmd = ['gffread', '-T', gff3_file, '-o', gff_out_file]
             with cd(path):
