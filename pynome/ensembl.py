@@ -432,12 +432,12 @@ class EnsemblDatabase(GenomeDatabase):
             # build the filename
             fa_file = gen.taxonomic_name + '.fa'
             # build the hisat2-build command
-            cmd = ['hisat2-build', '-f', fa_file, gen.taxonomic_name]
-                # 'hisat2-build -f {0} {1}'.format(fa_file, gen.taxonomic_name)
+            # cmd = ['hisat2-build', '-f', fa_file, gen.taxonomic_name]
+            cmd = 'hisat2-build -f {0} {1}'.format(fa_file, gen.taxonomic_name)
             # change to the path, and try to run the command. Log an error if it fails.
             with cd(path):
                 try:
-                    subprocess.run(cmd)
+                    subprocess.run(cmd, shell=True)
                 except:
                     logging.warning(
                         'Unable to build ht2 index of {}'.format(
@@ -458,7 +458,7 @@ class EnsemblDatabase(GenomeDatabase):
                 'Attempting to generate splice sites for {}'.format(gen.taxonomic_name))
             gtf_path = os.path.join(self.download_path, gen.taxonomic_name)
             gft_file = gen.taxonomic_name + '.gft'
-            output_file = gen.taxonomic_name + 'Splice_sites.txt'
+            output_file = 'Splice_sites.txt'
             with cd(gtf_path):
                 extract_splice_sites(gft_file, output_file)
         return
