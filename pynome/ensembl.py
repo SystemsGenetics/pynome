@@ -432,7 +432,7 @@ class EnsemblDatabase(GenomeDatabase):
             # build the filename
             fa_file = gen.taxonomic_name + '.fa'
             # build the hisat2-build command
-            cmd = 'hisat2-build -f {0} {0}'.format(fa_file)
+            cmd = 'hisat2-build -f {0} {1}'.format(fa_file, gen.taxonomic_name)
             # change to the path, and try to run the command. Log an error if it fails.
             with cd(path):
                 try:
@@ -453,6 +453,8 @@ class EnsemblDatabase(GenomeDatabase):
         genome_list = self.get_found_genomes()
 
         for gen in genome_list:
+            logging.debug(
+                'Attempting to generate splice sites for {}'.format(gen.taxonomic_name))
             gtf_path = os.path.join(self.download_path, gen.taxonomic_name)
             gft_file = gen.taxonomic_name + '.gft'
             with cd(gtf_path):
@@ -463,7 +465,7 @@ class EnsemblDatabase(GenomeDatabase):
         """
         ueses gffread command to generate *.gtf files.
 
-        gffread TARGET_FILE.gff3 -o -T
+        gffread -T <TARGET_FILE>.gff3 -o <TARGET_FILE>.gtf
 
         Should output to the gtf2 file format.
 
@@ -476,8 +478,9 @@ class EnsemblDatabase(GenomeDatabase):
             path = os.path.join(self.download_path, gen.taxonomic_name)
             # build the file name
             gff3_file = gen.taxonomic_name + '.gff3'
+            gff_out_file = gen.taxonomic_name + 'gtf'
             # Build the command:
-            cmd = 'gffread {0} -T -o'.format(gff3_file)
+            cmd = 'gffread -T {0} -o {1}'.format(gff3_file, gff_out_file)
             with cd(path):
                 try:
                     subprocess.run(cmd)
