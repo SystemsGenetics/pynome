@@ -458,8 +458,9 @@ class EnsemblDatabase(GenomeDatabase):
                 'Attempting to generate splice sites for {}'.format(gen.taxonomic_name))
             gtf_path = os.path.join(self.download_path, gen.taxonomic_name)
             gft_file = gen.taxonomic_name + '.gft'
+            output_file = gen.taxonomic_name + 'Splice_sites.txt'
             with cd(gtf_path):
-                extract_splice_sites(gft_file)
+                extract_splice_sites(gft_file, output_file)
         return
 
     def generate_gtf(self):

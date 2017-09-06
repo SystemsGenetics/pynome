@@ -1,5 +1,7 @@
 #
-# Copied from :https://github.com/infphilo/hisat2/blob/master/hisat2_extract_splice_sites.py
+# MODIFIED from:
+# https://github.com/infphilo/hisat2/blob/master/hisat2_extract_splice_sites.py
+# Modified by Tyler Biggs for use in SciDAS.
 #
 # Copyright 2015, Daehwan Kim <infphilo@gmail.com>
 #
@@ -26,7 +28,7 @@ from collections import defaultdict as dd, Counter
 from argparse import ArgumentParser, FileType
 
 
-def extract_splice_sites(gtf_file, verbose=False):
+def extract_splice_sites(gtf_file, out_file, verbose=False):
     genes = dd(list)
     trans = {}
 
@@ -81,9 +83,11 @@ def extract_splice_sites(gtf_file, verbose=False):
         for i in range(1, len(exons)):
             junctions.add((chrom, exons[i - 1][1], exons[i][0], strand))
     junctions = sorted(junctions)
-    for chrom, left, right, strand in junctions:
-        # Zero-based offset
-        print('{}\t{}\t{}\t{}'.format(chrom, left - 1, right - 1, strand))
+    with open(out_file, 'w') as f:
+        for chrom, left, right, strand in junctions:
+            # Zero-based offset
+            f.write('{}\t{}\t{}\t{}\n'.format(chrom, left - 1, right - 1, strand))
+            # print('{}\t{}\t{}\t{}'.format(chrom, left - 1, right - 1, strand))
 
     # Print some stats if asked
     if verbose:
