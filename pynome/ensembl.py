@@ -436,7 +436,7 @@ class EnsemblDatabase(GenomeDatabase):
             # change to the path, and try to run the command. Log an error if it fails.
             with cd(path):
                 try:
-                    subprocess.run(cmd)
+                    subprocess.run(cmd, shell=True)
                 except:
                     logging.warning(
                         'Unable to build ht2 index of {}'.format(
@@ -483,7 +483,7 @@ class EnsemblDatabase(GenomeDatabase):
             cmd = 'gffread -T {0} -o {1}'.format(gff3_file, gff_out_file)
             with cd(path):
                 try:
-                    subprocess.run(cmd)
+                    subprocess.run(cmd, shell=True)
                 except:
                     logging.warning(
                         'Unable to generate gtf file for {}'.format(
