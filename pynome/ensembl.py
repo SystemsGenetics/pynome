@@ -16,6 +16,7 @@ import subprocess
 from pynome.database import GenomeDatabase
 from pynome.utils import cd
 from pynome.ftpHelper import crawl_ftp_dir
+from pynome.hisat2_extract_splice_sites import extract_splice_sites
 from tqdm import tqdm
 
 ENSEMBL_FTP_URI = 'ftp.ensemblgenomes.org'
@@ -153,18 +154,18 @@ class EnsemblDatabase(GenomeDatabase):
 
         bad_words = ('chromosome', 'abinitio')
 
-        def split_line(line):
+        def split_line(in_line):
             """Parse an individual item line from an ftp.dir() call.
             This function handles splitting, without assuming the line
             contains a valid genome file."""
-            item = line.split()   # Split the listing by whitespace.
-            line_dict = {
+            # Split the listing by whitespace.
+            item = in_line.split()
+            return {
                 'dir_info': item[0],
                 'dir_subfolders': item[1],
                 'size': item[4],
                 'item_name': item[-1]
             }
-            return line_dict
 
         def parse_genome_name(line_dict):
             """Takes an item line dictionary and splits the genomes name
@@ -358,7 +359,6 @@ class EnsemblDatabase(GenomeDatabase):
         Looks up the taxonomy_id in the given pandas data frame.
 
         :param species:
-        :param pandas_df:
         :return:
         """
         taxonomy_id = self.species_metadata[
@@ -395,49 +395,14 @@ class EnsemblDatabase(GenomeDatabase):
         for genome in genomes:
             # Build the path in the same way as the download function.
             # TODO: Consider factoring this out, or storing the path in the db
-            target_dir = os.path.join(
-                self.download_path,
-                genome.taxonomic_name
-            )
+            target_dir = os.path.join(self.download_path, genome.taxonomic_name)
             # Go to the target directory and unzip the files therein.
             with cd(target_dir):
                 # TODO: Consider removing the star and specifying the files
                 subprocess.run('gunzip *', shell=True)
         return
 
-    def generate_file_paths(self, req_list):
-        """
-        Generates the file paths of all genomes in the data base.
-        There are, at one point or another, the following files per genome:
-
-            + [genome.taxonomic_name].fa.gz
-            + [genome.taxonomic_name].fa
-            + [genome.taxonomic_name].gff3.gz
-            + [genome.taxonomic_name].gff3
-            + [genome.taxonomic_name].gtf
-            + [genome.taxonomic_name].ht2
-            + Splice_sites.txt
-
-        This funciton wll supply a list of filepaths based on the list input.
-        """
-
-        # Get all the genomes in the sqlite database.
-        genomes = self.get_found_genomes()
-
-        # Build a list of the base file path.
-        path_list = []
-        for gen in genomes:
-            for req in req_list:
-                new_path = os.path.join(
-                    self.download_path,
-                    gen.taxonomic_name,
-                    gen.taxonomic_name + req)
-                path_list.append(new_path)
-
-        return path_list
-
-
-    def run_hisat(self, in_list):
+    def generate_hisat_index(self):
         """
         Run the hisat conversion tool on the supplied path list.
 
@@ -458,14 +423,67 @@ class EnsemblDatabase(GenomeDatabase):
         of threads (though in practice, speedup is somewhat worse than linear).
 
         """
+        genome_list = self.get_found_genomes()
 
-        for fa_path in in_list:
-            try:
-                cmd = 'hisat2-build {}'.format(fa_path)
-            except Exception as e:
-                logging.warning('Unable to build ht2 index of {}'.format(fa_path))
-                pass
-
+        # The hisat tool will create the indexes in the current directory.
+        for gen in genome_list:
+            # build the path
+            path = os.path.join(self.download_path, gen.taxonomic_name)
+            # build the filename
+            fa_file = gen.taxonomic_name + '.fa'
+            # build the hisat2-build command
+            cmd = 'hisat2-build -f {0} {0}'.format(fa_file)
+            # change to the path, and try to run the command. Log an error if it fails.
+            with cd(path):
+                try:
+                    subprocess.run(cmd)
+                except:
+                    logging.warning(
+                        'Unable to build ht2 index of {}'.format(
+                            gen.taxonomic_name))
         return
 
-        
+    def generate_splice_sites(self):
+        """
+        Command example for splice site generation:
+
+        python hisat2_extract_splice_sites.py GRCh38-gencode.v24.annotation.gtf > GRCh38.Splice_Sites.txt
+        :return:
+        """
+        genome_list = self.get_found_genomes()
+
+        for gen in genome_list:
+            gtf_path = os.path.join(self.download_path, gen.taxonomic_name)
+            gft_file = gen.taxonomic_name + '.gft'
+            with cd(gtf_path):
+                extract_splice_sites(gft_file)
+        return
+
+    def generate_gtf(self):
+        """
+        ueses gffread command to generate *.gtf files.
+
+        gffread TARGET_FILE.gff3 -o -T
+
+        Should output to the gtf2 file format.
+
+        :return:
+        """
+        genome_list = self.get_found_genomes()
+
+        for gen in genome_list:
+            # Build the path
+            path = os.path.join(self.download_path, gen.taxonomic_name)
+            # build the file name
+            gff3_file = gen.taxonomic_name + '.gff3'
+            # Build the command:
+            cmd = 'gffread {0} -T -o'.format(gff3_file)
+            with cd(path):
+                try:
+                    subprocess.run(cmd)
+                except:
+                    logging.warning(
+                        'Unable to generate gtf file for {}'.format(
+                            gen.taxonomic_name))
+
+        return

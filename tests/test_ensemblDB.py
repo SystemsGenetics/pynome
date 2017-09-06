@@ -46,42 +46,57 @@ crawl_test_uri = [
     # 'pub/fungi/release-36/gff3/fungi_ascomycota1_collection/',
     # 'pub/fungi/release-36/fasta/fungi_ascomycota1_collection/'
 ]
-# def test_ensemble_crawl(create_database):
-#     create_database.find_genomes(
-#         crawl_test_uri
-#     )
-#     genomes = create_database.get_found_genomes()
-#     for q in genomes:
-#         logging.info(str(q))
-#
-#
-# def test_estimate_download_size(create_database):
-#     size_estimate = create_database.estimate_download_size()
-#     logging.info('Size estimate: {}'.format(size_estimate))
-#
-#
-# def test_generate_metadata_uri(create_database):
-#     uri_list = create_database.generate_metadata_uri()
-#     logging.info("Printing metadata information.")
-#     for uri in uri_list.items():
-#         logging.info(uri)
-#
-#
-# def test_download_metadata(create_database):
-#     logging.info("Downloading metadata.")
-#     create_database.download_metadata()
-#
-#
-# def test_download_genomes(create_database):
-#     genomes = create_database.get_found_genomes()
-#     create_database.download_genomes()
-#
-#
-# def test_read_species_metadata(create_database):
-#     create_database.read_species_metadata()
-#
-# def test_add_taxonomy_ids(create_database):
-#     create_database.add_taxonomy_ids()
 
-def test_decopress_genomes(create_database):
+
+def test_ensemble_crawl(create_database):
+    create_database.find_genomes(
+        crawl_test_uri
+    )
+    genomes = create_database.get_found_genomes()
+    for q in genomes:
+        logging.info(str(q))
+
+
+def test_estimate_download_size(create_database):
+    size_estimate = create_database.estimate_download_size()
+    logging.info('Size estimate: {}'.format(size_estimate))
+
+
+def test_generate_metadata_uri(create_database):
+    uri_list = create_database.generate_metadata_uri()
+    logging.info("Printing metadata information.")
+    for uri in uri_list.items():
+        logging.info(uri)
+
+
+def test_download_metadata(create_database):
+    logging.info("Downloading metadata.")
+    create_database.download_metadata()
+
+
+def test_download_genomes(create_database):
+    create_database.download_genomes()
+
+
+def test_read_species_metadata(create_database):
+    create_database.read_species_metadata()
+
+
+def test_add_taxonomy_ids(create_database):
+    create_database.add_taxonomy_ids()
+
+
+def test_decompress_genomes(create_database):
     create_database.decompress_genomes()
+
+
+def test_generate_hisat_index(create_database):
+    create_database.generate_hisat_index()
+
+
+def test_generate_gtf(create_database):
+    create_database.generate_gtf()
+
+
+def test_generate_splice_sites(create_database):
+    create_database.generate_splice_sites()
