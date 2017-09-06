@@ -20,8 +20,8 @@ logging.basicConfig(
 
 
 @pytest.fixture(scope='module')
-def create_database(database_path='/media/tylerbiggs/genomic/test.db',
-                    download_path='/media/tylerbiggs/genomic/'):
+def create_database(database_path='/scidas/genomic/test.db',
+                    download_path='/scidas/genomic/'):
     """Create a database instance. The empty path should create the database
     in memory. Without scope='module', this would be run for every test."""
     logging.info('\nCreating the database.\n')
