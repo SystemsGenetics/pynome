@@ -437,7 +437,7 @@ class EnsemblDatabase(GenomeDatabase):
             # change to the path, and try to run the command. Log an error if it fails.
             with cd(path):
                 try:
-                    subprocess.run(cmd, shell=True)
+                    subprocess.run(cmd)
                 except:
                     logging.warning(
                         'Unable to build ht2 index of {}'.format(
