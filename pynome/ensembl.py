@@ -484,7 +484,7 @@ class EnsemblDatabase(GenomeDatabase):
             cmd = ['gffread', '-T', gff3_file, '-o', gff_out_file]
             with cd(path):
                 try:
-                    subprocess.run(cmd, shell=True)
+                    subprocess.run(cmd)
                 except:
                     logging.warning(
                         'Unable to generate gtf file for {}'.format(

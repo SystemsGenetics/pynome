@@ -30,8 +30,8 @@
           <file leaf-file-name="ensembl.py" pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/pynome/ensembl.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="552">
-                  <caret line="481" column="50" lean-forward="false" selection-start-line="481" selection-start-column="50" selection-end-line="481" selection-end-column="50" />
+                <state relative-caret-position="627">
+                  <caret line="486" column="38" lean-forward="false" selection-start-line="486" selection-start-column="38" selection-end-line="486" selection-end-column="38" />
                   <folding>
                     <element signature="e#245#258#0" expanded="true" />
                   </folding>
@@ -799,8 +799,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/pynome/ensembl.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="552">
-          <caret line="481" column="50" lean-forward="false" selection-start-line="481" selection-start-column="50" selection-end-line="481" selection-end-column="50" />
+        <state relative-caret-position="627">
+          <caret line="486" column="38" lean-forward="false" selection-start-line="486" selection-start-column="38" selection-end-line="486" selection-end-column="38" />
           <folding>
             <element signature="e#245#258#0" expanded="true" />
           </folding>
