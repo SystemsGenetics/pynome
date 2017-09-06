@@ -432,8 +432,8 @@ class EnsemblDatabase(GenomeDatabase):
             # build the filename
             fa_file = gen.taxonomic_name + '.fa'
             # build the hisat2-build command
-            # cmd = ['hisat2-build', '-f', fa_file, gen.taxonomic_name]
-            cmd = 'hisat2-build -f {0} {1}'.format(fa_file, gen.taxonomic_name)
+            cmd = ['hisat2-build', '-f', fa_file, gen.taxonomic_name]
+            # cmd = 'hisat2-build -f {0} {1}'.format(fa_file, gen.taxonomic_name)
             # change to the path, and try to run the command. Log an error if it fails.
             with cd(path):
                 try:

@@ -30,8 +30,8 @@
           <file leaf-file-name="ensembl.py" pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/pynome/ensembl.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="717">
-                  <caret line="439" column="39" lean-forward="true" selection-start-line="439" selection-start-column="39" selection-end-line="439" selection-end-column="39" />
+                <state relative-caret-position="567">
+                  <caret line="435" column="34" lean-forward="false" selection-start-line="435" selection-start-column="34" selection-end-line="435" selection-end-column="34" />
                   <folding>
                     <element signature="e#245#258#0" expanded="true" />
                   </folding>
@@ -78,26 +78,24 @@
               </provider>
             </entry>
           </file>
-          <file leaf-file-name="test_ensemblDB.py" pinned="false" current-in-tab="false">
+          <file leaf-file-name="test_ensemblDB.py" pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/tests/test_ensemblDB.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="298">
-                  <caret line="40" column="18" lean-forward="true" selection-start-line="40" selection-start-column="18" selection-end-line="40" selection-end-column="18" />
+                <state relative-caret-position="341">
+                  <caret line="78" column="0" lean-forward="true" selection-start-line="78" selection-start-column="0" selection-end-line="78" selection-end-column="0" />
                   <folding>
-                    <element signature="e#114#127#0" expanded="true" />
+                    <element signature="e#180#193#0" expanded="true" />
                   </folding>
                 </state>
               </provider>
             </entry>
           </file>
-          <file leaf-file-name="hisat2_extract_splice_sites.py" pinned="false" current-in-tab="true">
+          <file leaf-file-name="hisat2_extract_splice_sites.py" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/pynome/hisat2_extract_splice_sites.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="1076">
-                  <caret line="93" column="55" lean-forward="true" selection-start-line="93" selection-start-column="55" selection-end-line="93" selection-end-column="55" />
-                  <folding>
-                    <element signature="e#896#924#0" expanded="true" />
-                  </folding>
+                <state relative-caret-position="71">
+                  <caret line="26" column="27" lean-forward="true" selection-start-line="26" selection-start-column="27" selection-end-line="26" selection-end-column="27" />
+                  <folding />
                 </state>
               </provider>
             </entry>
@@ -158,8 +156,8 @@
         <option value="$PROJECT_DIR$/pynome/utils.py" />
         <option value="$PROJECT_DIR$/pynome/__main__.py" />
         <option value="$PROJECT_DIR$/README.md" />
-        <option value="$PROJECT_DIR$/tests/test_ensemblDB.py" />
         <option value="$PROJECT_DIR$/pynome/hisat2_extract_splice_sites.py" />
+        <option value="$PROJECT_DIR$/tests/test_ensemblDB.py" />
         <option value="$PROJECT_DIR$/pynome/ensembl.py" />
       </list>
     </option>
@@ -459,7 +457,7 @@
         <state relative-caret-position="391">
           <caret line="25" column="2" lean-forward="false" selection-start-line="25" selection-start-column="2" selection-end-line="25" selection-end-column="2" />
           <folding>
-            <element signature="e#114#127#0" expanded="true" />
+            <element signature="e#180#193#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -550,7 +548,7 @@
         <state relative-caret-position="391">
           <caret line="25" column="2" lean-forward="false" selection-start-line="25" selection-start-column="2" selection-end-line="25" selection-end-column="2" />
           <folding>
-            <element signature="e#114#127#0" expanded="true" />
+            <element signature="e#180#193#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -636,7 +634,7 @@
         <state relative-caret-position="0">
           <caret line="0" column="3" lean-forward="true" selection-start-line="0" selection-start-column="3" selection-end-line="0" selection-end-column="3" />
           <folding>
-            <element signature="e#114#127#0" expanded="true" />
+            <element signature="e#180#193#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -789,30 +787,28 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/tests/test_ensemblDB.py">
+    <entry file="file://$PROJECT_DIR$/pynome/hisat2_extract_splice_sites.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="298">
-          <caret line="40" column="18" lean-forward="true" selection-start-line="40" selection-start-column="18" selection-end-line="40" selection-end-column="18" />
-          <folding>
-            <element signature="e#114#127#0" expanded="true" />
-          </folding>
+        <state relative-caret-position="71">
+          <caret line="26" column="27" lean-forward="true" selection-start-line="26" selection-start-column="27" selection-end-line="26" selection-end-column="27" />
+          <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/pynome/hisat2_extract_splice_sites.py">
+    <entry file="file://$PROJECT_DIR$/tests/test_ensemblDB.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1076">
-          <caret line="93" column="55" lean-forward="true" selection-start-line="93" selection-start-column="55" selection-end-line="93" selection-end-column="55" />
+        <state relative-caret-position="341">
+          <caret line="78" column="0" lean-forward="true" selection-start-line="78" selection-start-column="0" selection-end-line="78" selection-end-column="0" />
           <folding>
-            <element signature="e#896#924#0" expanded="true" />
+            <element signature="e#180#193#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/pynome/ensembl.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="717">
-          <caret line="439" column="39" lean-forward="true" selection-start-line="439" selection-start-column="39" selection-end-line="439" selection-end-column="39" />
+        <state relative-caret-position="567">
+          <caret line="435" column="34" lean-forward="false" selection-start-line="435" selection-start-column="34" selection-end-line="435" selection-end-column="34" />
           <folding>
             <element signature="e#245#258#0" expanded="true" />
           </folding>

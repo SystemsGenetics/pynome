@@ -5,6 +5,9 @@ Tests for ftpHelper
 
 Run from the top dir via::
     ``pytest -sv``
+
+Testing on kamiak:
+python3 -m pytest -sv tests/test_ensemblDB.py
 """
 
 import pytest
