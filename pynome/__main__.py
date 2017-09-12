@@ -56,6 +56,9 @@ def main():
     parser.add_argument('-m', '--download-metadata', action='store_true')
     parser.add_argument('-r', '--read-metadata', action='store_true')
     parser.add_argument('-u', '--uncompress', action='store_true')
+    parser.add_argument('-i', '--hisat-index', action='store_true')
+    parser.add_argument('-g', '--gen-gtf', action='store_true')
+    parser.add_argument('-s', '--gen-splice', action='store_true')
     parser.add_argument('-v', '--verbose', help='Set output to verbose.',
                         action='store_true')
     args = parser.parse_args()  # Parse the arguments
@@ -106,6 +109,14 @@ def main():
 
     if args.uncompress:
         main_database.decompress_genomes()
+
+    if args.hisat_index:
+        main_database.generate_hisat_index()
+
+    if args.gen_gtf:
+        main_database.generate_gtf()
+
+    if args
 
     exit()
 

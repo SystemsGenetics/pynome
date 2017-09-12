@@ -426,7 +426,7 @@ class EnsemblDatabase(GenomeDatabase):
         genome_list = self.get_found_genomes()
 
         # The hisat tool will create the indexes in the current directory.
-        for gen in genome_list:
+        for gen in tqdm(genome_list):
             # build the path
             path = os.path.join(self.download_path, gen.taxonomic_name)
             # build the filename
@@ -453,7 +453,7 @@ class EnsemblDatabase(GenomeDatabase):
         """
         genome_list = self.get_found_genomes()
 
-        for gen in genome_list:
+        for gen in tqdm(genome_list):
             logging.debug(
                 'Attempting to generate splice sites for {}'.format(gen.taxonomic_name))
             gtf_path = os.path.join(self.download_path, gen.taxonomic_name)
@@ -475,7 +475,7 @@ class EnsemblDatabase(GenomeDatabase):
         """
         genome_list = self.get_found_genomes()
 
-        for gen in genome_list:
+        for gen in tqdm(genome_list):
             # Build the path
             path = os.path.join(self.download_path, gen.taxonomic_name)
             # build the file name
