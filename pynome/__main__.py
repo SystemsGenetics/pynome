@@ -7,8 +7,25 @@ In this version (0.1.0) only the Ensembl database is implemented.
 So to run it, and download to a directory on SciDAS storage (from
 the pynome dir)::
 
+    # Crawl ensembl and save genomes data to the sqlite database.
+    # The download path is still required.
+    $ python3 -m pynome -f <sql_db_path> <download_path>
+
+    # Find, download the genomes and metadata file:
+    $ python3 -m pynome -fdm <sql_db_path> <download_path>
+
+    # Find, download the genomes and metadata file:
     $ python3 -m pynome -fdm /scidas/genomes2/genome.db /scidas/genomes2
+
+    # Download the genomes and metadata (genomes must be found)
     $ python3 -m pynome -dm /scidas /scidas/genomes
+
+    # Decompress downloaded genomes
+    $ python3 -m pynome -u /scidas/genomes3/ensebl_genome.db /scidas/genomes3
+
+    # Run all post-download processes on downloaded genomes.
+    $ python3 -m pynome -uigs /scidas/genomes3/genomes.db /scidas/genomes3
+
 
 
 **Usage Examples**::
@@ -116,7 +133,8 @@ def main():
     if args.gen_gtf:
         main_database.generate_gtf()
 
-    if args
+    if args.gen_splice:
+        main_database.generate_splice_sites()
 
     exit()
 
