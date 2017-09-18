@@ -49,8 +49,10 @@ class GenomeEntry(Base):  # Inherit from declarative_base.
     to the database being examined.
     """
     __tablename__ = "GenomeTable"  # Should this be the same as the class?
-    taxonomic_name = Column(String(150), primary_key=True)
-    species = Column(String(150))
+    # __table_args__ = {'sqlite_autoincrement': True}
+    # index = Column(Integer(), , autoincrement=True)
+    taxonomic_name = Column(String(500), primary_key=True)
+    species = Column(String(500))
     fasta_uri = Column(String(1000))
     fasta_size = Column(Integer())
     gff3_uri = Column(String(1000))
@@ -59,6 +61,8 @@ class GenomeEntry(Base):  # Inherit from declarative_base.
     genus = Column(String(250))
     taxonomy_id = Column(String(100))
 
+    # Index(self, 'idx_tax_name', GenomeTable.c.taxonomic_name)
+
     def __init__(self, taxonomic_name, **kwargs):
         """Constructor that overrides the default provided. This ensures that
         a taxonomic_name is required for each GenomeEntry."""
@@ -66,17 +70,17 @@ class GenomeEntry(Base):  # Inherit from declarative_base.
         for key, value in kwargs.items():  # Set attributes found in **kwargs
             setattr(self, key, value)
 
-    def __str__(self):
-        """Custom representation that will be pulled up when a print out
-        is requested."""
-        out_str = (
-            "\n"
-            "Taxonomic Name: {0.taxonomic_name}\n"
-            "\tfasta URI: {0.fasta_uri}\n"
-            "\tgff3 URI: {0.gff3_uri}\n"
-            .format(self)
-        )
-        return out_str
+    # def __str__(self):
+    #     """Custom representation that will be pulled up when a print out
+    #     is requested."""
+    #     out_str = (
+    #         "\n"
+    #         "Taxonomic Name: {0.taxonomic_name}\n"
+    #         "\tfasta URI: {0.fasta_uri}\n"
+    #         "\tgff3 URI: {0.gff3_uri}\n"
+    #         .format(self)
+    #     )
+    #     return out_str
 
 
 class GenomeDatabase(object):
@@ -94,7 +98,6 @@ class GenomeDatabase(object):
         # engine is the path that our database is stored.
         logging.debug('Generating database at: {}'.format(self.database_path))
         engine = create_engine(self.database_path)
-        # metadata.create_all ensures that the table defined in GenomeEntry
         Base.metadata.create_all(engine)
         Session.configure(bind=engine)
         self.session = Session()
@@ -118,3 +121,6 @@ class GenomeDatabase(object):
         """Print all the Genomes in the database to the terminal."""
         query = self.session.query(GenomeEntry).all()
         return query
+
+    def get_genome_by_index(self, idx):
+        return self.session.query(GenomeEntry).get(idx)

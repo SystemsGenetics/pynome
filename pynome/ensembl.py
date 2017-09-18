@@ -365,10 +365,10 @@ class EnsemblDatabase(GenomeDatabase):
             self.species_metadata['species'].str.match(
                 species.lower())]['taxonomy_id'].values
         if taxonomy_id.size == 0:
-            logging.error('Unable to find a taxonomy id for {}'.format(species))
+            logging.error(
+                'Unable to find a taxonomy id for {}'.format(species))
             return None
         logging.debug('Found taxonomy id: {0}'.format(taxonomy_id))
-        logging.debug('Found taxonomy id type: {0}'.format(type(taxonomy_id)))
         return str(taxonomy_id[0])
 
     def add_taxonomy_ids(self):
@@ -384,9 +384,10 @@ class EnsemblDatabase(GenomeDatabase):
 
     def decompress_genomes(self):
         """
-        Decompresses the genomes that have been downloaded.
+        Decompresses the genomes that have been downloaded. This will be
+        changed to use a slurm array.
 
-        :return:
+        :return: Nothing
         """
         # Get all the genomes that have been found and saved in the SQLite db.
         genomes = self.get_found_genomes()
@@ -395,11 +396,37 @@ class EnsemblDatabase(GenomeDatabase):
         for genome in genomes:
             # Build the path in the same way as the download function.
             # TODO: Consider factoring this out, or storing the path in the db
-            target_dir = os.path.join(self.download_path, genome.taxonomic_name)
+            target_dir = os.path.join(
+                self.download_path, genome.taxonomic_name)
             # Go to the target directory and unzip the files therein.
             with cd(target_dir):
                 # TODO: Consider removing the star and specifying the files
                 subprocess.run('gunzip *', shell=True)
+        return
+
+    def slurm_decompress_genome(self, slurm_index):
+        """
+        This function is to be used in a slurm array. The slurm_index value
+        refers to a list entry from a sorted call of get_found_genomes.
+        This will fail if new entries are added to the database while the
+        decompression command runs.
+
+        This command should be called in slurm scripts in this way:
+            python3 -m pynome --slurm-decompress <idx>
+
+        ..todo:: Implement the CLI interface for the above example.
+        """
+        # Find all genomes in the database
+        genomes = self.get_found_genomes()
+        # Sort these alphabetically and store them as a tuple
+        genomes.sort()
+        # Retrieve the index based on slurm index
+        active_genome = genomes[slurm_index]
+        # Build the target dir
+        path = os.path.join(self.download_path, active_genome.taxonomic_name)
+        # Run the decompression command
+        with cd(path):
+            subprocess.run('gunzip *', shell=True)
         return
 
     def generate_hisat_index(self):
@@ -410,17 +437,18 @@ class EnsemblDatabase(GenomeDatabase):
 
         -f
 
-        Reads (specified with <m1>, <m2>, <s>) are FASTA files. FASTA files usually 
-        have extension .fa, .fasta, .mfa, .fna or similar. FASTA files do not have a
-        way of specifying quality values, so when -f is set, the result is as 
-        if --ignore-quals is also set.
+        Reads (specified with <m1>, <m2>, <s>) are FASTA files. FASTA files
+        usually have extension .fa, .fasta, .mfa, .fna or similar. FASTA
+        files do not have a way of specifying quality values, so when -f
+        is set, the result is as if --ignore-quals is also set.
 
         If your computer has multiple processors/cores, use -p
 
-        The -p option causes HISAT to launch a specified number of parallel search threads.
-        Each thread runs on a different processor/core and all threads find alignments in 
-        parallel, increasing alignment throughput by approximately a multiple of the number
-        of threads (though in practice, speedup is somewhat worse than linear).
+        The -p option causes HISAT to launch a specified number of parallel
+        search threads. Each thread runs on a different processor/core and
+        all threads find alignments in parallel, increasing alignment
+        throughput by approximately a multiple of the number of threads
+        (though in practice, speedup is somewhat worse than linear).
 
         """
         genome_list = self.get_found_genomes()
@@ -433,8 +461,8 @@ class EnsemblDatabase(GenomeDatabase):
             fa_file = gen.taxonomic_name + '.fa'
             # build the hisat2-build command
             cmd = ['hisat2-build', '-f', fa_file, gen.taxonomic_name]
-            # cmd = 'hisat2-build -f {0} {1}'.format(fa_file, gen.taxonomic_name)
-            # change to the path, and try to run the command. Log an error if it fails.
+            # change to the path, and try to run the command.
+            # Log an error if it fails.
             with cd(path):
                 try:
                     subprocess.run(cmd)
@@ -455,7 +483,8 @@ class EnsemblDatabase(GenomeDatabase):
 
         for gen in tqdm(genome_list):
             logging.debug(
-                'Attempting to generate splice sites for {}'.format(gen.taxonomic_name))
+                'Attempting to generate splice sites for {}'.format(
+                    gen.taxonomic_name))
             gtf_path = os.path.join(self.download_path, gen.taxonomic_name)
             gft_file = gen.taxonomic_name + '.gft'
             output_file = 'Splice_sites.txt'

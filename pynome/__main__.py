@@ -28,9 +28,9 @@ the pynome dir)::
 
 
 
-**Usage Examples**::
+**Testing Examples**::
 
-    $ python -m pynome -fdm
+    $ python3 -m pynome -fdmuigs /media/tylerbiggs/genomic/test.db /media/tylerbiggs/genomic
 """
 
 import os

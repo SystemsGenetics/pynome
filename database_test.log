@@ -1,18 +1,6 @@
 INFO:root:
 Creating the database.
 
-DEBUG:root:Generating database at: sqlite:///:memory:
-INFO:root:Genome Acyrthosiphon_pisum found and added to the database.
-INFO:root:Genome Acyrthosiphon_pisum found and added to the database.
-INFO:root:Genome Acyrthosiphon_pisum found and added to the database.
-INFO:root:
-Taxonomic Name: Acyrthosiphon_pisum
-	fasta URI: uri/to/fasta/file.fa.gz
-	gff3 URI: uri/to/gff3/
-
-INFO:root:
-Creating the database.
-
 DEBUG:root:Generating database at: sqlite:////media/tylerbiggs/genomic/test.db
 INFO:root:pub/fungi/release-36/gff3/
 INFO:root:pub/metazoa/release-36/gff3/
@@ -22,3 +10,116 @@ INFO:root:pub/fungi/release-36/fasta/
 INFO:root:pub/metazoa/release-36/fasta/
 INFO:root:pub/plants/release-36/fasta/
 INFO:root:pub/protists/release-36/fasta/
+DEBUG:root:FTP CRAWL INITIALIZED WITH
+	database: ['<pynome.database.GenomeEntry object at 0x7f192e8da518>', '<pynome.database.GenomeEntry object at 0x7f192e8da588>']
+	top_dir: pub/fungi/release-36/gff3/fungi_rozellomycota1_collection/
+	parsing_function: <function EnsemblDatabase.ensembl_line_parser at 0x7f19181f82f0>
+
+DEBUG:root:FTP CRAWL INITIALIZED WITH
+	database: ['<pynome.database.GenomeEntry object at 0x7f192e8da710>', '<pynome.database.GenomeEntry object at 0x7f192e8da780>']
+	top_dir: pub/fungi/release-36/gff3/fungi_rozellomycota1_collection/rozella_allomycis_csf55/
+	parsing_function: <function EnsemblDatabase.ensembl_line_parser at 0x7f19181f82f0>
+
+DEBUG:root:filtered_gen_species_list
+DEBUG:root:['Rozella', 'allomycis', 'csf55']
+INFO:root:Genome Rozella_allomycis_csf55 found and added to the database.
+DEBUG:root:FTP CRAWL INITIALIZED WITH
+	database: ['<pynome.database.GenomeEntry object at 0x7f192e8daba8>', '<pynome.database.GenomeEntry object at 0x7f192e8dac18>']
+	top_dir: pub/fungi/release-36/fasta/fungi_rozellomycota1_collection/
+	parsing_function: <function EnsemblDatabase.ensembl_line_parser at 0x7f19181f82f0>
+
+DEBUG:root:FTP CRAWL INITIALIZED WITH
+	database: ['<pynome.database.GenomeEntry object at 0x7f192e8da828>', '<pynome.database.GenomeEntry object at 0x7f192e8da7b8>']
+	top_dir: pub/fungi/release-36/fasta/fungi_rozellomycota1_collection/rozella_allomycis_csf55/
+	parsing_function: <function EnsemblDatabase.ensembl_line_parser at 0x7f19181f82f0>
+
+DEBUG:root:FTP CRAWL INITIALIZED WITH
+	database: ['<pynome.database.GenomeEntry object at 0x7f192e8da5f8>', '<pynome.database.GenomeEntry object at 0x7f192e8daa20>']
+	top_dir: pub/fungi/release-36/fasta/fungi_rozellomycota1_collection/rozella_allomycis_csf55/cdna/
+	parsing_function: <function EnsemblDatabase.ensembl_line_parser at 0x7f19181f82f0>
+
+DEBUG:root:FTP CRAWL INITIALIZED WITH
+	database: ['<pynome.database.GenomeEntry object at 0x7f192e8daa58>', '<pynome.database.GenomeEntry object at 0x7f192e8da9e8>']
+	top_dir: pub/fungi/release-36/fasta/fungi_rozellomycota1_collection/rozella_allomycis_csf55/cds/
+	parsing_function: <function EnsemblDatabase.ensembl_line_parser at 0x7f19181f82f0>
+
+DEBUG:root:FTP CRAWL INITIALIZED WITH
+	database: ['<pynome.database.GenomeEntry object at 0x7f192e8da4a8>', '<pynome.database.GenomeEntry object at 0x7f192e8dac88>']
+	top_dir: pub/fungi/release-36/fasta/fungi_rozellomycota1_collection/rozella_allomycis_csf55/dna/
+	parsing_function: <function EnsemblDatabase.ensembl_line_parser at 0x7f19181f82f0>
+
+DEBUG:root:filtered_gen_species_list
+DEBUG:root:['Rozella', 'allomycis', 'csf55']
+INFO:root:Genome Rozella_allomycis_csf55 found and added to the database.
+DEBUG:root:FTP CRAWL INITIALIZED WITH
+	database: ['<pynome.database.GenomeEntry object at 0x7f192e8dae10>', '<pynome.database.GenomeEntry object at 0x7f192e8daa20>']
+	top_dir: pub/fungi/release-36/fasta/fungi_rozellomycota1_collection/rozella_allomycis_csf55/dna_index/
+	parsing_function: <function EnsemblDatabase.ensembl_line_parser at 0x7f19181f82f0>
+
+DEBUG:root:filtered_gen_species_list
+DEBUG:root:['Rozella', 'allomycis', 'csf55']
+INFO:root:Genome Rozella_allomycis_csf55 found and added to the database.
+DEBUG:root:FTP CRAWL INITIALIZED WITH
+	database: ['<pynome.database.GenomeEntry object at 0x7f192e8dada0>', '<pynome.database.GenomeEntry object at 0x7f192e900128>']
+	top_dir: pub/fungi/release-36/fasta/fungi_rozellomycota1_collection/rozella_allomycis_csf55/ncrna/
+	parsing_function: <function EnsemblDatabase.ensembl_line_parser at 0x7f19181f82f0>
+
+DEBUG:root:FTP CRAWL INITIALIZED WITH
+	database: ['<pynome.database.GenomeEntry object at 0x7f192e903048>', '<pynome.database.GenomeEntry object at 0x7f192e9030b8>']
+	top_dir: pub/fungi/release-36/fasta/fungi_rozellomycota1_collection/rozella_allomycis_csf55/pep/
+	parsing_function: <function EnsemblDatabase.ensembl_line_parser at 0x7f19181f82f0>
+
+DEBUG:root:FTP CRAWL INITIALIZED WITH
+	database: ['<pynome.database.GenomeEntry object at 0x7f192e905048>', '<pynome.database.GenomeEntry object at 0x7f192e9050b8>']
+	top_dir: pub/fungi/release-36/gff3/fungi_ascomycota1_collection/_candida_glabrata/
+	parsing_function: <function EnsemblDatabase.ensembl_line_parser at 0x7f19181f82f0>
+
+DEBUG:root:filtered_gen_species_list
+DEBUG:root:['candida', 'glabrata']
+INFO:root:Genome candida_glabrata found and added to the database.
+DEBUG:root:FTP CRAWL INITIALIZED WITH
+	database: ['<pynome.database.GenomeEntry object at 0x7f192f199710>', '<pynome.database.GenomeEntry object at 0x7f192f199668>']
+	top_dir: pub/fungi/release-36/fasta/fungi_ascomycota1_collection/_candida_glabrata/
+	parsing_function: <function EnsemblDatabase.ensembl_line_parser at 0x7f19181f82f0>
+
+DEBUG:root:FTP CRAWL INITIALIZED WITH
+	database: ['<pynome.database.GenomeEntry object at 0x7f192f199a58>', '<pynome.database.GenomeEntry object at 0x7f192f199c88>']
+	top_dir: pub/fungi/release-36/fasta/fungi_ascomycota1_collection/_candida_glabrata/cdna/
+	parsing_function: <function EnsemblDatabase.ensembl_line_parser at 0x7f19181f82f0>
+
+DEBUG:root:FTP CRAWL INITIALIZED WITH
+	database: ['<pynome.database.GenomeEntry object at 0x7f192f199668>', '<pynome.database.GenomeEntry object at 0x7f192f1c8f60>']
+	top_dir: pub/fungi/release-36/fasta/fungi_ascomycota1_collection/_candida_glabrata/cds/
+	parsing_function: <function EnsemblDatabase.ensembl_line_parser at 0x7f19181f82f0>
+
+DEBUG:root:FTP CRAWL INITIALIZED WITH
+	database: ['<pynome.database.GenomeEntry object at 0x7f192f1c8f60>', '<pynome.database.GenomeEntry object at 0x7f192f1c8cc0>']
+	top_dir: pub/fungi/release-36/fasta/fungi_ascomycota1_collection/_candida_glabrata/dna/
+	parsing_function: <function EnsemblDatabase.ensembl_line_parser at 0x7f19181f82f0>
+
+DEBUG:root:filtered_gen_species_list
+DEBUG:root:['candida', 'glabrata']
+INFO:root:Genome candida_glabrata found and added to the database.
+DEBUG:root:FTP CRAWL INITIALIZED WITH
+	database: ['<pynome.database.GenomeEntry object at 0x7f192f1c8c88>', '<pynome.database.GenomeEntry object at 0x7f192f1c8cc0>']
+	top_dir: pub/fungi/release-36/fasta/fungi_ascomycota1_collection/_candida_glabrata/dna_index/
+	parsing_function: <function EnsemblDatabase.ensembl_line_parser at 0x7f19181f82f0>
+
+DEBUG:root:filtered_gen_species_list
+DEBUG:root:['candida', 'glabrata']
+INFO:root:Genome candida_glabrata found and added to the database.
+DEBUG:root:FTP CRAWL INITIALIZED WITH
+	database: ['<pynome.database.GenomeEntry object at 0x7f192e9070f0>', '<pynome.database.GenomeEntry object at 0x7f192e907160>']
+	top_dir: pub/fungi/release-36/fasta/fungi_ascomycota1_collection/_candida_glabrata/ncrna/
+	parsing_function: <function EnsemblDatabase.ensembl_line_parser at 0x7f19181f82f0>
+
+DEBUG:root:FTP CRAWL INITIALIZED WITH
+	database: ['<pynome.database.GenomeEntry object at 0x7f192e905160>', '<pynome.database.GenomeEntry object at 0x7f192e9051d0>']
+	top_dir: pub/fungi/release-36/fasta/fungi_ascomycota1_collection/_candida_glabrata/pep/
+	parsing_function: <function EnsemblDatabase.ensembl_line_parser at 0x7f19181f82f0>
+
+INFO:root:<pynome.database.GenomeEntry object at 0x7f192f1c8f98>
+INFO:root:<pynome.database.GenomeEntry object at 0x7f192e908080>
+INFO:root:Size estimate: 8866733
+INFO:root:Printing metadata information.
+INFO:root:('pub/release-36/species.txt', 'species.txt')
