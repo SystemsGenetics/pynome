@@ -9,8 +9,4 @@
 #SBATCH --array=0-1
 `module load python3`
 cd "/scidas/genomes3"
-# Get all the directories
-srun python3 "/data/ficklin/software/pynome/slurmScripts/decompress.py" genomes.db $SLURM_ARRAY_TASK_ID
-# NOTES ON SLURM SCRIPTS
-# %A will be replaced by the value of SLURM_ARRAY_JOB_ID
-# %a will be replaced by the value of SLURM_ARRAY_TASK_ID
+srun python3 "/data/ficklin/software/pynome/hisat2_extract_splice_sites.py" genomes.db $SLURM_ARRAY_TASK_ID
