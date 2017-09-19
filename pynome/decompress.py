@@ -21,7 +21,7 @@ def unzip(path):
 def main():
     # Create the parser
     parser = argparse.ArgumentParser()
-    # Create the required, positional arguments.
+    # Create the required, positional argumetnssqsl.
     parser.add_argument('database', nargs=1)
     parser.add_argument('', nargs=1)
     # Parse the arguments
