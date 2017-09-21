@@ -1,7 +1,13 @@
-"""Retrieves genome data files & metadata form online databases.
+"""
+======================
+Command Line Interface
+======================
+
+Retrieves genome data files & metadata form online databases.
 In this version (0.1.0) only the Ensembl database is implemented.
 
-**SCIDAS**: On SciDAS pynome is located under:
+**SCIDAS**: On SciDAS pynome is located under::
+
     /data/ficklin/modulefiles/pynome_deploy
 
 So to run it, and download to a directory on SciDAS storage (from
@@ -25,8 +31,6 @@ the pynome dir)::
 
     # Run all post-download processes on downloaded genomes.
     $ python3 -m pynome -uigs /scidas/genomes3/genomes.db /scidas/genomes3
-
-
 
 **Testing Examples**::
 
@@ -96,10 +100,6 @@ def main():
 
     if args.verbose:  # Enable verbose logging mode
         logging.basicConfig(level=logging.DEBUG)
-
-    # check if the database is populated:
-    # if not, and find gemoes is not enabled
-    # exit and print a
 
     if args.find_genomes:
         print('Finding Genomes!')

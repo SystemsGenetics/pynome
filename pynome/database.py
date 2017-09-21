@@ -4,6 +4,9 @@
 The Genome Database Module
 ==========================
 The **Genomedatabase** module consists of two classes:
+
+#. **GenomeEntry** A sqlalchemy class that creates the sqlite table.
+#. **GenomeDatabase** A class that handles interactions with an sqlite db.
 """
 
 import logging
@@ -27,6 +30,7 @@ class GenomeEntry(Base):  # Inherit from declarative_base.
 
     :param taxonomic_name: The taxonomic name and primary key of
                            the GenomeEntry.
+    :param species: The species name.
     :param download_method: The Download method. Stored as
                             ``<method_name> <database>``
     :param fasta_uri: The fa.gz url as a String. Max Chars = 1000.
@@ -47,10 +51,12 @@ class GenomeEntry(Base):  # Inherit from declarative_base.
 
     In deployments this will be handled by a wrapper function specific
     to the database being examined.
+
+    .. todo::
+
+        Consider adding a local directory string column.
     """
     __tablename__ = "GenomeTable"  # Should this be the same as the class?
-    # __table_args__ = {'sqlite_autoincrement': True}
-    # index = Column(Integer(), , autoincrement=True)
     taxonomic_name = Column(String(500), primary_key=True)
     species = Column(String(500))
     fasta_uri = Column(String(1000))
@@ -60,8 +66,6 @@ class GenomeEntry(Base):  # Inherit from declarative_base.
     assembly_name = Column(String(250))
     genus = Column(String(250))
     taxonomy_id = Column(String(100))
-
-    # Index(self, 'idx_tax_name', GenomeTable.c.taxonomic_name)
 
     def __init__(self, taxonomic_name, **kwargs):
         """Constructor that overrides the default provided. This ensures that
@@ -118,9 +122,6 @@ class GenomeDatabase(object):
         return
 
     def get_found_genomes(self):
-        """Print all the Genomes in the database to the terminal."""
+        """Find all the Genomes in the database and return them as a list."""
         query = self.session.query(GenomeEntry).all()
         return query
-
-    def get_genome_by_index(self, idx):
-        return self.session.query(GenomeEntry).get(idx)

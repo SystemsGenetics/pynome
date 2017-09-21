@@ -5,7 +5,8 @@ Ensembl Database
 
 The ensembl database module. A child class of the genome database class,
 this module cotains all code directly related to connecting and parsing data
-from the ensembl geneome database."""
+from the ensembl geneome database.
+"""
 
 import ftplib
 import os
@@ -28,7 +29,7 @@ class EnsemblDatabase(GenomeDatabase):
     """The EnsemblDatabase class. This handles finding and downloading
     genomes from the ensembl genome database. The database url is:
 
-        ```ftp.ensemblgenomes.org```
+        ``ftp.ensemblgenomes.org``
 
     It does so by recursively walking the ftp directory. It only collects
     those genomes that have a ``*.gff3.gz`` or a ``*.fa.gz`` file.
@@ -68,8 +69,8 @@ class EnsemblDatabase(GenomeDatabase):
         return uri_dict
 
     def download_metadata(self):
-        """Downloads the 'species_EnsemblKINGDOM.txt files. These are smaller, more
-        usable metadata file found in each """
+        """Downloads the `species.txt` files. This is a tab delimited listing
+        of metadata. """
 
         metadata_uri_dict = self.generate_metadata_uri()
 
@@ -140,15 +141,15 @@ class EnsemblDatabase(GenomeDatabase):
         This line is split by whitespace. For future reference, the indexes
         correspond (usually) to::
 
-            + ``[0]:    the directory information.``
-            + ``[1]:    the number of items therein?``
-            + ``[2]:    unknown always 'ftp'``
-            + ``[3]:    unknown always 'ftp'``
-            + ``[4]:    the file size in bytes, 4096 is one block``
-            + ``[5]:    Month``
-            + ``[6]:    Day``
-            + ``[7]:    Year``
-            + ``[8]:    filename``
+            + [0]:    the directory information.
+            + [1]:    the number of items therein?
+            + [2]:    unknown always 'ftp'
+            + [3]:    unknown always 'ftp'
+            + [4]:    the file size in bytes, 4096 is one block
+            + [5]:    Month
+            + [6]:    Day
+            + [7]:    Year
+            + [8]:    filename
 
         Either adds a genome, or returns nothing."""
 
@@ -238,11 +239,13 @@ class EnsemblDatabase(GenomeDatabase):
     def find_genomes(self, uri_list, parsing_function=ensembl_line_parser):
         """Private function that handles finding the list of genomes.
 
-        :param parsing_function: This should be a function that reads an
-            ``ftplib.dir()`` line output. This output should always be a
-            file, not a directory.
         :param uri_list: This should be a list of base URIs to start
-            the ftp crawler from."""
+            the ftp crawler from.
+        :param parsing_function: This should be a function that reads an
+            ``ftplib.dir()`` line output. The  output sent to such a function
+            will always be a file, not a directory.
+
+        """
         self.ftp.connect(ENSEMBL_FTP_URI)  # connect to the ensemble ftp
         self.ftp.login()
         for uri in tqdm(uri_list):
@@ -265,7 +268,9 @@ class EnsemblDatabase(GenomeDatabase):
         return sum(filter(None, size))
 
     def download_genomes(self):
-        """This function takes an list of genome tuples.
+        """This function downloads all genomes that have been found and stored
+        in the database.
+
         The directory structure to fit the files downloaded is as follows::
 
             Genome/
@@ -386,8 +391,6 @@ class EnsemblDatabase(GenomeDatabase):
         """
         Decompresses the genomes that have been downloaded. This will be
         changed to use a slurm array.
-
-        :return: Nothing
         """
         # Get all the genomes that have been found and saved in the SQLite db.
         genomes = self.get_found_genomes()
@@ -395,7 +398,6 @@ class EnsemblDatabase(GenomeDatabase):
         # Iterate over the list of genomes
         for genome in genomes:
             # Build the path in the same way as the download function.
-            # TODO: Consider factoring this out, or storing the path in the db
             target_dir = os.path.join(
                 self.download_path, genome.taxonomic_name)
             # Go to the target directory and unzip the files therein.
@@ -412,9 +414,10 @@ class EnsemblDatabase(GenomeDatabase):
         decompression command runs.
 
         This command should be called in slurm scripts in this way:
-            python3 -m pynome --slurm-decompress <idx>
 
-        ..todo:: Implement the CLI interface for the above example.
+        >>> python3 -m pynome --slurm-decompress <idx>
+
+        .. todo:: Implement the CLI interface for the above example.
         """
         # Find all genomes in the database
         genomes = self.get_found_genomes()
@@ -476,7 +479,7 @@ class EnsemblDatabase(GenomeDatabase):
         """
         Command example for splice site generation:
 
-        python hisat2_extract_splice_sites.py GRCh38-gencode.v24.annotation.gtf > GRCh38.Splice_Sites.txt
+        >>> python hisat2_extract_splice_sites.py GRCh38.gtf > Splice_Sites.txt
         :return:
         """
         genome_list = self.get_found_genomes()
@@ -494,13 +497,11 @@ class EnsemblDatabase(GenomeDatabase):
 
     def generate_gtf(self):
         """
-        ueses gffread command to generate *.gtf files.
+        Uses **gffread** command to generate `\*.gtf` files.
 
-        gffread -T <TARGET_FILE>.gff3 -o <TARGET_FILE>.gtf
+        ``gffread -T <TARGET-FILE>.gff3 -o <TARGET-FILE>.gtf``
 
-        Should output to the gtf2 file format.
-
-        :return:
+        Should output to the `.gtf2` file format by default.
         """
         genome_list = self.get_found_genomes()
 
