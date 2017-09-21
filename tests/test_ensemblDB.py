@@ -25,6 +25,18 @@ logging.basicConfig(
 )
 
 
+# def pytest_addoption(parser):
+#     parser.addoption('--database-path', action='store',
+#         default='/media/tylerbiggs/genomic/test.db',
+#         help='Filepath of the sqlite database.')
+#     parser.addoption('--genome-path', action='store',
+#         default='/media/tylerbiggs/genomic/',
+#         help='Filepath of the sqlite database.')
+
+# @pytest.fixture
+# def cmdopt(request):
+#     request.config.getoption('--database-path')
+
 @pytest.fixture(scope='module')
 def create_database(database_path='/media/tylerbiggs/genomic/test.db',
                     download_path='/media/tylerbiggs/genomic'):
@@ -73,25 +85,21 @@ def test_generate_metadata_uri(create_database):
         logging.info(uri)
 
 
-def test_row_id(create_database):
-    print(create_database.get_genome_by_index(0))
+def test_download_metadata(create_database):
+    logging.info("Downloading metadata.")
+    create_database.download_metadata()
 
 
-# def test_download_metadata(create_database):
-#     logging.info("Downloading metadata.")
-#     create_database.download_metadata()
+def test_download_genomes(create_database):
+    create_database.download_genomes()
 
 
-# def test_download_genomes(create_database):
-#     create_database.download_genomes()
+def test_read_species_metadata(create_database):
+    create_database.read_species_metadata()
 
 
-# def test_read_species_metadata(create_database):
-#     create_database.read_species_metadata()
-
-
-# def test_add_taxonomy_ids(create_database):
-#     create_database.add_taxonomy_ids()
+def test_add_taxonomy_ids(create_database):
+    create_database.add_taxonomy_ids()
 
 
 # def test_decompress_genomes(create_database):

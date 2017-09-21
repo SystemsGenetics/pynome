@@ -10,6 +10,30 @@ In this version (0.1.0) only the Ensembl database is implemented.
 
     /data/ficklin/modulefiles/pynome_deploy
 
+**Usage:**::
+
+    python3 -m pynome -h
+    usage: __main__.py [-h] [-f] [-p] [-d] [-m] [-r] [-u] [-i] [-g] [-s] [-v]
+                       database-path download-path
+
+    positional arguments:
+      database-path
+      download-path
+
+    optional arguments:
+      -h, --help            show this help message and exit
+      -f, --find-genomes
+      -p, --print-genomes
+      -d, --download-genomes
+      -m, --download-metadata
+      -r, --read-metadata
+      -u, --uncompress
+      -i, --hisat-index
+      -g, --gen-gtf
+      -s, --gen-splice
+      -v, --verbose         Set output to verbose.
+
+
 So to run it, and download to a directory on SciDAS storage (from
 the pynome dir)::
 
