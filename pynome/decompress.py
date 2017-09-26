@@ -2,7 +2,7 @@
 A sript designed to be run through slurm. Requries a database
 file locaiton and an index.
 
-It should be invoked:
+It should be invoked as part of a slurm batch job:
     python3 pynome/decompress.py <database_path> <idx>
 """
 
@@ -21,9 +21,8 @@ def unzip(path):
 def main():
     # Create the parser
     parser = argparse.ArgumentParser()
-    # Create the required, positional argumetnssqsl.
+    # Create the required, positional arguments
     parser.add_argument('database', nargs=1)
-    parser.add_argument('', nargs=1)
     # Parse the arguments
     args = parser.parse_args()
     # Create the sqlite3 connection
@@ -36,8 +35,9 @@ def main():
     genome_list = [xx for xx in curs]
     # Sort the retrieved list
     genome_list.sort()
-    # Create the path
+    # Close the connection to the sql database.
     conn.close()
+    # Create the path
     genome_path = genome_list.args.index.taxonomic_name
     unzip(genome_path)
     return

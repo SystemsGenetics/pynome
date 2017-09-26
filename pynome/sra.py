@@ -23,22 +23,6 @@ Sample search string:
 
 ((txid4530[Organism:exp]) AND
 "biomol rna"[Properties]) AND
-(("instrument hiseq x five"[Properties] OR
-"instrument hiseq x ten"[Properties] OR
-"instrument illumina genome analyzer"[Properties] OR
-"instrument illumina genome analyzer ii"[Properties] OR
-"instrument illumina genome analyzer iix"[Properties] OR
-"instrument illumina hiseq 1000"[Properties] OR
-"instrument illumina hiseq 1500"[Properties] OR
-"instrument illumina hiseq 2000"[Properties] OR
-"instrument illumina hiseq 2500"[Properties] OR
-"instrument illumina hiseq 3000"[Properties] OR
-"instrument illumina hiseq 4000"[Properties] OR
-"instrument illumina miniseq"[Properties] OR
-"instrument illumina miseq"[Properties] OR
-"instrument illumina nextseq 500"[Properties] OR
-"instrument nextseq 500"[Properties] OR
-"instrument nextseq 550"[Properties] OR
 "platform illumina"[Properties]))
 """
 
@@ -70,6 +54,7 @@ def build_sra_search(tax_id):
     # return sra_search_term_l
     return search_str
 
+
 def write_sra_file():
     pass
 
@@ -94,6 +79,6 @@ if __name__ == '__main__':
     # For each item passed, run the search
     for id in args.taxonomy_id:
         sra_query = build_sra_search(args.taxonomy_id)
-        print(sra_query)
+        # print(sra_query)
         result = run_sra_search(sra_query)
-        print(result)
+        # print(result)

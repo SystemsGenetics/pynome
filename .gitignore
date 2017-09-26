@@ -1,4 +1,4 @@
-main.log
+*.log
 .cache/
 .idea/pynomedev.iml
 pynome/__pycache__/__init__.cpython-35.pyc
@@ -14,4 +14,3 @@ tests/__pycache__/context.cpython-35.pyc
 tests/__pycache__/pynome_tests.cpython-35-PYTEST.pyc
 tests/__pycache__/test_database.cpython-35-PYTEST.pyc
 tests/__pycache__/test_ensemblDB.cpython-35-PYTEST.pyc
-*.log

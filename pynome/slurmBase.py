@@ -1,28 +1,61 @@
+"""
+=====================
+Slurm Batch Generator
+=====================
 
-SLURM_TEST = """\
-#!/bin/bash
+This script prepares arrays that allow for the access of all downloaded
+genomes by pynome. It accomplishes this by connecting to the sqlite database
+and creating a list of downloaded genomes. It sorts and counts this list. It
+then needs to run one of several jobs.
+
+#. Decompress the genomes.
+#. Generate HISAT indexes.
+#. Convert the gff3 to a gtf.
+#. Generate splice sites.
+
+
+"""
+
+import sqlite3
+
+SLURM_DECOMPRESS = """#!/bin/bash
 #SBATCH --partition=ficklin
-#SBATCH --job-name=test
-#SBATCH --output=res.txt
-#
-#SBATCH --ntasks=1
-#SBATCH --time=10:00
-#SBATCH --mem-per-cpu=100
+#SBATCH --account=ficklin
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=1
+#SBATCH --time=8:00:00
+#SBATCH --job-name=decompress-%A_%a
+#SBATCH --output=logs/01-decompress.%a.log
+#SBATCH --array=0-{0}
+# Load needed modules
+module load python3
+# cd into the base genome directory
+cd "/scidas/genomes3"
+# SRUN the desired command.
+srun python3 "/data/ficklin/software/pynome/slurmScripts/decompress.py" genomes.db $SLURM_ARRAY_TASK_ID
 
-srun hostname
-srun sleep 60
-"""
+""".format()
 
-SLURM_DECOMPRESS = """\
-#!/bin/bash
-#SBATCH --partition=ficklin                 ### Partition
-#SBATCH --job-name=decompressGenomesArray   ### Job Name
-#SBATCH --nodes=5 							### Number of nodes
-#SBATCH --ntasks=1							### Tasks per array job
-#SBATCH --array=0-
 
-echo "I am Slurm job ${SLURM_JOB_ID}, array job ${SLURM_ARRAY_JOB_ID}, and array task ${SLURM_ARRAY_TASK_ID}."
+def write_slurm_script():
+    pass
 
-python3 -m pynome 
 
-"""
+def submit_slurm_script():
+    pass
+
+
+def write_ref_file():
+    pass
+
+
+def order_found_genomes(database_path):
+
+    conn = sqlite3.connect(database_path)
+    curs = conn.cursor()
+    curs.execute('SELECT * FROM GenomeTable ORDER BY taxonomic_name')
+    genome_list = [xx for xx in curs]
+    genome_list.sort()
+    conn.close()
+
+    return genome_list

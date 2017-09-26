@@ -297,8 +297,8 @@ class EnsemblDatabase(GenomeDatabase):
                 # Create the target directory.
                 target_dir = os.path.join(
                     self.download_path,
-                    # genome.genus,
-                    genome.taxonomic_name
+                    genome.taxonomic_name,
+                    genome.assembly_name,
                 )
                 if not os.path.exists(target_dir):
                     os.makedirs(target_dir)
