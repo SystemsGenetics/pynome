@@ -11,11 +11,14 @@ python3 -m pytest -sv tests/test_ensemblDB.py
 
 Testing on workstation:
 python3 -m pytest -sv tests/test_ensemblDB.py
+
+Testing on workstation with command line arguments.
+python3 -m pytest -sv tests/test_ensemblDB.py /media/tylerbiggs/genomic/test.db /media/tylerbiggs/genomic/test_genomes
 """
 
-import pytest
+# import pytest
 import logging
-from pynome.ensembl import EnsemblDatabase
+# from pynome.ensembl import EnsemblDatabase
 
 logging.getLogger(__name__)
 logging.basicConfig(
@@ -23,31 +26,6 @@ logging.basicConfig(
     filemode='w',
     level='DEBUG'
 )
-
-
-# def pytest_addoption(parser):
-#     parser.addoption('--database-path', action='store',
-#         default='/media/tylerbiggs/genomic/test.db',
-#         help='Filepath of the sqlite database.')
-#     parser.addoption('--genome-path', action='store',
-#         default='/media/tylerbiggs/genomic/',
-#         help='Filepath of the sqlite database.')
-
-# @pytest.fixture
-# def cmdopt(request):
-#     request.config.getoption('--database-path')
-
-@pytest.fixture(scope='module')
-def create_database(database_path='/media/tylerbiggs/genomic/test.db',
-                    download_path='/media/tylerbiggs/genomic'):
-    """Create a database instance. The empty path should create the database
-    in memory. Without scope='module', this would be run for every test."""
-    logging.info('\nCreating the database.\n')
-    database_instance = EnsemblDatabase(
-        download_path=download_path,
-        database_path=database_path,
-    )
-    yield database_instance
 
 
 def test_generate_uri(create_database):
@@ -59,10 +37,10 @@ def test_generate_uri(create_database):
 crawl_test_uri = [
     'pub/fungi/release-36/gff3/fungi_rozellomycota1_collection/',
     'pub/fungi/release-36/fasta/fungi_rozellomycota1_collection/',
-    'pub/fungi/release-36/gff3/fungi_ascomycota1_collection/_candida_glabrata/',
-    'pub/fungi/release-36/fasta/fungi_ascomycota1_collection/_candida_glabrata/',
-    # 'pub/fungi/release-36/gff3/fungi_ascomycota1_collection/',
-    # 'pub/fungi/release-36/fasta/fungi_ascomycota1_collection/'
+    # 'pub/fungi/release-36/gff3/fungi_ascomycota1_collection/_candida_glabrata/',
+    # 'pub/fungi/release-36/fasta/fungi_ascomycota1_collection/_candida_glabrata/',
+    'pub/fungi/release-36/gff3/fungi_ascomycota1_collection/',
+    'pub/fungi/release-36/fasta/fungi_ascomycota1_collection/'
 ]
 
 

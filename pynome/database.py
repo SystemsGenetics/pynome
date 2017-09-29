@@ -18,6 +18,56 @@ from sqlalchemy import Column, Integer, String, create_engine
 Base = declarative_base()
 
 
+class Genome(object):
+    """
+    Class that models an individual genome.
+    """
+
+    def __init__(self):
+        # Species properties
+        self._assembly_name = None
+        self._genus = None
+        self._species = None
+        self._infraspecific_name = None
+        self._taxonomic_name = None
+        # FASTA properties
+        self._fasta_uri = None
+        self._fasta_remote_size = None
+        # GFF3 properties
+        self._gff3_uri = None
+        self._gff3_remote_size = None
+
+    @property
+    def assembly_name(self):
+        return self._assembly_name
+
+    @property
+    def genus(self):
+        return self._genus
+
+    @property
+    def species(self):
+        return self._species
+
+    @property
+    def infraspecific_name(self):
+        return self._infraspecific_name
+
+    @property
+    def taxonomic_name(self):
+        """
+        Taxonomic name is stored as [genus]_[species]{_[infraspecific name]}
+        So this function will return these values built as a string in the
+        above format.
+        """
+        return '_'.join([self._genus, self._species, self._infraspecific_name])
+
+
+
+
+
+
+
 class GenomeEntry(Base):  # Inherit from declarative_base.
     """A sqlite handler for the GenomeTable database.
 
@@ -66,6 +116,9 @@ class GenomeEntry(Base):  # Inherit from declarative_base.
     assembly_name = Column(String(250))
     genus = Column(String(250))
     taxonomy_id = Column(String(100))
+    local_path = Column(String(500))
+    intraspecific_name = Column(String(100))
+    base_filename = Column(String(500))
 
     def __init__(self, taxonomic_name, **kwargs):
         """Constructor that overrides the default provided. This ensures that

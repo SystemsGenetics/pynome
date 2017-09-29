@@ -12,8 +12,6 @@ then needs to run one of several jobs.
 #. Generate HISAT indexes.
 #. Convert the gff3 to a gtf.
 #. Generate splice sites.
-
-
 """
 
 import sqlite3
@@ -30,7 +28,9 @@ SLURM_DECOMPRESS = """#!/bin/bash
 # Load needed modules
 module load python3
 # cd into the base genome directory
-cd "/scidas/genomes3"
+cd "{1}"
+# Get the generated list of genomes
+Genome
 # SRUN the desired command.
 srun python3 "/data/ficklin/software/pynome/slurmScripts/decompress.py" genomes.db $SLURM_ARRAY_TASK_ID
 
@@ -45,17 +45,11 @@ def submit_slurm_script():
     pass
 
 
-def write_ref_file():
-    pass
-
-
 def order_found_genomes(database_path):
-
     conn = sqlite3.connect(database_path)
     curs = conn.cursor()
     curs.execute('SELECT * FROM GenomeTable ORDER BY taxonomic_name')
     genome_list = [xx for xx in curs]
     genome_list.sort()
     conn.close()
-
     return genome_list

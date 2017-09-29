@@ -22,11 +22,12 @@ def main():
     # Create the parser
     parser = argparse.ArgumentParser()
     # Create the required, positional arguments
-    parser.add_argument('database', nargs=1)
+    parser.add_argument('sql', action='store_const')
+    parser.add_argument('index', action='store_const')
     # Parse the arguments
     args = parser.parse_args()
     # Create the sqlite3 connection
-    conn = sqlite3.connect(args.database)
+    conn = sqlite3.connect(args.sql)
     # Create the sqlite3 pointer
     curs = conn.cursor()
     # Run the query
@@ -37,9 +38,9 @@ def main():
     genome_list.sort()
     # Close the connection to the sql database.
     conn.close()
-    # Create the path
-    genome_path = genome_list.args.index.taxonomic_name
-    unzip(genome_path)
+    # Get the active genome based on the given index:
+    active_genome = genome_list[int(args.index)]
+    unzip(active_genome.local_path)
     return
 
 

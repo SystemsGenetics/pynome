@@ -82,6 +82,9 @@ class EnsemblDatabase(GenomeDatabase):
             size_estimate = self.ftp.size(uri) / 8.192
             target_dir = os.path.join(self.download_path, file_name)
 
+            if os.path.isfile(target_dir):
+                return
+
             with tqdm(total=int(size_estimate), unit_scale=True,
                       unit='MB') as meta_pbar:
 
@@ -186,21 +189,67 @@ class EnsemblDatabase(GenomeDatabase):
                 species = gen_species_list[1]
                 # The remainder should be the intra-specific name
                 if len(gen_species_list) > 2:
-                    intra_name = '_'.join(gen_species_list[2:])
-                    taxonomic_name = '_'.join((genus, species, intra_name))
+                    intraspecific_name = '_'.join(gen_species_list[2:])
+
+                    taxonomic_name = '_'.join(
+                        [genus, species, intraspecific_name])
+
+                    local_path = os.path.join(
+                        self.download_path,
+                        genus + '_' + species + '_' + intraspecific_name,
+                        assembly_name)
+
+                    base_filename = "".join([
+                        genus,
+                        "_",
+                        species,
+                        "_",
+                        intraspecific_name,
+                        "-",
+                        assembly_name
+                    ])
+
                 else:
-                    taxonomic_name = '_'.join((genus, species))
+                    taxonomic_name = '_'.join([genus, species])
+
+                    intraspecific_name = None
+
+                    local_path = os.path.join(
+                        self.download_path,
+                        genus + '_' + species, assembly_name)
+
+                    base_filename = "".join([
+                        genus,
+                        "_",
+                        species,
+                        "-",
+                        assembly_name
+                    ])
 
             except:
                 taxonomic_name = name_list[0]
                 assembly_name = name_list[1]
                 genus, species = genus_species.split('_', 1)
+                intraspecific_name = None
+                local_path = os.path.join(
+                    self.download_path,
+                    genus + '_' + species, assembly_name)
+                base_filename = "".join([
+                        genus,
+                        "_",
+                        species,
+                        "-",
+                        assembly_name
+                ])
 
             return {
                 'taxonomic_name': taxonomic_name,
                 'genus': genus,
                 'assembly_name': assembly_name,
-                'species': species}
+                'species': species,
+                'local_path': local_path,
+                'base_filename': base_filename,
+                'intraspecific_name': intraspecific_name}
 
         def add_fasta(line_dict):
             fasta_genome = parse_genome_name(line_dict)
@@ -295,20 +344,35 @@ class EnsemblDatabase(GenomeDatabase):
                     genome.gff3_uri: '.gff3.gz',
                 }
                 # Create the target directory.
-                target_dir = os.path.join(
-                    self.download_path,
-                    genome.taxonomic_name,
-                    genome.assembly_name,
-                )
+                target_dir = genome.local_path
                 if not os.path.exists(target_dir):
                     os.makedirs(target_dir)
 
                 # Iterate through the download dictionary
                 for uri, file_ext in download_dict.items():
-                    target_file = os.path.join(
-                        target_dir, genome.taxonomic_name + file_ext)
-                    with open(target_file, 'wb') as curr_file:
+                    if genome.intraspecific_name:
+                        filename = "".join([
+                            genome.genus,
+                            "_",
+                            genome.species,
+                            "_",
+                            genome.intraspecific_name,
+                            "-",
+                            genome.assembly_name
+                        ])
+                    else:
+                        filename = "".join([
+                            genome.genus,
+                            "_",
+                            genome.species,
+                            "-",
+                            genome.assembly_name
+                        ])
 
+                    target_file = os.path.join(
+                        target_dir, filename + file_ext)
+
+                    with open(target_file, 'wb') as curr_file:
                         def callback(data):
                             update_size = len(data) / 8.192
                             total_pbar.update(int(update_size))
