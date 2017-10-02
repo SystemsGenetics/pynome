@@ -151,7 +151,7 @@ class GenomeDatabase(object):
     def __init__(self, download_path, database_path):
         """Initialization of the GenomeDatabase class."""
         self.download_path = download_path  # The local download location.
-        self.database_path = 'sqlite:///' + database_path
+        self.database_path = 'sqlite://' + database_path
         # engine is the path that our database is stored.
         logging.debug('Generating database at: {}'.format(self.database_path))
         engine = create_engine(self.database_path)

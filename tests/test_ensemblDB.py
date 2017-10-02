@@ -13,10 +13,10 @@ Testing on workstation:
 python3 -m pytest -sv tests/test_ensemblDB.py
 
 Testing on workstation with command line arguments.
-python3 -m pytest -sv tests/test_ensemblDB.py /media/tylerbiggs/genomic/test.db /media/tylerbiggs/genomic/test_genomes
+python3 -m pytest -sv tests/test_ensemblDB.py /media/tylerbiggs/genomic/test.db /media/tylerbiggs/genomic/test_genomes/
 
 Testing on KAMIAK with command line arguments.
-python3 -m pytest -sv tests/test_ensemblDB.py
+python3 -m pytest -sv tests/test_ensemblDB.py /scidas/genome_test.db /scidas/test_genomes/
 
 """
 
