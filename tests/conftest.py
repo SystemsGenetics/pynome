@@ -4,7 +4,7 @@ It's use in this application is to load command line options.
 """
 
 import pytest
-import logging
+# import logging
 from pynome.ensembl import EnsemblDatabase
 
 
@@ -35,7 +35,8 @@ def create_database(database, genome):
     # download_path='/media/tylerbiggs/genomic/test_genomes'):
     """Create a database instance. The empty path should create the database
     in memory. Without scope='module', this would be run for every test."""
-    logging.info('\nCreating the database.\n')
+    # logging.info('\nCreating the database.\n')
+    print('Starting pytest database fixture.')
     database_instance = EnsemblDatabase(
         download_path=genome,
         database_path=database,

@@ -17,7 +17,7 @@ python3 -m pytest -sv tests/test_ensemblDB.py /media/tylerbiggs/genomic/test.db 
 
 Testing on KAMIAK with command line arguments.
 python3 -m pytest -sv tests/test_ensemblDB.py /scidas/genome_test.db /scidas/test_genomes/
-
+pytest -sv tests/test_ensemblDB.py --database=/scidas/genome_test.db --genome=/scidas/test_genomes/
 """
 
 # import pytest

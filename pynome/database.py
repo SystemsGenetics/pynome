@@ -64,11 +64,6 @@ class Genome(object):
         return '_'.join([self._genus, self._species, self._infraspecific_name])
 
 
-
-
-
-
-
 class GenomeEntry(Base):  # Inherit from declarative_base.
     """A sqlite handler for the GenomeTable database.
 
