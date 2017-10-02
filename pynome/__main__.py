@@ -110,8 +110,8 @@ def main():
     logging.info('\nChecking for or creating the database.\n')
 
     # create the database path if it does not already exist
-    if not os.path.exists(args.download_path[0]):
-        os.makedirs(args.download_path[0])
+    # if not os.path.exists(args.download_path[0]):
+    #     os.makedirs(args.download_path[0])
 
     try:
         main_database = EnsemblDatabase(

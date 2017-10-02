@@ -9,6 +9,7 @@ The **Genomedatabase** module consists of two classes:
 #. **GenomeDatabase** A class that handles interactions with an sqlite db.
 """
 
+import os
 import logging
 from pynome import Session
 from sqlalchemy.ext.declarative import declarative_base
@@ -150,8 +151,12 @@ class GenomeDatabase(object):
 
     def __init__(self, download_path, database_path):
         """Initialization of the GenomeDatabase class."""
+        if not os.path.exists(download_path):
+            os.makedirs(download_path)
+        if not os.path.exists(database_path):
+            os.makedirs(database_path)
+        self.database_path = 'sqlite:///' + database_path
         self.download_path = download_path  # The local download location.
-        self.database_path = 'sqlite://' + database_path
         # engine is the path that our database is stored.
         logging.debug('Generating database at: {}'.format(self.database_path))
         engine = create_engine(self.database_path)
