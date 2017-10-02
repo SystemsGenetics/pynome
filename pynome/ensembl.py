@@ -35,7 +35,7 @@ class EnsemblDatabase(GenomeDatabase):
     those genomes that have a ``*.gff3.gz`` or a ``*.fa.gz`` file.
     """
 
-    def __init__(self, release_version=36, **kwargs):
+    def __init__(self, release_version=37, **kwargs):
         super().__init__(**kwargs)  # Call parent class init
         self._release_version = None  # set by the release version setter
         self._release_number = None  # set by the release version setter
@@ -84,6 +84,9 @@ class EnsemblDatabase(GenomeDatabase):
 
             if os.path.isfile(target_dir):
                 return
+
+            if not os.path.exists(os.path.dirname(target_dir)):
+                os.makedirs(os.path.dirname(target_dir))
 
             with tqdm(total=int(size_estimate), unit_scale=True,
                       unit='MB') as meta_pbar:

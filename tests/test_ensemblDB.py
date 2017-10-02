@@ -14,6 +14,10 @@ python3 -m pytest -sv tests/test_ensemblDB.py
 
 Testing on workstation with command line arguments.
 python3 -m pytest -sv tests/test_ensemblDB.py /media/tylerbiggs/genomic/test.db /media/tylerbiggs/genomic/test_genomes
+
+Testing on KAMIAK with command line arguments.
+python3 -m pytest -sv tests/test_ensemblDB.py
+
 """
 
 # import pytest
@@ -37,10 +41,10 @@ def test_generate_uri(create_database):
 crawl_test_uri = [
     'pub/fungi/release-36/gff3/fungi_rozellomycota1_collection/',
     'pub/fungi/release-36/fasta/fungi_rozellomycota1_collection/',
-    # 'pub/fungi/release-36/gff3/fungi_ascomycota1_collection/_candida_glabrata/',
-    # 'pub/fungi/release-36/fasta/fungi_ascomycota1_collection/_candida_glabrata/',
-    'pub/fungi/release-36/gff3/fungi_ascomycota1_collection/',
-    'pub/fungi/release-36/fasta/fungi_ascomycota1_collection/'
+    'pub/fungi/release-36/gff3/fungi_ascomycota1_collection/_candida_glabrata/',
+    'pub/fungi/release-36/fasta/fungi_ascomycota1_collection/_candida_glabrata/',
+    # 'pub/fungi/release-36/gff3/fungi_ascomycota1_collection/',
+    # 'pub/fungi/release-36/fasta/fungi_ascomycota1_collection/'
 ]
 
 
@@ -94,5 +98,6 @@ def test_add_taxonomy_ids(create_database):
 
 # def test_generate_splice_sites(create_database):
 #     create_database.generate_splice_sites()
+
 
 
