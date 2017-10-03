@@ -14,9 +14,9 @@ It should be invoked as part of a slurm batch job:
 import sqlite3
 import argparse
 import sys
-import os
+# import os
 import subprocess
-sys.path.append(os.getcwd())
+sys.path.append("/data/ficklin/software/pynome/")
 from pynome.utils import cd
 
 # TODO: Try something similar to this?
