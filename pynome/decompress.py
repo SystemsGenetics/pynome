@@ -2,14 +2,22 @@
 A sript designed to be run through slurm. Requries a database
 file locaiton and an index.
 
+Where are my logs?
+What environment variables are available?
+
+
 It should be invoked as part of a slurm batch job:
     python3 pynome/decompress.py <database_path> <idx>
 """
 
+import os
 import sqlite3
 import argparse
 import subprocess
 from pynome.utils import cd
+
+# TODO: Try something similar to this?
+# job_id = os.environ.get('SLURM_JOB_ID')
 
 
 def unzip(path):
@@ -23,7 +31,8 @@ def main():
     parser = argparse.ArgumentParser()
     # Create the required, positional arguments
     parser.add_argument('sql', action='store_const')
-    parser.add_argument('index', action='store_const')
+    job_index = os.environ.get('SLURM_ARRAY_TASK_ID')
+    # parser.add_argument('index', action='store_const')
     # Parse the arguments
     args = parser.parse_args()
     # Create the sqlite3 connection
@@ -39,7 +48,7 @@ def main():
     # Close the connection to the sql database.
     conn.close()
     # Get the active genome based on the given index:
-    active_genome = genome_list[int(args.index)]
+    active_genome = genome_list[job_index]
     unzip(active_genome.local_path)
     return
 
