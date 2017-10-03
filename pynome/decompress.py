@@ -14,6 +14,7 @@ It should be invoked as part of a slurm batch job:
 import sqlite3
 import argparse
 import sys
+import os
 import subprocess
 sys.path.append(os.getcwd())
 from pynome.utils import cd
