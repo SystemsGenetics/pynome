@@ -8,9 +8,7 @@
 #SBATCH --output=/scidas/logs/01-decompress.%a.log
 #SBATCH --error=/scidas/logs/01-decompress-ERRORS.%a.log
 #SBATCH --array=0-1
-workon pynome_env
-python /data/ficklin/software/pynome/slurmScripts/decompress.py /scidas/genome_test.db
-deactivate
+python /data/ficklin/software/pynome/pynome/slurmScripts/decompress.py /scidas/genome_test.db $SLURM_ARRAY_TASK_ID
 # NOTES ON SLURM SCRIPTS
 # %A will be replaced by the value of SLURM_ARRAY_JOB_ID
 # %a will be replaced by the value of SLURM_ARRAY_TASK_ID

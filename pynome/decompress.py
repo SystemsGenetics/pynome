@@ -10,7 +10,7 @@ It should be invoked as part of a slurm batch job:
     python3 pynome/decompress.py <database_path> <idx>
 """
 
-import os
+# import os
 import sqlite3
 import argparse
 import subprocess
@@ -31,8 +31,8 @@ def main():
     parser = argparse.ArgumentParser()
     # Create the required, positional arguments
     parser.add_argument('sql', action='store_const')
-    job_index = os.environ.get('SLURM_ARRAY_TASK_ID')
-    # parser.add_argument('index', action='store_const')
+    # job_index = os.environ.get('SLURM_ARRAY_TASK_ID')
+    parser.add_argument('index', action='store_const')
     # Parse the arguments
     args = parser.parse_args()
     # Create the sqlite3 connection
@@ -48,7 +48,8 @@ def main():
     # Close the connection to the sql database.
     conn.close()
     # Get the active genome based on the given index:
-    active_genome = genome_list[job_index]
+    # active_genome = genome_list[job_index]
+    active_genome = genome_list[int(args.index)]
     unzip(active_genome.local_path)
     return
 
