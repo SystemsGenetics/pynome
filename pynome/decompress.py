@@ -50,7 +50,7 @@ def main():
     # Get the active genome based on the given index:
     # active_genome = genome_list[job_index]
     active_genome = genome_list[int(args.index)]
-    unzip(active_genome)
+    unzip(active_genome[0])
     return
 
 
