@@ -24,8 +24,9 @@ class cd:
 
 
 def slurm_index_interpreter(
-        requests=("local_path", "base_filename"),  # a tuple for sqlite3 use
-        sql_database, index):
+        sql_database,
+        index,
+        requests=("local_path", "base_filename")):  # a tuple for sqlite3 use
     """
     This script will query a given sql database, then return the
     requested information of the given index position. The entries are
