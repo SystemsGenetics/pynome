@@ -11,7 +11,6 @@ It should be invoked as part of a slurm batch job:
 """
 
 # import os
-import sqlite3
 import argparse
 import sys
 # import os
@@ -37,7 +36,7 @@ def main():
     args = parser.parse_args()
 
     active_genome = slurm_index_interpreter(
-        requests=("local_path", "base_filename"),
+        requests=("local_path",),  # Ensure tuple with a comma
         sql_database=args.sql,
         index=int(args.index)
     )
