@@ -33,9 +33,9 @@ def main():
     # Create the parser
     parser = argparse.ArgumentParser()
     # Create the required, positional arguments
-    parser.add_argument('sql', action='store_const')
+    parser.add_argument('--sql', action='store_const')
     # job_index = os.environ.get('SLURM_ARRAY_TASK_ID')
-    parser.add_argument('index', action='store_const')
+    parser.add_argument('--index', action='store_const')
     # Parse the arguments
     args = parser.parse_args()
     # Create the sqlite3 connection
