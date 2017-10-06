@@ -40,7 +40,7 @@ def main():
     # Create the sqlite3 pointer
     curs = conn.cursor()
     # Run the query
-    curs.execute('SELECT * FROM GenomeTable ORDER BY taxonomic_name')
+    curs.execute('SELECT local_path FROM GenomeTable ORDER BY taxonomic_name')
     # Create a list from the query
     genome_list = [xx for xx in curs]
     # Sort the retrieved list
@@ -50,7 +50,7 @@ def main():
     # Get the active genome based on the given index:
     # active_genome = genome_list[job_index]
     active_genome = genome_list[int(args.index)]
-    unzip(active_genome.local_path)
+    unzip(active_genome)
     return
 
 
