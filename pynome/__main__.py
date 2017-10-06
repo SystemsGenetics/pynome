@@ -46,6 +46,7 @@ the pynome dir)::
 
     # Find, download the genomes and metadata file:
     $ python3 -m pynome -fdm /scidas/genomes2/genome.db /scidas/genomes2
+    $ python3 -m pynome -fdm /scidas/genomes/pynome_genome.db /scidas/genomes/enseble_genomes
 
     # Download the genomes and metadata (genomes must be found)
     $ python3 -m pynome -dm /scidas /scidas/genomes

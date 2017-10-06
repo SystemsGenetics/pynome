@@ -2,24 +2,15 @@
 A sript designed to be run through slurm. Requries a database
 file locaiton and an index.
 
-Where are my logs?
-What environment variables are available?
-
-
 It should be invoked as part of a slurm batch job:
     python3 pynome/decompress.py <database_path> <idx>
 """
 
-# import os
 import argparse
 import sys
-# import os
 import subprocess
 sys.path.append("/data/ficklin/software/pynome/")
 from pynome.utils import cd, slurm_index_interpreter
-
-# TODO: Try something similar to this?
-# job_id = os.environ.get('SLURM_JOB_ID')
 
 
 def unzip(path):
@@ -40,8 +31,7 @@ def main():
         index=int(args.index),
         requests=("local_path",),  # Ensure tuple with a comma
     )
-    print(active_genome)
-    print(type(active_genome))
+
     unzip(active_genome[0])
     return
 

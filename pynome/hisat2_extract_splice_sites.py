@@ -129,10 +129,11 @@ def extract_splice_sites(gtf_file, out_file, verbose=False):
 if __name__ == '__main__':
     parser = ArgumentParser(
         description='Extract splice junctions from a GTF file')
-    parser.add_argument('gtf_file',
+    parser.add_argument('--gtf_file',
                         nargs='?',
                         type=FileType('r'),
                         help='input GTF file (use "-" for stdin)')
+    parser.add_argument('--out_file')
     parser.add_argument('-v', '--verbose',
                         dest='verbose',
                         action='store_true',
@@ -142,4 +143,9 @@ if __name__ == '__main__':
     if not args.gtf_file:
         parser.print_help()
         exit(1)
-    extract_splice_sites(args.gtf_file, args.verbose)
+
+    extract_splice_sites(
+        args.gtf_file,
+        args.out_file,
+        args.verbose
+    )
