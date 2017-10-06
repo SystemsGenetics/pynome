@@ -17,7 +17,7 @@ import sys
 # import os
 import subprocess
 sys.path.append("/data/ficklin/software/pynome/")
-from pynome.utils import cd
+from pynome.utils import cd, slurm_index_interpreter
 
 # TODO: Try something similar to this?
 # job_id = os.environ.get('SLURM_JOB_ID')
@@ -35,21 +35,13 @@ def main():
     parser.add_argument('--sql')
     parser.add_argument('--index')
     args = parser.parse_args()
-    # Create the sqlite3 connection
-    conn = sqlite3.connect(args.sql)
-    # Create the sqlite3 pointer
-    curs = conn.cursor()
-    # Run the query
-    curs.execute('SELECT local_path FROM GenomeTable ORDER BY taxonomic_name')
-    # Create a list from the query
-    genome_list = [xx for xx in curs]
-    # Sort the retrieved list
-    genome_list.sort()
-    # Close the connection to the sql database.
-    conn.close()
-    # Get the active genome based on the given index:
-    # active_genome = genome_list[job_index]
-    active_genome = genome_list[int(args.index)]
+
+    active_genome = slurm_index_interpreter(
+        requests=("local_path", "base_filename"),
+        sql_database=args.sql,
+        index=int(args.index)
+    )
+
     unzip(active_genome[0])
     return
 

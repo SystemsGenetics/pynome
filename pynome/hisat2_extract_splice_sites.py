@@ -3,6 +3,9 @@
 # https://github.com/infphilo/hisat2/blob/master/hisat2_extract_splice_sites.py
 # Modified by Tyler Biggs for use in SciDAS.
 #
+# The major change is to the main() function, which I have modified to work
+# within our slurm workflow.
+#
 # Copyright 2015, Daehwan Kim <infphilo@gmail.com>
 #
 # This file is part of HISAT 2.
