@@ -36,11 +36,12 @@ def main():
     args = parser.parse_args()
 
     active_genome = slurm_index_interpreter(
-        requests=("local_path",),  # Ensure tuple with a comma
         sql_database=args.sql,
-        index=int(args.index)
+        index=int(args.index),
+        requests=("local_path",),  # Ensure tuple with a comma
     )
-
+    print(active_genome)
+    print(type(active_genome))
     unzip(active_genome[0])
     return
 
