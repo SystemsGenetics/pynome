@@ -48,16 +48,15 @@ def slurm_index_interpreter(
     conn = sqlite3.connect(sql_database)
     curs = conn.cursor()
 
-    # Create and run the search, first create the correct number of q marks.
-    qmark = "?"
-    for item in range(1, len(requests)):
-        qmark += ",?"
     # Then construct the search string.
-    base_search_str =\
-        "SELECT {} FROM GenomeTable ORDER BY taxonomic_name".format(qmark)
+    cols_req_str = ','.join(requests)
+    # Create the search string
+    search_str = "SELECT {} FROM GenomeTable ORDER BY taxonomic_name".format(
+        cols_req_str
+    )
 
     # Now execute the search and pull out the desired genome by its index
-    curs.execute(base_search_str, requests)
+    curs.execute(search_str)
     genome_list = curs.fetchall()
     desired_genome = genome_list[index]
 
