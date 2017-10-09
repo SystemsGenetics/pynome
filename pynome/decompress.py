@@ -9,6 +9,7 @@ It should be invoked as part of a slurm batch job:
 import argparse
 import sys
 import subprocess
+# Some path hackery needed while pynome isn't fully completed.
 sys.path.append("/data/ficklin/software/pynome/")
 from pynome.utils import cd, slurm_index_interpreter
 

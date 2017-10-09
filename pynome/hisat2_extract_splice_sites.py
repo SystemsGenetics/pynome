@@ -127,6 +127,10 @@ def extract_splice_sites(gtf_file, out_file, verbose=False):
 
 
 if __name__ == '__main__':
+    """This main() function has been modified to generate the target input and
+    output file based on a slurm array index (or any index within the range
+    of genome lenths.)
+    """
     parser = ArgumentParser(
         description='Extract splice junctions from a GTF file')
     parser.add_argument('--gtf_file',
