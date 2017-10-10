@@ -99,6 +99,3 @@ def test_add_taxonomy_ids(create_database):
 
 # def test_generate_splice_sites(create_database):
 #     create_database.generate_splice_sites()
-
-
-

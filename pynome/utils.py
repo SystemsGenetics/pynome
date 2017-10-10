@@ -58,7 +58,7 @@ def slurm_index_interpreter(
     # Now execute the search and pull out the desired genome by its index
     curs.execute(search_str)
     genome_list = curs.fetchall()
-    desired_genome = genome_list[index]
+    desired_genome = genome_list[index - 1]
 
     # Close the connection
     conn.close()
