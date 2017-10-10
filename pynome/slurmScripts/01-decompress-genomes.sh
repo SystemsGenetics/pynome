@@ -11,6 +11,7 @@
 #SBATCH --job-name=decompress-%A_%a
 #SBATCH --output=/scidas/logs/decompress.log
 #SBATCH --error=/scidas/logs/decompress-ERRORS.log
+#SBATCH --open-mode=append     ### Set the log to append 
 
 #SBATCH --array=0-56
 
