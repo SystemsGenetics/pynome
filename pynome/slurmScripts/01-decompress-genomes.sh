@@ -9,8 +9,8 @@
 #SBATCH --time=0-01:00:00      ### Wall clock time limit in Days-HH:MM:SS
 
 #SBATCH --job-name=decompress-%A_%a
-#SBATCH --output=/scidas/logs/01-decompress.log
-#SBATCH --error=/scidas/logs/01-decompress-ERRORS.log
+#SBATCH --output=/scidas/logs/decompress.log
+#SBATCH --error=/scidas/logs/decompress-ERRORS.log
 
 #SBATCH --array=0-56
 
