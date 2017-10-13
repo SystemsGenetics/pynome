@@ -22,6 +22,8 @@ Base = declarative_base()
 class Genome(object):
     """
     Class that models an individual genome.
+
+    NOT USED!!!
     """
 
     def __init__(self):
@@ -122,18 +124,6 @@ class GenomeEntry(Base):  # Inherit from declarative_base.
         self.taxonomic_name = taxonomic_name
         for key, value in kwargs.items():  # Set attributes found in **kwargs
             setattr(self, key, value)
-
-    # def __str__(self):
-    #     """Custom representation that will be pulled up when a print out
-    #     is requested."""
-    #     out_str = (
-    #         "\n"
-    #         "Taxonomic Name: {0.taxonomic_name}\n"
-    #         "\tfasta URI: {0.fasta_uri}\n"
-    #         "\tgff3 URI: {0.gff3_uri}\n"
-    #         .format(self)
-    #     )
-    #     return out_str
 
 
 class GenomeDatabase(object):

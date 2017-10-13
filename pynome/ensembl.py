@@ -13,6 +13,7 @@ import os
 import logging
 import itertools
 import pandas
+import subprocess
 from pynome.database import GenomeDatabase
 from pynome.ftpHelper import crawl_ftp_dir
 from tqdm import tqdm
@@ -162,6 +163,7 @@ class EnsemblDatabase(GenomeDatabase):
             """Parse an individual item line from an ftp.dir() call.
             This function handles splitting, without assuming the line
             contains a valid genome file."""
+
             # Split the listing by whitespace.
             item = in_line.split()
             return {
@@ -235,11 +237,11 @@ class EnsemblDatabase(GenomeDatabase):
                     self.download_path,
                     genus + '_' + species, assembly_name)
                 base_filename = "".join([
-                        genus,
-                        "_",
-                        species,
-                        "-",
-                        assembly_name
+                    genus,
+                    "_",
+                    species,
+                    "-",
+                    assembly_name
                 ])
 
             return {
@@ -387,6 +389,102 @@ class EnsemblDatabase(GenomeDatabase):
         self.ftp.quit()  # close the ftp connection
         return
 
+    def check_local_genome_integrity(self):
+        """
+        Checks the local genome files downloaded and ensures that they match
+        the linux sum provided by ensemble. Returns True if the genome is good,
+        and false otherwise. Assumes the files are still zipped.
+        """
+        def get_checksum_uri(uri):
+            """
+            Breaks apart a remote uri to ensure the correct checksum file is
+            considered.
+
+            :param uri: The base uri where the deisred CHECKSUMS file is.
+            :param tag: The tag to apply, this allows us to discern between the
+            fasta and gff3 checksum files.
+
+            :returns: A list that contains the URI of the target CHECKSUMS file
+            and the corresponding filename that is to be checked.
+            """
+            uri, filename = uri.rsplit("/", 1)
+            return [uri + "/CHECKSUMS", filename]
+
+        def download_checksum_file(checksum_URI, local_download_path, tag):
+            """
+            Downloads a given checksum for the fasta and gff3 files for a
+            given genome. Assumes an FTP connection is already initialized.
+
+            :param checksum_URI:
+            :param local_download_path:
+
+            :returns:
+            """
+            target_local_dir = os.path.join(
+                local_download_path,
+                "CHECKSUMS" + tag)
+
+            self.ftp.retrbinary(
+                cmd="RETR {}".format(checksum_URI),
+                open(target_local_dir, "wb").write)
+            return
+
+        def read_genome_checksum_files(genome, curr_file):
+            """
+            Reads a downloaded checksum file, and compares the values
+            therein to a locally computed one. The blocks and checksum are
+            generated with the standard UNIX `sum` utility.
+
+            :param genome:
+            :param curr_file:
+
+            :returns: A list that contains the checksum and block count.
+            """
+            with open(local_checksum_filepath, "r") as chk_file:
+                content = chk_file.readlines()
+
+            for line in content:
+                line = content.split()
+                if line[-1] == curr_file:  # then this is the right line
+                    chksum, blocks = line[0:1]
+            return [chksum, blocks]
+
+        def calculate_local_unix_sum(file):
+            """
+            Calculates the unix sum of a given file.
+            TODO: Perhaps move this to the utils.py file.
+
+            :param file:
+            :returns:
+            """
+            cmd = ["sum"]
+            subprocess.run()
+            return [chksum, blocks]
+
+        # Connect and login to the ftp server.
+        self.ftp.connect(ENSEMBL_FTP_URI)
+        self.ftp.login()
+
+        # Get all the genomes
+        for genome in tqdm(self.get_found_genomes()):
+
+            # Get the gff3 CHECKSUMS file.
+            gff3_sum_uri, gff3_filename = get_checksum_uri(
+                genome.gff3_uri)
+            download_checksum_file(gff3_sum_uri, genome.local_path, "_gff3")
+
+            # Get the fasta CHECKSUMS file.
+            fasta_sum_uri, fasta_filename = get_checksum_uri(
+                genome.fasta_uri)
+            download_checksum_file(gff3_sum_uri, genome.local_path, "_fasta")
+
+            # Check the GFF3 file.
+            good_check_vals = read_genome_checksum_files(genome, gff3_filename)
+            local_check_vals = calculate_local_unix_sum()
+
+        self.ftp.quit()  # close the ftp connection
+        return
+
     def read_species_metadata(self, file_name="species.txt"):
         """
         Reads the downloaded metadata file: ``species.txt`` file and returns a
@@ -429,7 +527,7 @@ class EnsemblDatabase(GenomeDatabase):
 
         :param species: The species to return the taxonomy id of.
 
-        :return: A taxonomy id based 
+        :returns: A taxonomy id
         """
         taxonomy_id = self.species_metadata[
             self.species_metadata['species'].str.match(
