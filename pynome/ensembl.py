@@ -457,8 +457,9 @@ class EnsemblDatabase(GenomeDatabase):
             :param file:
             :returns:
             """
-            cmd = ["sum"]
-            subprocess.run()
+            cmd = ["sum", file]
+            subprocess.run(cmd, stdout=subprocess.PIPE)
+            chksum, blocks = command.stdout.strip().split()
             return [chksum, blocks]
 
         # Connect and login to the ftp server.
