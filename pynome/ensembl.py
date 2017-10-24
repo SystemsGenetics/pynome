@@ -566,7 +566,7 @@ class EnsemblDatabase(GenomeDatabase):
             # Go to the target directory and unzip the files therein.
             with cd(genome.local_path):
                 cmd = [
-                    'sbatch', '--account=ficklin', '--partition=ficklin',
+                    'srun', '--account=ficklin', '--partition=ficklin',
                     'gunzip', genome.base_filename + 'fa.gz',
                     genome.base_filename + 'gff3.gz']
                 subprocess.run(cmd)
@@ -629,7 +629,7 @@ class EnsemblDatabase(GenomeDatabase):
             fa_file = gen.base_filename + '.fa'
             # build the hisat2-build command
             cmd = [
-                'sbatch', '--account=ficklin', '--partition=ficklin',
+                'srun', '--account=ficklin', '--partition=ficklin',
                 'hisat2-build', '-f', fa_file, gen.base_filename]
             # change to the path, and try to run the command.
             # Log an error if it fails.
@@ -658,7 +658,7 @@ class EnsemblDatabase(GenomeDatabase):
             gff_out_file = gen.base_filename + '.gtf'
             # Build the command:
             cmd = [
-                'sbatch', '--account=ficklin', '--partition=ficklin',
+                'srun', '--account=ficklin', '--partition=ficklin',
                 'gffread', '-T', gff3_file, '-o', gff_out_file]
             with cd(gen.local_path):
                 try:
@@ -682,7 +682,7 @@ class EnsemblDatabase(GenomeDatabase):
         for gen in tqdm(genome_list):
             gft_file = gen.base_filename + '.gft'
             output_file = 'Splice_sites.txt'
-            cmd =['sbatch', '--account=ficklin', '--partition=ficklin',
+            cmd =['srun', '--account=ficklin', '--partition=ficklin',
                   '/data/ficklin/software/pynome/pynome/hisat2_extract_splice_sites.py',
                 gft_file, output_file]
             with cd(gen.local_path):
