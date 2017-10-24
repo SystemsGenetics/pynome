@@ -16,7 +16,9 @@ import pandas
 import subprocess
 from pynome.database import GenomeDatabase
 from pynome.ftpHelper import crawl_ftp_dir
+from pynome.utils import cd
 from tqdm import tqdm
+from pynome.hisat2_extract_splice_sites import extract_splice_sites
 
 ENSEMBL_FTP_URI = 'ftp.ensemblgenomes.org'
 ENSEMBL_DATA_TYPES = ['gff3', 'fasta']
@@ -425,7 +427,7 @@ class EnsemblDatabase(GenomeDatabase):
                 "CHECKSUMS" + tag)
 
             self.ftp.retrbinary(
-                cmd="RETR {}".format(checksum_URI),
+                "RETR {}".format(checksum_URI),
                 open(target_local_dir, "wb").write)
             return
 
@@ -551,24 +553,21 @@ class EnsemblDatabase(GenomeDatabase):
             }
             self.save_genome(**update_dict)
 
-    # def decompress_genomes(self):
-    #     """
-    #     Decompresses the genomes that have been downloaded. This will be
-    #     changed to use a slurm array.
-    #     """
-    #     # Get all the genomes that have been found and saved in the SQLite db
-    #     genomes = self.get_found_genomes()
+    def decompress_genomes(self):
+        """
+        Decompresses the genomes that have been downloaded. This will be
+        changed to use a slurm array.
+        """
+        # Get all the genomes that have been found and saved in the SQLite db
+        genomes = self.get_found_genomes()
 
-    #     # Iterate over the list of genomes
-    #     for genome in genomes:
-    #         # Build the path in the same way as the download function.
-    #         target_dir = os.path.join(
-    #             self.download_path, genome.taxonomic_name)
-    #         # Go to the target directory and unzip the files therein.
-    #         with cd(target_dir):
-    #             # TODO: Consider removing the star and specifying the files
-    #             subprocess.run('gunzip *', shell=True)
-    #     return
+        # Iterate over the list of genomes
+        for genome in genomes:
+            # Go to the target directory and unzip the files therein.
+            with cd(genome.local_path):
+                # TODO: Consider removing the star and specifying the files
+                subprocess.run('gunzip *', shell=True)
+        return
 
     # def slurm_decompress_genome(self, slurm_index):
     #     """
@@ -596,93 +595,88 @@ class EnsemblDatabase(GenomeDatabase):
     #         subprocess.run('gunzip *', shell=True)
     #     return
 
-    # def generate_hisat_index(self):
-    #     """
-    #     Run the hisat conversion tool on the supplied path list.
+    def generate_hisat_index(self):
+        """
+        Run the hisat conversion tool on the supplied path list.
 
-    #     HISAT tool options:
+        HISAT tool options:
 
-    #     -f
+        -f
 
-    #     Reads (specified with <m1>, <m2>, <s>) are FASTA files. FASTA files
-    #     usually have extension .fa, .fasta, .mfa, .fna or similar. FASTA
-    #     files do not have a way of specifying quality values, so when -f
-    #     is set, the result is as if --ignore-quals is also set.
+        Reads (specified with <m1>, <m2>, <s>) are FASTA files. FASTA files
+        usually have extension .fa, .fasta, .mfa, .fna or similar. FASTA
+        files do not have a way of specifying quality values, so when -f
+        is set, the result is as if --ignore-quals is also set.
 
-    #     If your computer has multiple processors/cores, use -p
+        If your computer has multiple processors/cores, use -p
 
-    #     The -p option causes HISAT to launch a specified number of parallel
-    #     search threads. Each thread runs on a different processor/core and
-    #     all threads find alignments in parallel, increasing alignment
-    #     throughput by approximately a multiple of the number of threads
-    #     (though in practice, speedup is somewhat worse than linear).
+        The -p option causes HISAT to launch a specified number of parallel
+        search threads. Each thread runs on a different processor/core and
+        all threads find alignments in parallel, increasing alignment
+        throughput by approximately a multiple of the number of threads
+        (though in practice, speedup is somewhat worse than linear).
 
-    #     """
-    #     genome_list = self.get_found_genomes()
+        """
+        genome_list = self.get_found_genomes()
 
-    #     # The hisat tool will create the indexes in the current directory.
-    #     for gen in tqdm(genome_list):
-    #         # build the path
-    #         path = os.path.join(self.download_path, gen.taxonomic_name)
-    #         # build the filename
-    #         fa_file = gen.taxonomic_name + '.fa'
-    #         # build the hisat2-build command
-    #         cmd = ['hisat2-build', '-f', fa_file, gen.taxonomic_name]
-    #         # change to the path, and try to run the command.
-    #         # Log an error if it fails.
-    #         with cd(path):
-    #             try:
-    #                 subprocess.run(cmd)
-    #             except:
-    #                 logging.warning(
-    #                     'Unable to build ht2 index of {}'.format(
-    #                         gen.taxonomic_name))
-    #     return
+        # The hisat tool will create the indexes in the current directory.
+        for gen in tqdm(genome_list):
+            # build the filename
+            fa_file = gen.base_filename + '.fa'
+            # build the hisat2-build command
+            cmd = ['hisat2-build', '-f', fa_file, gen.base_filename]
+            # change to the path, and try to run the command.
+            # Log an error if it fails.
+            with cd(gen.local_path):
+                try:
+                    subprocess.run(cmd)
+                except:
+                    logging.warning(
+                        'Unable to build ht2 index of {}'.format(
+                            gen.base_filename))
+        return
 
-    # def generate_splice_sites(self):
-    #     """
-    #     Command example for splice site generation:
+    def generate_splice_sites(self):
+        """
+        Command example for splice site generation:
 
-    #     >>> python hisat2_extract_splice_sites.py GRCh38.gtf > Splice_Sites.txt
-    #     :return:
-    #     """
-    #     genome_list = self.get_found_genomes()
+        >>> python hisat2_extract_splice_sites.py GRCh38.gtf > Splice_Sites.txt
+        :return:
+        """
+        genome_list = self.get_found_genomes()
 
-    #     for gen in tqdm(genome_list):
-    #         logging.debug(
-    #             'Attempting to generate splice sites for {}'.format(
-    #                 gen.taxonomic_name))
-    #         gtf_path = os.path.join(self.download_path, gen.taxonomic_name)
-    #         gft_file = gen.taxonomic_name + '.gft'
-    #         output_file = 'Splice_sites.txt'
-    #         with cd(gtf_path):
-    #             extract_splice_sites(gft_file, output_file)
-    #     return
+        for gen in tqdm(genome_list):
+            logging.debug(
+                'Attempting to generate splice sites for {}'.format(
+                    gen.base_filename))
+            gft_file = gen.base_filename + '.gft'
+            output_file = 'Splice_sites.txt'
+            with cd(gen.local_path):
+                extract_splice_sites(gft_file, output_file)
+        return
 
-    # def generate_gtf(self):
-    #     """
-    #     Uses **gffread** command to generate `\*.gtf` files.
+    def generate_gtf(self):
+        """
+        Uses **gffread** command to generate `\*.gtf` files.
 
-    #     ``gffread -T <TARGET-FILE>.gff3 -o <TARGET-FILE>.gtf``
+        ``gffread -T <TARGET-FILE>.gff3 -o <TARGET-FILE>.gtf``
 
-    #     Should output to the `.gtf2` file format by default.
-    #     """
-    #     genome_list = self.get_found_genomes()
+        Should output to the `.gtf2` file format by default.
+        """
+        genome_list = self.get_found_genomes()
 
-    #     for gen in tqdm(genome_list):
-    #         # Build the path
-    #         path = os.path.join(self.download_path, gen.taxonomic_name)
-    #         # build the file name
-    #         gff3_file = gen.taxonomic_name + '.gff3'
-    #         gff_out_file = gen.taxonomic_name + '.gtf'
-    #         # Build the command:
-    #         cmd = ['gffread', '-T', gff3_file, '-o', gff_out_file]
-    #         with cd(path):
-    #             try:
-    #                 subprocess.run(cmd)
-    #             except:
-    #                 logging.warning(
-    #                     'Unable to generate gtf file for {}'.format(
-    #                         gen.taxonomic_name))
+        for gen in tqdm(genome_list):
+            # build the file name
+            gff3_file = gen.base_filename + '.gff3'
+            gff_out_file = gen.base_filename + '.gtf'
+            # Build the command:
+            cmd = ['gffread', '-T', gff3_file, '-o', gff_out_file]
+            with cd(gen.local_path):
+                try:
+                    subprocess.run(cmd)
+                except:
+                    logging.warning(
+                        'Unable to generate gtf file for {}'.format(
+                            gen.base_filename))
 
-    #     return
+        return
