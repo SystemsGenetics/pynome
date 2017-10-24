@@ -137,8 +137,8 @@ if __name__ == '__main__':
     parser = ArgumentParser(
         description='Extract splice junctions from a GTF file')
     parser.add_argument('--gtf_file',
-                        nargs='?',
-                        type=FileType('r'),
+                        nargs='1',
+                        # type=FileType('r'),
                         help='input GTF file (use "-" for stdin)')
     parser.add_argument('--out_file')
     parser.add_argument('-v', '--verbose',
