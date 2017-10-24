@@ -1,11 +1,4 @@
 #
-# MODIFIED from:
-# https://github.com/infphilo/hisat2/blob/master/hisat2_extract_splice_sites.py
-# Modified by Tyler Biggs for use in SciDAS.
-#
-# The major change is to the main() function, which I have modified to work
-# within our slurm workflow.
-#
 # Copyright 2015, Daehwan Kim <infphilo@gmail.com>
 #
 # This file is part of HISAT 2.
@@ -24,22 +17,19 @@
 # along with HISAT 2.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-# from __future__ import print_function
+from __future__ import print_function
 
 from sys import stderr, exit
 from collections import defaultdict as dd, Counter
 from argparse import ArgumentParser, FileType
 
 
-def extract_splice_sites(gtf_file, out_file, verbose=False):
+def extract_splice_sites(gtf_file, verbose=False):
     genes = dd(list)
     trans = {}
 
-    with open(gtf_file) as f:
-        gtf_read = f.read()
-
     # Parse valid exon lines from the GTF file into a dict by transcript_id
-    for line in gtf_read:
+    for line in gtf_file:
         line = line.strip()
         if not line or line.startswith('#'):
             continue
@@ -74,26 +64,24 @@ def extract_splice_sites(gtf_file, out_file, verbose=False):
 
     # Sort exons and merge where separating introns are <=5 bps
     for tran, [chrom, strand, exons] in trans.items():
-        exons.sort()
-        tmp_exons = [exons[0]]
-        for i in range(1, len(exons)):
-            if exons[i][0] - tmp_exons[-1][1] <= 5:
-                tmp_exons[-1][1] = exons[i][1]
-            else:
-                tmp_exons.append(exons[i])
-        trans[tran] = [chrom, strand, tmp_exons]
+            exons.sort()
+            tmp_exons = [exons[0]]
+            for i in range(1, len(exons)):
+                if exons[i][0] - tmp_exons[-1][1] <= 5:
+                    tmp_exons[-1][1] = exons[i][1]
+                else:
+                    tmp_exons.append(exons[i])
+            trans[tran] = [chrom, strand, tmp_exons]
 
     # Calculate and print the unique junctions
     junctions = set()
     for chrom, strand, exons in trans.values():
         for i in range(1, len(exons)):
-            junctions.add((chrom, exons[i - 1][1], exons[i][0], strand))
+            junctions.add((chrom, exons[i-1][1], exons[i][0], strand))
     junctions = sorted(junctions)
-    with open(out_file, 'w') as f:
-        for chrom, left, right, strand in junctions:
-            # Zero-based offset
-            f.write('{}\t{}\t{}\t{}\n'.format(chrom, left - 1, right - 1, strand))
-            # print('{}\t{}\t{}\t{}'.format(chrom, left - 1, right - 1, strand))
+    for chrom, left, right, strand in junctions:
+        # Zero-based offset
+        print('{}\t{}\t{}\t{}'.format(chrom, left-1, right-1, strand))
 
     # Print some stats if asked
     if verbose:
@@ -102,57 +90,47 @@ def extract_splice_sites(gtf_file, out_file, verbose=False):
         for chrom, strand, exons in trans.values():
             tran_len = 0
             for i, exon in enumerate(exons):
-                exon_len = exon[1] - exon[0] + 1
+                exon_len = exon[1]-exon[0]+1
                 exon_lengths[exon_len] += 1
                 tran_len += exon_len
                 if i == 0:
                     continue
-                intron_lengths[exon[0] - exons[i - 1][1]] += 1
+                intron_lengths[exon[0] - exons[i-1][1]] += 1
             trans_lengths[tran_len] += 1
 
         print('genes: {}, genes with multiple isoforms: {}'.format(
-            len(genes), sum(len(v) > 1 for v in genes.values())),
-            file=stderr)
+                len(genes), sum(len(v) > 1 for v in genes.values())),
+              file=stderr)
         print('transcripts: {}, transcript avg. length: {:d}'.format(
-            len(trans), sum(trans_lengths.elements()) / len(trans)),
-            file=stderr)
+                len(trans), sum(trans_lengths.elements())/len(trans)),
+              file=stderr)
         print('exons: {}, exon avg. length: {:d}'.format(
-            sum(exon_lengths.values()),
-            sum(exon_lengths.elements()) / sum(exon_lengths.values())),
-            file=stderr)
+                sum(exon_lengths.values()),
+                sum(exon_lengths.elements())/sum(exon_lengths.values())),
+              file=stderr)
         print('introns: {}, intron avg. length: {:d}'.format(
-            sum(intron_lengths.values()),
-            sum(intron_lengths.elements()) / sum(intron_lengths.values())),
-            file=stderr)
+                sum(intron_lengths.values()),
+                sum(intron_lengths.elements())/sum(intron_lengths.values())),
+              file=stderr)
         print('average number of exons per transcript: {:d}'.format(
-            sum(exon_lengths.values()) / len(trans)),
-            file=stderr)
+                sum(exon_lengths.values())/len(trans)),
+              file=stderr)
 
 
 if __name__ == '__main__':
-    """This main() function has been modified to generate the target input and
-    output file based on a slurm array index (or any index within the range
-    of genome lenths.)
-    """
     parser = ArgumentParser(
         description='Extract splice junctions from a GTF file')
-    parser.add_argument('--gtf_file',
-                        nargs='1',
-                        # type=FileType('r'),
-                        help='input GTF file (use "-" for stdin)')
-    parser.add_argument('--out_file')
+    parser.add_argument('gtf_file',
+        nargs='?',
+        type=FileType('r'),
+        help='input GTF file (use "-" for stdin)')
     parser.add_argument('-v', '--verbose',
-                        dest='verbose',
-                        action='store_true',
-                        help='also print some statistics to stderr')
+        dest='verbose',
+        action='store_true',
+        help='also print some statistics to stderr')
 
     args = parser.parse_args()
     if not args.gtf_file:
         parser.print_help()
         exit(1)
-
-    extract_splice_sites(
-        args.gtf_file,
-        args.out_file,
-        args.verbose
-    )
+    extract_splice_sites(args.gtf_file, args.verbose)
