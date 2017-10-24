@@ -565,8 +565,12 @@ class EnsemblDatabase(GenomeDatabase):
         for genome in genomes:
             # Go to the target directory and unzip the files therein.
             with cd(genome.local_path):
-                # TODO: Consider removing the star and specifying the files
-                subprocess.run('gunzip *', shell=True)
+                cmd = [
+                    'sbatch', '--account=ficklin', '--partition=ficklin',
+                    'gunzip', genome.base_filename + 'fa.gz',
+                    genome.base_filename + 'gff3.gz']
+                subprocess.run(cmd)
+                # subprocess.run('gunzip *', shell=True)
         return
 
     # def slurm_decompress_genome(self, slurm_index):
@@ -624,7 +628,9 @@ class EnsemblDatabase(GenomeDatabase):
             # build the filename
             fa_file = gen.base_filename + '.fa'
             # build the hisat2-build command
-            cmd = ['hisat2-build', '-f', fa_file, gen.base_filename]
+            cmd = [
+                'sbatch', '--account=ficklin', '--partition=ficklin',
+                'hisat2-build', '-f', fa_file, gen.base_filename]
             # change to the path, and try to run the command.
             # Log an error if it fails.
             with cd(gen.local_path):
@@ -634,25 +640,6 @@ class EnsemblDatabase(GenomeDatabase):
                     logging.warning(
                         'Unable to build ht2 index of {}'.format(
                             gen.base_filename))
-        return
-
-    def generate_splice_sites(self):
-        """
-        Command example for splice site generation:
-
-        >>> python hisat2_extract_splice_sites.py GRCh38.gtf > Splice_Sites.txt
-        :return:
-        """
-        genome_list = self.get_found_genomes()
-
-        for gen in tqdm(genome_list):
-            logging.debug(
-                'Attempting to generate splice sites for {}'.format(
-                    gen.base_filename))
-            gft_file = gen.base_filename + '.gft'
-            output_file = 'Splice_sites.txt'
-            with cd(gen.local_path):
-                extract_splice_sites(gft_file, output_file)
         return
 
     def generate_gtf(self):
@@ -670,7 +657,9 @@ class EnsemblDatabase(GenomeDatabase):
             gff3_file = gen.base_filename + '.gff3'
             gff_out_file = gen.base_filename + '.gtf'
             # Build the command:
-            cmd = ['gffread', '-T', gff3_file, '-o', gff_out_file]
+            cmd = [
+                'sbatch', '--account=ficklin', '--partition=ficklin',
+                'gffread', '-T', gff3_file, '-o', gff_out_file]
             with cd(gen.local_path):
                 try:
                     subprocess.run(cmd)
@@ -679,4 +668,24 @@ class EnsemblDatabase(GenomeDatabase):
                         'Unable to generate gtf file for {}'.format(
                             gen.base_filename))
 
+        return
+
+    def generate_splice_sites(self):
+        """
+        Command example for splice site generation:
+
+        >>> python hisat2_extract_splice_sites.py GRCh38.gtf > Splice_Sites.txt
+        :return:
+        """
+        genome_list = self.get_found_genomes()
+
+        for gen in tqdm(genome_list):
+            gft_file = gen.base_filename + '.gft'
+            output_file = 'Splice_sites.txt'
+            cmd =['sbatch', '--account=ficklin', '--partition=ficklin',
+                  '/data/ficklin/software/pynome/pynome/hisat2_extract_splice_sites.py',
+                gft_file, output_file]
+            with cd(gen.local_path):
+                subprocess.run(cmd)
+                # extract_splice_sites(gft_file, output_file)
         return

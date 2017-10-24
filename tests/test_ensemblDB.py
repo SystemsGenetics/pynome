@@ -19,6 +19,8 @@ Testing on KAMIAK with command line arguments.
 python3 -m pytest -sv tests/test_ensemblDB.py /scidas/genome_test.db /scidas/test_genomes/
 python3 -m pytest -sv tests/test_ensemblDB.py --database=/scidas/genome_test.db --genome=/scidas/test_genomes/
 pytest -sv tests/test_ensemblDB.py --database=/scidas/genome_test.db --genome=/scidas/test_genomes/
+
+idev --account=ficklin --partition=ficklin --time=48:00:00
 """
 
 # import pytest
@@ -93,9 +95,9 @@ def test_generate_hisat_index(create_database):
     create_database.generate_hisat_index()
 
 
-def test_generate_gtf(create_database):
-    create_database.generate_gtf()
-
-
 def test_generate_splice_sites(create_database):
     create_database.generate_splice_sites()
+
+
+def test_generate_gtf(create_database):
+    create_database.generate_gtf()
