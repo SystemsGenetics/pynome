@@ -35,8 +35,11 @@ def extract_splice_sites(gtf_file, out_file, verbose=False):
     genes = dd(list)
     trans = {}
 
+    with open(gtf_file) as f:
+        gtf_read = f.read()
+
     # Parse valid exon lines from the GTF file into a dict by transcript_id
-    for line in gtf_file:
+    for line in gtf_read:
         line = line.strip()
         if not line or line.startswith('#'):
             continue

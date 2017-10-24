@@ -685,7 +685,7 @@ class EnsemblDatabase(GenomeDatabase):
             cmd =['srun', '--account=ficklin', '--partition=ficklin', 'python3',
                   '/data/ficklin/software/pynome/pynome/hisat2_extract_splice_sites.py',
                 '--gtf_file={}'.format(gft_file), '--out_file={}'.format(output_file)]
-            with cd(gen.local_path):
-                subprocess.run(cmd)
-                # extract_splice_sites(gft_file, output_file)
+            # with cd(gen.local_path):
+            subprocess.run(cmd)
+            # extract_splice_sites(gft_file, output_file)
         return
