@@ -18,9 +18,11 @@ python3 -m pytest -sv tests/test_ensemblDB.py /media/tylerbiggs/genomic/test.db 
 Testing on KAMIAK with command line arguments.
 python3 -m pytest -sv tests/test_ensemblDB.py /scidas/genome_test.db /scidas/test_genomes/
 python3 -m pytest -sv tests/test_ensemblDB.py --database=/scidas/genome_test.db --genome=/scidas/test_genomes/
-pytest -sv tests/test_ensemblDB.py --database=/scidas/genome_test.db --genome=/scidas/test_genomes/
+python3 -m pytest -sv tests/test_ensemblDB.py --database=/scidas/genome_test.db --genome=/scidas/test_genomes/
 
 idev --account=ficklin --partition=ficklin --time=48:00:00
+
+sbatch --account=ficklin --partition=ficklin --time=4:00:00
 """
 
 # import pytest

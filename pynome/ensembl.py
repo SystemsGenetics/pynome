@@ -680,8 +680,8 @@ class EnsemblDatabase(GenomeDatabase):
         genome_list = self.get_found_genomes()
 
         for gen in tqdm(genome_list):
-            gft_file = gen.base_filename + '.gtf'
-            output_file = 'Splice_sites.txt'
+            gft_file = os.path.join(gen.local_path, gen.base_filename + '.gtf')
+            output_file = os.path.join(gen.local_path, 'Splice_sites.txt')
             cmd =['srun', '--account=ficklin', '--partition=ficklin', 'python3',
                   '/data/ficklin/software/pynome/pynome/hisat2_extract_splice_sites.py',
                 '--gtf_file={}'.format(gft_file), '--out_file={}'.format(output_file)]
