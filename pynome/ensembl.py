@@ -567,8 +567,8 @@ class EnsemblDatabase(GenomeDatabase):
             with cd(genome.local_path):
                 cmd = [
                     'srun', '--account=ficklin', '--partition=ficklin',
-                    'gunzip', genome.base_filename + 'fa.gz',
-                    genome.base_filename + 'gff3.gz']
+                    'gunzip', genome.base_filename + '.fa.gz',
+                    genome.base_filename + '.gff3.gz']
                 subprocess.run(cmd)
                 # subprocess.run('gunzip *', shell=True)
         return
