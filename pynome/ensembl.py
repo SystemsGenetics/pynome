@@ -675,15 +675,16 @@ class EnsemblDatabase(GenomeDatabase):
         Command example for splice site generation:
 
         >>> python hisat2_extract_splice_sites.py GRCh38.gtf > Splice_Sites.txt
-        :return:
+        :returns:
         """
         genome_list = self.get_found_genomes()
 
         for gen in tqdm(genome_list):
-            gft_file = gen.base_filename + '.gtf'
-            output_file = gen.base_filename + '.Splice_sites.txt'
+            gft_file = os.path.join(gen.local_path, gen.base_filename + '.gtf')
+            output_file = os.path.join(
+                gen.local_path, gen.base_filename + '.Splice_sites.txt')
             cmd = [
-                'srun', '--account=ficklin', '--partition=ficklin', #'python3',
+                'srun', '--account=ficklin', '--partition=ficklin',
                 'hisat2_extract_splice_sites.py', gft_file, '>', output_file]
             with cd(gen.local_path):
                 subprocess.run(cmd)
