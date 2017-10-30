@@ -683,9 +683,10 @@ class EnsemblDatabase(GenomeDatabase):
             gft_file = os.path.join(gen.local_path, gen.base_filename + '.gtf')
             output_file = os.path.join(
                 gen.local_path, gen.base_filename + '.Splice_sites.txt')
-            cmd = [
-                'srun', '--account=ficklin', '--partition=ficklin',
-                'hisat2_extract_splice_sites.py', gft_file, '>', output_file]
+            cmd = (
+                'srun --account=ficklin --partition=ficklin'
+                'hisat2_extract_splice_sites.py {0} > {1}'.format(
+                    gft_file, output_file))
             with cd(gen.local_path):
-                subprocess.run(cmd)
+                subprocess.run(cmd, shell=True)
         return
