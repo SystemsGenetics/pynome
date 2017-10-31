@@ -16,9 +16,6 @@ Welcome to Pynome's documentation!
 .. automodule:: pynome.ensembl
    :members:
 
-.. automodule:: pynome.ftpHelper
-   :members:
-
 .. automodule:: pynome.__main__
    :members:
 

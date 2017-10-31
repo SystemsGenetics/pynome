@@ -20,9 +20,10 @@ Base = declarative_base()
 
 
 class GenomeEntry(Base):  # Inherit from declarative_base.
-    """A sqlite handler for the GenomeTable database.
+    """
+    A sqlite handler for the GenomeTable database.
 
-    This supposedly will both create the desired sql table, as well as
+    This will both create the desired sql table, as well as
     act as the handler for generating new row entries into said table.
     To add a record to the database, an instance of this class must be
     initialized with the desired data within. Then that new instance of
@@ -52,23 +53,28 @@ class GenomeEntry(Base):  # Inherit from declarative_base.
 
     In deployments this will be handled by a wrapper function specific
     to the database being examined.
-
-    .. todo::
-
-        Consider adding a local directory string column.
     """
-    __tablename__ = "GenomeTable"  # Should this be the same as the class?
+
+    # Define the SQLite table name.
+    __tablename__ = "GenomeTable"
+
+    # Define columns within that table.
+    # TAXONOMIC ENTRIES
     taxonomic_name = Column(String(500), primary_key=True)
     species = Column(String(500))
+    assembly_name = Column(String(250))
+    genus = Column(String(250))
+    taxonomy_id = Column(String(100))
+    intraspecific_name = Column(String(100))
+
+    # REMOTE FILES
     fasta_uri = Column(String(1000))
     fasta_size = Column(Integer())
     gff3_uri = Column(String(1000))
     gff3_size = Column(Integer())
-    assembly_name = Column(String(250))
-    genus = Column(String(250))
-    taxonomy_id = Column(String(100))
+
+    # LOCAL FILES
     local_path = Column(String(500))
-    intraspecific_name = Column(String(100))
     base_filename = Column(String(500))
 
     def __init__(self, taxonomic_name, **kwargs):

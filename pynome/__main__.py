@@ -62,7 +62,6 @@ the pynome dir)::
     $ python3 -m pynome -fdmuigs /media/tylerbiggs/genomic/test.db /media/tylerbiggs/genomic
 """
 
-import os
 import logging
 import argparse
 from pynome.ensembl import EnsemblDatabase
