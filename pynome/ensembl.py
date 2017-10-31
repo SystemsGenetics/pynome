@@ -15,10 +15,9 @@ import itertools
 import pandas
 import subprocess
 from pynome.database import GenomeDatabase
-from pynome.ftpHelper import crawl_ftp_dir
-from pynome.utils import cd
+from pynome.utils import cd, crawl_ftp_dir
 from tqdm import tqdm
-from pynome.hisat2_extract_splice_sites import extract_splice_sites
+
 
 ENSEMBL_FTP_URI = 'ftp.ensemblgenomes.org'
 ENSEMBL_DATA_TYPES = ['gff3', 'fasta']

@@ -3,7 +3,6 @@ Utilities for Pynome
 """
 
 import os
-import sqlite3
 
 
 class cd:
@@ -12,6 +11,7 @@ class cd:
     Borrowed from Stackoverflow:
     stackoverflow.com/questions/431684/how-do-i-cd-in-python
     """
+
     def __init__(self, newPath):
         self.newPath = os.path.expanduser(newPath)
 
@@ -23,44 +23,38 @@ class cd:
         os.chdir(self.savedPath)
 
 
-def slurm_index_interpreter(
-        sql_database,
-        index,
-        requests=("local_path", "base_filename")):  # a tuple for sqlite3 use
-    """
-    This script will query a given sql database, then return the
-    requested information of the given index position. The entries are
-    sorted alphabetical by their taxonomic name.
+def crawl_ftp_dir(database, top_dir, parsing_function):
+    """Recursively crawl a target directory. Takes as an input a
+    target directory and a parsing function. The ftplib.FTP.dir()
+    function is used to retrieve a directory listing, line by line,
+    in string format. These are appended to a newly generated list.
+    Each item in this list is subject to the parsing function.
 
-    :param requests: Must be a tuple of strings that are the desired column
-    as defined in `database.py`. By default this tuple is defined to be
-    `("local_path", "base_filename")`.
-
-    :param sql_database: The file path of the sqlite database.
-
-    :param index: The integer index of the sqlite database to be operated on.
-
-    :returns: A list of tuples with the requested values (columns) in the
-    same order they were requested with.
+    :param ftp_instance: An instance of ftplib.FTP()
+    :param top_dir: The directory from which contents will be retrieved.
+    :param parsing_function: The function to parse each non-directory
+                             result.
     """
 
-    # Create the connection and cursor.
-    conn = sqlite3.connect(sql_database)
-    curs = conn.cursor()
+    retrieved_dir_list = []  # empty list to hold the callback
 
-    # Then construct the search string.
-    cols_req_str = ','.join(requests)
-    # Create the search string
-    search_str = "SELECT {} FROM GenomeTable ORDER BY taxonomic_name".format(
-        cols_req_str
-    )
+    def dir_check(dir_value):
+        """Checks if the input: dir_value is a directory. Assumes the input
+        will be in the following format:
+             ``"drwxr-sr-x  2 ftp   ftp    4096 Jan 13  2015 filename"``
+        This works by checking the first letter of the input string,
+        and returns True for a directory or False otherwise."""
+        if dir_value[0][0] == 'd':
+            return True
+        else:
+            return False
 
-    # Now execute the search and pull out the desired genome by its index
-    curs.execute(search_str)
-    genome_list = curs.fetchall()
-    desired_genome = genome_list[index - 1]
+    database.ftp.dir(top_dir, retrieved_dir_list.append)
 
-    # Close the connection
-    conn.close()
-
-    return desired_genome
+    for line in retrieved_dir_list:
+        if dir_check(line):  # Then the line is a dir and should be crawled.
+            target_dir = ''.join((top_dir, line.split()[-1], '/'))
+            crawl_ftp_dir(database, target_dir, parsing_function)
+        else:  # otherwise the line must be parsed.
+            parsing_function(database, line, top_dir)
+    return
