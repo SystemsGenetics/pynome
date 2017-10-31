@@ -388,6 +388,10 @@ class EnsemblDatabase(GenomeDatabase):
                         except:
                             logging.warning('UNABLE TO DOWNLOAD A GENOME')
                             logging.warning(genome.taxonomic_name)
+                        finally:
+                            # Check if the file size is 0, if so delete it.
+                            if os.stat(target_file).st_size == 0:
+                                os.remove(target_file)
         self.ftp.quit()  # close the ftp connection
         return
 
