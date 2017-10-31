@@ -688,5 +688,5 @@ class EnsemblDatabase(GenomeDatabase):
                 'hisat2_extract_splice_sites.py {0}'.format(
                     gft_file, output_file))
             # with cd(gen.local_path):
-            subprocess.run(cmd)
+            subprocess.run(cmd, shell=True)
         return
