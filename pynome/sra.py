@@ -10,31 +10,29 @@ taxonomy id.
 
 Filter criteria:
 
+Filter criteria:
+
 1)  read length >-= 100bp
-2)  # of spots (reads):  15 Million
+2) # of spots (reads): 10 Million
 3)  PAIRED reads only
 4)  Species with genome and GFF3 file.
 5)  Illumina sequencers.
+6)  Assay Type: RNA-Seq
 
-A problem emerges. Read lengths appear to be stored as strings. A greater than
-or equal to implementation does not appear possible.
-
-Sample search string:
-
-((txid4530[Organism:exp]) AND
-"biomol rna"[Properties]) AND
-"platform illumina"[Properties]))
+https://www.ncbi.nlm.nih.gov/books/NBK25499/
 """
 
-# import os
-# import sys
-# import json
 import urllib
 import argparse
 import xmltodict
 
+ENTREZ_BASE = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi"
 
-QUERY = 'https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=sra&term='
+QUERY ='https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=sra&term='
+
+def construct_entrez_search():
+
+    return
 
 
 def build_sra_search(tax_id):
@@ -42,16 +40,10 @@ def build_sra_search(tax_id):
     Builds the SRA search string based on an input taxonomy id number.
     :return:
     """
-    # sra_search_term_l = list()
-
-    # for tax_id in tax_id_l:
-    tax_id_str = "txid{0}[Organism:exp]".format(tax_id)
+    tax_id_str = "{0}[uid]".format(tax_id)
     properties_str = '"biomol rna"[Properties]'
     platform_str = '"platform illumina"[Properties]'
-    search_str = tax_id_str + ' AND ' + properties_str + ' AND ' + platform_str
-    # sra_search_term_l.append(search_str)
-
-    # return sra_search_term_l
+    search_str = tax_id_str + '+AND+' + properties_str + '+AND+' + platform_str
     return search_str
 
 
@@ -67,7 +59,7 @@ def run_sra_search(sra_term):
         response_xml = response.read()
 
     response = xmltodict.parse(response_xml)
-    retr_id_l = response['eSearchResult']['IdList']['Id']
+    retr_id_l = response #['eSearchResult']['IdList']['Id']
     return retr_id_l
 
 

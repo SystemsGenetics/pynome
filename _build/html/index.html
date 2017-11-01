@@ -1,16 +1,13 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
     <title>Welcome to Pynome’s documentation! &#8212; Pynome alpha documentation</title>
-    
     <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
@@ -33,7 +30,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
 
   </head>
-  <body role="document">
+  <body>
   
 
     <div class="document">
@@ -42,7 +39,7 @@
           <div class="body" role="main">
             
   <div class="section" id="welcome-to-pynome-s-documentation">
-<h1>Welcome to Pynome&#8217;s documentation!<a class="headerlink" href="#welcome-to-pynome-s-documentation" title="Permalink to this headline">¶</a></h1>
+<h1>Welcome to Pynome’s documentation!<a class="headerlink" href="#welcome-to-pynome-s-documentation" title="Permalink to this headline">¶</a></h1>
 <div class="toctree-wrapper compound">
 </div>
 <span class="target" id="module-pynome.database"></span><div class="section" id="the-genome-database-module">
@@ -82,7 +79,7 @@ sqlite database.</p>
 <dt id="pynome.database.GenomeEntry">
 <em class="property">class </em><code class="descclassname">pynome.database.</code><code class="descname">GenomeEntry</code><span class="sig-paren">(</span><em>taxonomic_name</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#pynome.database.GenomeEntry" title="Permalink to this definition">¶</a></dt>
 <dd><p>A sqlite handler for the GenomeTable database.</p>
-<p>This supposedly will both create the desired sql table, as well as
+<p>This will both create the desired sql table, as well as
 act as the handler for generating new row entries into said table.
 To add a record to the database, an instance of this class must be
 initialized with the desired data within. Then that new instance of
@@ -93,19 +90,19 @@ Each GenomeEntry has:</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>taxonomic_name</strong> &#8211; The taxonomic name and primary key of
+<li><strong>taxonomic_name</strong> – The taxonomic name and primary key of
 the GenomeEntry.</li>
-<li><strong>species</strong> &#8211; The species name.</li>
-<li><strong>download_method</strong> &#8211; The Download method. Stored as
+<li><strong>species</strong> – The species name.</li>
+<li><strong>download_method</strong> – The Download method. Stored as
 <code class="docutils literal"><span class="pre">&lt;method_name&gt;</span> <span class="pre">&lt;database&gt;</span></code></li>
-<li><strong>fasta_uri</strong> &#8211; The fa.gz url as a String. Max Chars = 1000.</li>
-<li><strong>gff3_uri</strong> &#8211; The gff3.gz uri as a String. Max Chars = 1000.</li>
-<li><strong>genome_local_path</strong> &#8211; The local path of this genome as a String.
+<li><strong>fasta_uri</strong> – The fa.gz url as a String. Max Chars = 1000.</li>
+<li><strong>gff3_uri</strong> – The gff3.gz uri as a String. Max Chars = 1000.</li>
+<li><strong>genome_local_path</strong> – The local path of this genome as a String.
 Max Chars = 1000.</li>
-<li><strong>gff3_size</strong> &#8211; The remote size of the gff3.gz file as an Integer.</li>
-<li><strong>fasta_size</strong> &#8211; The remote size of the fa.gz file as an Integer.</li>
-<li><strong>assembly_name</strong> &#8211; The name of the assembly.</li>
-<li><strong>genus</strong> &#8211; The genus of the assembly.</li>
+<li><strong>gff3_size</strong> – The remote size of the gff3.gz file as an Integer.</li>
+<li><strong>fasta_size</strong> – The remote size of the fa.gz file as an Integer.</li>
+<li><strong>assembly_name</strong> – The name of the assembly.</li>
+<li><strong>genus</strong> – The genus of the assembly.</li>
 </ul>
 </td>
 </tr>
@@ -177,7 +174,7 @@ of metadata.</p>
 <dl class="method">
 <dt id="pynome.ensembl.EnsemblDatabase.ensembl_line_parser">
 <code class="descname">ensembl_line_parser</code><span class="sig-paren">(</span><em>line</em>, <em>top_dir</em><span class="sig-paren">)</span><a class="headerlink" href="#pynome.ensembl.EnsemblDatabase.ensembl_line_parser" title="Permalink to this definition">¶</a></dt>
-<dd><p>This function parses one &#8216;line&#8217; at a time retrieved from an
+<dd><p>This function parses one ‘line’ at a time retrieved from an
 <code class="docutils literal"><span class="pre">ftp.dir()</span></code> command. This line has already been confirmed to
 not be a directory.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -185,8 +182,8 @@ not be a directory.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>top_dir</strong> &#8211; The parent directory.</li>
-<li><strong>line</strong> &#8211; An input line, described in detail below.</li>
+<li><strong>top_dir</strong> – The parent directory.</li>
+<li><strong>line</strong> – An input line, described in detail below.</li>
 </ul>
 </td>
 </tr>
@@ -223,9 +220,9 @@ correspond (usually) to:</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>uri_list</strong> &#8211; This should be a list of base URIs to start
+<li><strong>uri_list</strong> – This should be a list of base URIs to start
 the ftp crawler from.</li>
-<li><strong>parsing_function</strong> &#8211; This should be a function that reads an
+<li><strong>parsing_function</strong> – This should be a function that reads an
 <code class="docutils literal"><span class="pre">ftplib.dir()</span></code> line output. The  output sent to such a function
 will always be a file, not a directory.</li>
 </ul>
@@ -252,7 +249,7 @@ will always be a file, not a directory.</li>
 <p>Reads (specified with &lt;m1&gt;, &lt;m2&gt;, &lt;s&gt;) are FASTA files. FASTA files
 usually have extension .fa, .fasta, .mfa, .fna or similar. FASTA
 files do not have a way of specifying quality values, so when -f
-is set, the result is as if &#8211;ignore-quals is also set.</p>
+is set, the result is as if –ignore-quals is also set.</p>
 <p>If your computer has multiple processors/cores, use -p</p>
 <p>The -p option causes HISAT to launch a specified number of parallel
 search threads. Each thread runs on a different processor/core and
@@ -301,7 +298,7 @@ from the ensembl database.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>species</strong> &#8211; The species to return the taxonomy id of.</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>species</strong> – The species to return the taxonomy id of.</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">A taxonomy id</td>
 </tr>
@@ -318,7 +315,7 @@ pandas data frame.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>file_name</strong> &#8211; The name of <code class="docutils literal"><span class="pre">species.txt</span></code>.</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>file_name</strong> – The name of <code class="docutils literal"><span class="pre">species.txt</span></code>.</td>
 </tr>
 </tbody>
 </table>
@@ -326,7 +323,7 @@ pandas data frame.</p>
 <p>#name
 species
 division
-<strong>taxonomy_id</strong> &lt;&#8211; The one we are interested in.
+<strong>taxonomy_id</strong> &lt;– The one we are interested in.
 assembly
 assembly_accession
 genebuild
@@ -439,7 +436,7 @@ be called from the command line.</p>
         <div class="sphinxsidebarwrapper">
   <h3><a href="#">Table Of Contents</a></h3>
   <ul>
-<li><a class="reference internal" href="#">Welcome to Pynome&#8217;s documentation!</a><ul>
+<li><a class="reference internal" href="#">Welcome to Pynome’s documentation!</a><ul>
 <li><a class="reference internal" href="#the-genome-database-module">The Genome Database Module</a></li>
 <li><a class="reference internal" href="#ensembl-database">Ensembl Database</a></li>
 <li><a class="reference internal" href="#command-line-interface">Command Line Interface</a></li>
@@ -479,7 +476,7 @@ be called from the command line.</p>
       &copy;2017, Tyler Biggs.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.6</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.3</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
       
       |
