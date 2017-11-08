@@ -12,8 +12,8 @@ Filter criteria:
 
 Filter criteria:
 
-1)  read length >-= 100bp
-2) # of spots (reads): 10 Million
+1)  read length >= 100bp
+2)  # of spots (reads): 10 Million
 3)  PAIRED reads only
 4)  Species with genome and GFF3 file.
 5)  Illumina sequencers.
@@ -41,8 +41,8 @@ def build_sra_search(tax_id):
     :return:
     """
     tax_id_str = "{0}[uid]".format(tax_id)
-    properties_str = '"biomol rna"[Properties]'
-    platform_str = '"platform illumina"[Properties]'
+    properties_str = 'biomol+rna[Properties]'
+    platform_str = 'platform+illumina[Properties]'
     search_str = tax_id_str + '+AND+' + properties_str + '+AND+' + platform_str
     return search_str
 

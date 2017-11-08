@@ -22,7 +22,10 @@ python3 -m pytest -sv tests/test_ensemblDB.py --database=/scidas/genome_test.db 
 
 python3 -m pytest -sv /data/ficklin/software/pynome/tests/test_ensemblDB.py --database=/scidas/genome_test.db --genome=/scidas/test_genomes/
 
+
+
 idev --account=ficklin --partition=ficklin --time=48:00:00
+
 
 sbatch --account=ficklin --partition=ficklin --time=4:00:00
 """
