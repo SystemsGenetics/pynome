@@ -10,4 +10,9 @@
 #SBATCH --output=/scidas/genomes_october/gtf_generation.log
 #SBATCH --error=/scidas/genomes_october/gtf_generation-ERRORS.log
 
-python3 -m pynome -g /scidas/genomes_october/genome.db /scidas/genomes_october/genomes
+module load python3
+module load gffcompare
+module load cufflinks
+
+
+python3 -m /data/ficklin/software/pynome/pynome -g /scidas/genomes_october/genome.db /scidas/genomes_october/genomes
