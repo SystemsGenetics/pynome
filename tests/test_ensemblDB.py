@@ -1,15 +1,38 @@
 """
-==================
+===================
 Tests for ftpHelper
-==================
+===================
 
 Run from the top dir via::
     ``pytest -sv``
+
+Testing on kamiak:
+python3 -m pytest -sv tests/test_ensemblDB.py
+
+Testing on workstation:
+python3 -m pytest -sv tests/test_ensemblDB.py
+
+Testing on workstation with command line arguments.
+python3 -m pytest -sv tests/test_ensemblDB.py /media/tylerbiggs/genomic/test.db /media/tylerbiggs/genomic/test_genomes/
+
+Testing on KAMIAK with command line arguments.
+python3 -m pytest -sv tests/test_ensemblDB.py /scidas/genome_test.db /scidas/test_genomes/
+python3 -m pytest -sv tests/test_ensemblDB.py --database=/scidas/genome_test.db --genome=/scidas/test_genomes/
+python3 -m pytest -sv tests/test_ensemblDB.py --database=/scidas/genome_test.db --genome=/scidas/test_genomes/
+
+python3 -m pytest -sv /data/ficklin/software/pynome/tests/test_ensemblDB.py --database=/scidas/genome_test.db --genome=/scidas/test_genomes/
+
+
+
+idev --account=ficklin --partition=ficklin --time=48:00:00
+
+
+sbatch --account=ficklin --partition=ficklin --time=4:00:00
 """
 
-import pytest
+# import pytest
 import logging
-from pynome.ensembl import EnsemblDatabase
+# from pynome.ensembl import EnsemblDatabase
 
 logging.getLogger(__name__)
 logging.basicConfig(
@@ -17,19 +40,6 @@ logging.basicConfig(
     filemode='w',
     level='DEBUG'
 )
-
-
-@pytest.fixture(scope='module')
-def create_database(database_path='/media/tylerbiggs/genomic//test.db',
-                    download_path='/media/tylerbiggs/genomic/'):
-    """Create a database instance. The empty path should create the database
-    in memory. Without scope='module', this would be run for every test."""
-    logging.info('\nCreating the database.\n')
-    database_instance = EnsemblDatabase(
-        download_path=download_path,
-        database_path=database_path,
-    )
-    yield database_instance
 
 
 def test_generate_uri(create_database):
@@ -41,15 +51,15 @@ def test_generate_uri(create_database):
 crawl_test_uri = [
     'pub/fungi/release-36/gff3/fungi_rozellomycota1_collection/',
     'pub/fungi/release-36/fasta/fungi_rozellomycota1_collection/',
-    # 'pub/fungi/release-36/gff3/fungi_ascomycota1_collection/_candida_glabrata/',
-    # 'pub/fungi/release-36/fasta/fungi_ascomycota1_collection/_candida_glabrata/',
-    'pub/fungi/release-36/gff3/fungi_ascomycota1_collection/',
-    'pub/fungi/release-36/fasta/fungi_ascomycota1_collection/'
+    'pub/fungi/release-36/gff3/fungi_ascomycota1_collection/_candida_glabrata/',
+    'pub/fungi/release-36/fasta/fungi_ascomycota1_collection/_candida_glabrata/',
+    # 'pub/fungi/release-36/gff3/fungi_ascomycota1_collection/',
+    # 'pub/fungi/release-36/fasta/fungi_ascomycota1_collection/'
 ]
+
+
 def test_ensemble_crawl(create_database):
-    create_database.find_genomes(
-        crawl_test_uri
-    )
+    create_database.find_genomes(crawl_test_uri)
     genomes = create_database.get_found_genomes()
     for q in genomes:
         logging.info(str(q))
@@ -73,12 +83,28 @@ def test_download_metadata(create_database):
 
 
 def test_download_genomes(create_database):
-    genomes = create_database.get_found_genomes()
     create_database.download_genomes()
 
 
 def test_read_species_metadata(create_database):
     create_database.read_species_metadata()
 
+
 def test_add_taxonomy_ids(create_database):
     create_database.add_taxonomy_ids()
+
+
+def test_decompress_genomes(create_database):
+    create_database.decompress_genomes()
+
+
+def test_generate_hisat_index(create_database):
+    create_database.generate_hisat_index()
+
+
+def test_generate_splice_sites(create_database):
+    create_database.generate_splice_sites()
+
+
+def test_generate_gtf(create_database):
+    create_database.generate_gtf()

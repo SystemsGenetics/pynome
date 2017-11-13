@@ -4,8 +4,12 @@
 The Genome Database Module
 ==========================
 The **Genomedatabase** module consists of two classes:
+
+#. **GenomeEntry** A sqlalchemy class that creates the sqlite table.
+#. **GenomeDatabase** A class that handles interactions with an sqlite db.
 """
 
+import os
 import logging
 from pynome import Session
 from sqlalchemy.ext.declarative import declarative_base
@@ -16,9 +20,10 @@ Base = declarative_base()
 
 
 class GenomeEntry(Base):  # Inherit from declarative_base.
-    """A sqlite handler for the GenomeTable database.
+    """
+    A sqlite handler for the GenomeTable database.
 
-    This supposedly will both create the desired sql table, as well as
+    This will both create the desired sql table, as well as
     act as the handler for generating new row entries into said table.
     To add a record to the database, an instance of this class must be
     initialized with the desired data within. Then that new instance of
@@ -27,16 +32,20 @@ class GenomeEntry(Base):  # Inherit from declarative_base.
 
     :param taxonomic_name: The taxonomic name and primary key of
                            the GenomeEntry.
-    :param download_method: The Download method. Stored as
-                            ``<method_name> <database>``
-    :param fasta_uri: The fa.gz url as a String. Max Chars = 1000.
-    :param gff3_uri: The gff3.gz uri as a String. Max Chars = 1000.
-    :param genome_local_path: The local path of this genome as a String.
-                              Max Chars = 1000.
-    :param gff3_size: The remote size of the gff3.gz file as an Integer.
-    :param fasta_size: The remote size of the fa.gz file as an Integer.
+    :param species: The species name.
     :param assembly_name: The name of the assembly.
     :param genus: The genus of the assembly.
+    :param taxonomy_id: The numerical taxonomy identifier.
+    :param intraspecific_name: The intra-specific name of a given entry.
+
+    :param fasta_uri: The fa.gz url as a String.
+    :param fasta_size: The remote size of the fa.gz file as an Integer.
+    :param gff3_uri: The gff3.gz uri as a String.
+    :param gff3_size: The remote size of the gff3.gz file as an Integer.
+
+    :param local_path: The local path of this genome as a String.
+    :param base_filename: The filename base for this genome item entry.
+            [genus]_[species]{_[infraspecific name]}-[assembly_name]
 
     :Examples:
 
@@ -48,16 +57,28 @@ class GenomeEntry(Base):  # Inherit from declarative_base.
     In deployments this will be handled by a wrapper function specific
     to the database being examined.
     """
-    __tablename__ = "GenomeTable"  # Should this be the same as the class?
-    taxonomic_name = Column(String(150), primary_key=True)
-    species = Column(String(150))
+
+    # Define the SQLite table name.
+    __tablename__ = "GenomeTable"
+
+    # Define columns within that table.
+    # TAXONOMIC ENTRIES
+    taxonomic_name = Column(String(500), primary_key=True)
+    species = Column(String(500))
+    assembly_name = Column(String(250))
+    genus = Column(String(250))
+    taxonomy_id = Column(String(100))
+    intraspecific_name = Column(String(100))
+
+    # REMOTE FILES
     fasta_uri = Column(String(1000))
     fasta_size = Column(Integer())
     gff3_uri = Column(String(1000))
     gff3_size = Column(Integer())
-    assembly_name = Column(String(250))
-    genus = Column(String(250))
-    taxonomy_id = Column(String(100))
+
+    # LOCAL FILES
+    local_path = Column(String(500))
+    base_filename = Column(String(500))
 
     def __init__(self, taxonomic_name, **kwargs):
         """Constructor that overrides the default provided. This ensures that
@@ -66,35 +87,33 @@ class GenomeEntry(Base):  # Inherit from declarative_base.
         for key, value in kwargs.items():  # Set attributes found in **kwargs
             setattr(self, key, value)
 
-    def __str__(self):
-        """Custom representation that will be pulled up when a print out
-        is requested."""
-        out_str = (
-            "\n"
-            "Taxonomic Name: {0.taxonomic_name}\n"
-            "\tfasta URI: {0.fasta_uri}\n"
-            "\tgff3 URI: {0.gff3_uri}\n"
-            .format(self)
-        )
-        return out_str
-
 
 class GenomeDatabase(object):
     """Base Genome Database class. Many functions will be overwritten by
-    the database-specific child classes.
-    :param path: the sql database path.
+    the database-specific child classes. This class can be considered an
+    abstract base class.
+
+    :param download_path: The path where genomes will be saved to.
+    :param database_path: The path where the SQLite database that stores
+        some metadata and other information is located.
 
     .. warning:: **This class should not be directly called.**
-        It must be implemented with a child class to be useful."""
+        It must be implemented with a child class to be useful.
+
+    .. todo:: This is a TODO test.
+    """
 
     def __init__(self, download_path, database_path):
         """Initialization of the GenomeDatabase class."""
-        self.download_path = download_path  # The local download location.
         self.database_path = 'sqlite:///' + database_path
+        self.download_path = download_path  # The local download location.
+        if not os.path.exists(self.download_path):
+            os.makedirs(self.download_path)
+        if not os.path.exists(self.database_path):
+            os.makedirs(self.database_path)
         # engine is the path that our database is stored.
         logging.debug('Generating database at: {}'.format(self.database_path))
         engine = create_engine(self.database_path)
-        # metadata.create_all ensures that the table defined in GenomeEntry
         Base.metadata.create_all(engine)
         Session.configure(bind=engine)
         self.session = Session()
@@ -115,6 +134,6 @@ class GenomeDatabase(object):
         return
 
     def get_found_genomes(self):
-        """Print all the Genomes in the database to the terminal."""
+        """Find all the Genomes in the database and return them as a list."""
         query = self.session.query(GenomeEntry).all()
         return query

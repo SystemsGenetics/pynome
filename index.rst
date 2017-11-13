@@ -16,8 +16,12 @@ Welcome to Pynome's documentation!
 .. automodule:: pynome.ensembl
    :members:
 
-.. automodule:: pynome.ftpHelper
+.. automodule:: pynome.utils
    :members:
+
+.. automodule:: pynome.__main__
+   :members:
+
 
 Indices and tables
 ==================
