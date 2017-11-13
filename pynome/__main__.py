@@ -61,14 +61,11 @@ the pynome dir)::
 
     $ python3 -m pynome -fdmuigs /media/tylerbiggs/genomic/test.db /media/tylerbiggs/genomic
 
+    srun --partition=ficklin --account=ficklin python3 -m pynome -fdmr /scidas/genomes_october/genome.db /scidas/genomes_october/genomes
 
-srun --partition=ficklin --account=ficklin python3 -m pynome -fdmr /scidas/genomes_october/genome.db /scidas/genomes_october/genomes
+    srun --partition=ficklin --account=ficklin python3 -m pynome -uigs /scidas/genomes_october/genome.db /scidas/genomes_october/genomes
 
-
-
-srun --partition=ficklin --account=ficklin python3 -m pynome -uigs /scidas/genomes_october/genome.db /scidas/genomes_october/genomes
-
-python3 -m pynome -i /scidas/genomes_october/genome.db /scidas/genomes_october/genomes
+    python3 -m pynome -i /scidas/genomes_october/genome.db /scidas/genomes_october/genomes
 
 """
 

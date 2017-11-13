@@ -53,8 +53,21 @@
 <dt id="pynome.database.GenomeDatabase">
 <em class="property">class </em><code class="descclassname">pynome.database.</code><code class="descname">GenomeDatabase</code><span class="sig-paren">(</span><em>download_path</em>, <em>database_path</em><span class="sig-paren">)</span><a class="headerlink" href="#pynome.database.GenomeDatabase" title="Permalink to this definition">¶</a></dt>
 <dd><p>Base Genome Database class. Many functions will be overwritten by
-the database-specific child classes.
-:param path: the sql database path.</p>
+the database-specific child classes. This class can be considered an
+abstract base class.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>download_path</strong> – The path where genomes will be saved to.</li>
+<li><strong>database_path</strong> – The path where the SQLite database that stores
+some metadata and other information is located.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
 <div class="admonition warning">
 <p class="first admonition-title">Warning</p>
 <p class="last"><strong>This class should not be directly called.</strong>
@@ -93,16 +106,17 @@ Each GenomeEntry has:</p>
 <li><strong>taxonomic_name</strong> – The taxonomic name and primary key of
 the GenomeEntry.</li>
 <li><strong>species</strong> – The species name.</li>
-<li><strong>download_method</strong> – The Download method. Stored as
-<code class="docutils literal"><span class="pre">&lt;method_name&gt;</span> <span class="pre">&lt;database&gt;</span></code></li>
-<li><strong>fasta_uri</strong> – The fa.gz url as a String. Max Chars = 1000.</li>
-<li><strong>gff3_uri</strong> – The gff3.gz uri as a String. Max Chars = 1000.</li>
-<li><strong>genome_local_path</strong> – The local path of this genome as a String.
-Max Chars = 1000.</li>
-<li><strong>gff3_size</strong> – The remote size of the gff3.gz file as an Integer.</li>
-<li><strong>fasta_size</strong> – The remote size of the fa.gz file as an Integer.</li>
 <li><strong>assembly_name</strong> – The name of the assembly.</li>
 <li><strong>genus</strong> – The genus of the assembly.</li>
+<li><strong>taxonomy_id</strong> – The numerical taxonomy identifier.</li>
+<li><strong>intraspecific_name</strong> – The intra-specific name of a given entry.</li>
+<li><strong>fasta_uri</strong> – The fa.gz url as a String.</li>
+<li><strong>fasta_size</strong> – The remote size of the fa.gz file as an Integer.</li>
+<li><strong>gff3_uri</strong> – The gff3.gz uri as a String.</li>
+<li><strong>gff3_size</strong> – The remote size of the gff3.gz file as an Integer.</li>
+<li><strong>local_path</strong> – The local path of this genome as a String.</li>
+<li><strong>base_filename</strong> – The filename base for this genome item entry.
+[genus]_[species]{_[infraspecific name]}-[assembly_name]</li>
 </ul>
 </td>
 </tr>
@@ -346,6 +360,39 @@ species_id</p>
 </dd></dl>
 
 </div>
+<span class="target" id="module-pynome.utils"></span><p>Utilities for Pynome</p>
+<dl class="class">
+<dt id="pynome.utils.cd">
+<em class="property">class </em><code class="descclassname">pynome.utils.</code><code class="descname">cd</code><span class="sig-paren">(</span><em>newPath</em><span class="sig-paren">)</span><a class="headerlink" href="#pynome.utils.cd" title="Permalink to this definition">¶</a></dt>
+<dd><p>Context manager for changing the current working directory.
+Borrowed from Stackoverflow:
+stackoverflow.com/questions/431684/how-do-i-cd-in-python</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="pynome.utils.crawl_ftp_dir">
+<code class="descclassname">pynome.utils.</code><code class="descname">crawl_ftp_dir</code><span class="sig-paren">(</span><em>database</em>, <em>top_dir</em>, <em>parsing_function</em><span class="sig-paren">)</span><a class="headerlink" href="#pynome.utils.crawl_ftp_dir" title="Permalink to this definition">¶</a></dt>
+<dd><p>Recursively crawl a target directory. Takes as an input a
+target directory and a parsing function. The ftplib.FTP.dir()
+function is used to retrieve a directory listing, line by line,
+in string format. These are appended to a newly generated list.
+Each item in this list is subject to the parsing function.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>ftp_instance</strong> – An instance of ftplib.FTP()</li>
+<li><strong>top_dir</strong> – The directory from which contents will be retrieved.</li>
+<li><strong>parsing_function</strong> – The function to parse each non-directory
+result.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 <span class="target" id="module-pynome.__main__"></span><div class="section" id="command-line-interface">
 <h2>Command Line Interface<a class="headerlink" href="#command-line-interface" title="Permalink to this headline">¶</a></h2>
 <p>Retrieves genome data files &amp; metadata form online databases.
@@ -402,6 +449,12 @@ $ python3 -m pynome -uigs /scidas/genomes3/genomes.db /scidas/genomes3
 </div>
 <p><strong>Testing Examples</strong>:</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span>$ python3 -m pynome -fdmuigs /media/tylerbiggs/genomic/test.db /media/tylerbiggs/genomic
+
+srun --partition=ficklin --account=ficklin python3 -m pynome -fdmr /scidas/genomes_october/genome.db /scidas/genomes_october/genomes
+
+srun --partition=ficklin --account=ficklin python3 -m pynome -uigs /scidas/genomes_october/genome.db /scidas/genomes_october/genomes
+
+python3 -m pynome -i /scidas/genomes_october/genome.db /scidas/genomes_october/genomes
 </pre></div>
 </div>
 <dl class="function">

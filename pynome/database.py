@@ -33,16 +33,19 @@ class GenomeEntry(Base):  # Inherit from declarative_base.
     :param taxonomic_name: The taxonomic name and primary key of
                            the GenomeEntry.
     :param species: The species name.
-    :param download_method: The Download method. Stored as
-                            ``<method_name> <database>``
-    :param fasta_uri: The fa.gz url as a String. Max Chars = 1000.
-    :param gff3_uri: The gff3.gz uri as a String. Max Chars = 1000.
-    :param genome_local_path: The local path of this genome as a String.
-                              Max Chars = 1000.
-    :param gff3_size: The remote size of the gff3.gz file as an Integer.
-    :param fasta_size: The remote size of the fa.gz file as an Integer.
     :param assembly_name: The name of the assembly.
     :param genus: The genus of the assembly.
+    :param taxonomy_id: The numerical taxonomy identifier.
+    :param intraspecific_name: The intra-specific name of a given entry.
+
+    :param fasta_uri: The fa.gz url as a String.
+    :param fasta_size: The remote size of the fa.gz file as an Integer.
+    :param gff3_uri: The gff3.gz uri as a String.
+    :param gff3_size: The remote size of the gff3.gz file as an Integer.
+
+    :param local_path: The local path of this genome as a String.
+    :param base_filename: The filename base for this genome item entry.
+            [genus]_[species]{_[infraspecific name]}-[assembly_name]
 
     :Examples:
 
@@ -87,11 +90,18 @@ class GenomeEntry(Base):  # Inherit from declarative_base.
 
 class GenomeDatabase(object):
     """Base Genome Database class. Many functions will be overwritten by
-    the database-specific child classes.
-    :param path: the sql database path.
+    the database-specific child classes. This class can be considered an
+    abstract base class.
+
+    :param download_path: The path where genomes will be saved to.
+    :param database_path: The path where the SQLite database that stores
+        some metadata and other information is located.
 
     .. warning:: **This class should not be directly called.**
-        It must be implemented with a child class to be useful."""
+        It must be implemented with a child class to be useful.
+
+    .. todo:: This is a TODO test.
+    """
 
     def __init__(self, download_path, database_path):
         """Initialization of the GenomeDatabase class."""
