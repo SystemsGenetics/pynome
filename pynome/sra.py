@@ -23,54 +23,50 @@ https://www.ncbi.nlm.nih.gov/books/NBK25499/
 """
 
 import urllib
-import argparse
 import xmltodict
 
-ENTREZ_BASE = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi"
 
-QUERY ='https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=sra&term='
-
-def construct_entrez_search():
-
-    return
+QUERY = ("https://eutils.ncbi.nlm.nih.gov"
+         "/entrez/eutils/esearch.fcgi?db=sra&term=")
 
 
-def build_sra_search(tax_id):
-    """
-    Builds the SRA search string based on an input taxonomy id number.
-    :return:
-    """
-    tax_id_str = "{0}[uid]".format(tax_id)
-    properties_str = 'biomol+rna[Properties]'
-    platform_str = 'platform+illumina[Properties]'
-    search_str = tax_id_str + '+AND+' + properties_str + '+AND+' + platform_str
-    return search_str
+def build_sra_search_string(tax_ID):
+        """
+        Builds an SRA search string based on a taxonomy ID number.
+        The search string is built to work with Eutils, and searches
+        the SRA database and returns a list of SRA accession numbers.
 
+        :param tax_ID: The taxonomy ID of a species.
+        :returns: A string built from the taxonomy ID.
 
-def write_sra_file():
-    pass
+        Example::
+            (((((txid39946[Organism:noexp]) AND "biomol rna"[Properties])
+            AND "illumina"[Platform]) AND "type rnaseq"[Filter])) AND
+            100:1000[ReadLength]
+        """
+
+        tax_id_str = "txid{0}[Organism:noexp]".format(tax_ID)
+        properties_str = 'biomol+rna[Properties]'
+        platform_str = 'platform+illumina[Properties]'
+        read_length_str = '100:1000[ReadLength]'
+        layout_paired_str = '"paired"[Layout]'
+
+        return '+AND+'.join((tax_id_str, properties_str, platform_str,
+                             read_length_str, layout_paired_str))
 
 
 def run_sra_search(sra_term):
-    """Runs the actual query."""
-    query = QUERY + sra_term
-    print(query)
+    """
+    Runs the actual SRA query.
+    :param
+    """
+    # &retmax= sets the maximum number of retrivable terms.
+    # the value 100000 is the maximum allowed.
+    query = QUERY + sra_term + "&retmax=100000"
     with urllib.request.urlopen(query) as response:
         response_xml = response.read()
 
     response = xmltodict.parse(response_xml)
-    retr_id_l = response #['eSearchResult']['IdList']['Id']
+    retr_id_l = response['eSearchResult']['IdList']['Id']
+
     return retr_id_l
-
-
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser()
-    parser.add_argument('taxonomy_id', metavar='taxonomy-id', nargs='+')
-    args = parser.parse_args()  # Parse the arguments
-
-    # For each item passed, run the search
-    for id in args.taxonomy_id:
-        sra_query = build_sra_search(args.taxonomy_id)
-        # print(sra_query)
-        result = run_sra_search(sra_query)
-        # print(result)

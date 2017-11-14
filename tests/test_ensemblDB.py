@@ -108,3 +108,7 @@ def test_generate_splice_sites(create_database):
 
 def test_generate_gtf(create_database):
     create_database.generate_gtf()
+
+
+def test_write_SRA_accession_list(create_database):
+    create_database.write_SRA_accession_list()
