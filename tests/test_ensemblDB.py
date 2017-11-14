@@ -94,20 +94,20 @@ def test_add_taxonomy_ids(create_database):
     create_database.add_taxonomy_ids()
 
 
-def test_decompress_genomes(create_database):
-    create_database.decompress_genomes()
+# def test_decompress_genomes(create_database):
+#     create_database.decompress_genomes()
 
 
-def test_generate_hisat_index(create_database):
-    create_database.generate_hisat_index()
+# def test_generate_hisat_index(create_database):
+#     create_database.generate_hisat_index()
 
 
-def test_generate_splice_sites(create_database):
-    create_database.generate_splice_sites()
+# def test_generate_splice_sites(create_database):
+#     create_database.generate_splice_sites()
 
 
-def test_generate_gtf(create_database):
-    create_database.generate_gtf()
+# def test_generate_gtf(create_database):
+#     create_database.generate_gtf()
 
 
 def test_write_SRA_accession_list(create_database):
