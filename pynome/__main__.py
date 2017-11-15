@@ -69,10 +69,10 @@ the pynome dir)::
 
 """
 
-import os
 import logging
 import argparse
 from pynome.ensembl import EnsemblDatabase
+from pynome.SQLiteStorage import SQLiteStorage
 
 
 logging.getLogger(__name__)
@@ -122,9 +122,11 @@ def main():
     #     os.makedirs(args.download_path[0])
 
     try:
+        storage = SQLiteStorage(download_path = args.download_path[0])
         main_database = EnsemblDatabase(
-            database_path=args.database_path[0],
-            download_path=args.download_path[0],)
+          database_path = args.database_path[0],
+          Storage = storage
+        )
     except:
         print("Unable to create or read the database!")
         print('Database Path: {0}'.format(args.database_path[0]))
@@ -143,7 +145,7 @@ def main():
 
     if args.print_genomes:
         print('Printing Genomes!')
-        print(main_database.get_found_genomes())
+        print(main_database.get_genomes())
 
     if args.download_metadata:
         print("Downloading Metadata!")

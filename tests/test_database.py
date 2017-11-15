@@ -56,6 +56,6 @@ def test_save_genome(create_database):
 def test_get_all_genomes(create_database):
     """Test printing all genome entries."""
     # create_database.print_genomes()
-    genomes = create_database.get_found_genomes()
+    genomes = create_database.get_genomes()
     for q in genomes:
         logging.info(str(q))

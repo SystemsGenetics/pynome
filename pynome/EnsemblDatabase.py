@@ -14,7 +14,7 @@ import logging
 import itertools
 import pandas
 import subprocess
-from pynome.database import GenomeDatabase
+from pynome.GenomeDatabase import GenomeDatabase
 from pynome.utils import cd, crawl_ftp_dir
 from pynome.sra import build_sra_search_string, run_sra_search
 from tqdm import tqdm
@@ -312,7 +312,7 @@ class EnsemblDatabase(GenomeDatabase):
 
     def estimate_download_size(self):
         size = []
-        genomes = self.get_found_genomes()
+        genomes = self.get_genomes()
         for genome in genomes:
             size.extend((
                 genome.gff3_size,
@@ -334,7 +334,7 @@ class EnsemblDatabase(GenomeDatabase):
 
         """
         size_estimate = self.estimate_download_size() / 8.192
-        genomes = self.get_found_genomes()
+        genomes = self.get_genomes()
         self.ftp.connect(ENSEMBL_FTP_URI)
         self.ftp.login()
 
@@ -473,7 +473,7 @@ class EnsemblDatabase(GenomeDatabase):
         self.ftp.login()
 
         # Get all the genomes
-        for genome in tqdm(self.get_found_genomes()):
+        for genome in tqdm(self.get_genomes()):
 
             # Get the gff3 CHECKSUMS file.
             gff3_sum_uri, gff3_filename = get_checksum_uri(
@@ -549,7 +549,7 @@ class EnsemblDatabase(GenomeDatabase):
     def add_taxonomy_ids(self):
         # Read the metadata file to get the pandas dataframe:
         self.read_species_metadata()
-        for genome in tqdm(self.get_found_genomes()):
+        for genome in tqdm(self.get_genomes()):
             taxonomy_id = self.get_taxonomy_id(genome.taxonomic_name)
             update_dict = {
                 'taxonomic_name': genome.taxonomic_name,
@@ -563,7 +563,7 @@ class EnsemblDatabase(GenomeDatabase):
         changed to use a slurm array.
         """
         # Get all the genomes that have been found and saved in the SQLite db
-        genomes = self.get_found_genomes()
+        genomes = self.get_genomes()
 
         # Iterate over the list of genomes
         for genome in genomes:
@@ -580,7 +580,7 @@ class EnsemblDatabase(GenomeDatabase):
     # def slurm_decompress_genome(self, slurm_index):
     #     """
     #     This function is to be used in a slurm array. The slurm_index value
-    #     refers to a list entry from a sorted call of get_found_genomes.
+    #     refers to a list entry from a sorted call of get_genomes.
     #     This will fail if new entries are added to the database while the
     #     decompression command runs.
 
@@ -591,7 +591,7 @@ class EnsemblDatabase(GenomeDatabase):
     #     .. todo:: Implement the CLI interface for the above example.
     #     """
     #     # Find all genomes in the database
-    #     genomes = self.get_found_genomes()
+    #     genomes = self.get_genomes()
     #     # Sort these alphabetically and store them as a tuple
     #     genomes.sort()
     #     # Retrieve the index based on slurm index
@@ -625,7 +625,7 @@ class EnsemblDatabase(GenomeDatabase):
         (though in practice, speedup is somewhat worse than linear).
 
         """
-        genome_list = self.get_found_genomes()
+        genome_list = self.get_genomes()
 
         # The hisat tool will create the indexes in the current directory.
         for gen in tqdm(genome_list):
@@ -654,7 +654,7 @@ class EnsemblDatabase(GenomeDatabase):
 
         Should output to the `.gtf2` file format by default.
         """
-        genome_list = self.get_found_genomes()
+        genome_list = self.get_genomes()
 
         for gen in tqdm(genome_list):
             # build the file name
@@ -681,7 +681,7 @@ class EnsemblDatabase(GenomeDatabase):
         >>> python hisat2_extract_splice_sites.py GRCh38.gtf > Splice_Sites.txt
         :returns:
         """
-        genome_list = self.get_found_genomes()
+        genome_list = self.get_genomes()
 
         for gen in tqdm(genome_list):
             gft_file = os.path.join(gen.local_path, gen.base_filename + '.gtf')
@@ -702,7 +702,7 @@ class EnsemblDatabase(GenomeDatabase):
         is then writen to the appropriate local genome directory.
         """
 
-        genome_list = self.get_found_genomes()
+        genome_list = self.get_genomes()
 
         for gen in tqdm(genome_list):
             # build the search string.

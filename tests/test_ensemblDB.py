@@ -60,7 +60,7 @@ crawl_test_uri = [
 
 def test_ensemble_crawl(create_database):
     create_database.find_genomes(crawl_test_uri)
-    genomes = create_database.get_found_genomes()
+    genomes = create_database.get_genomes()
     for q in genomes:
         logging.info(str(q))
 
