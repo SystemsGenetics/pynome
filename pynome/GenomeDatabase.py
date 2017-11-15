@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import os
-from pynome.GeomeEntry import GenomeAssembly
+from pynome.GenomeAssembly import GenomeAssembly
 
 class GenomeDatabase(object):
     """

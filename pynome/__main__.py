@@ -71,7 +71,7 @@ the pynome dir)::
 
 import logging
 import argparse
-from pynome.ensembl import EnsemblDatabase
+from pynome.EnsemblDatabase import EnsemblDatabase
 from pynome.SQLiteStorage import SQLiteStorage
 
 
