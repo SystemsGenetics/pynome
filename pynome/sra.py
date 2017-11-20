@@ -10,8 +10,6 @@ taxonomy id.
 
 Filter criteria:
 
-Filter criteria:
-
 1)  read length >= 100bp
 2)  # of spots (reads): 10 Million
 3)  PAIRED reads only
@@ -20,6 +18,7 @@ Filter criteria:
 6)  Assay Type: RNA-Seq
 
 https://www.ncbi.nlm.nih.gov/books/NBK25499/
+
 """
 
 import urllib
@@ -29,44 +28,81 @@ import xmltodict
 QUERY = ("https://eutils.ncbi.nlm.nih.gov"
          "/entrez/eutils/esearch.fcgi?db=sra&term=")
 
-
-def build_sra_search_string(tax_ID):
-        """
-        Builds an SRA search string based on a taxonomy ID number.
-        The search string is built to work with Eutils, and searches
-        the SRA database and returns a list of SRA accession numbers.
-
-        :param tax_ID: The taxonomy ID of a species.
-        :returns: A string built from the taxonomy ID.
-
-        Example::
-            (((((txid39946[Organism:noexp]) AND "biomol rna"[Properties])
-            AND "illumina"[Platform]) AND "type rnaseq"[Filter])) AND
-            100:1000[ReadLength]
-        """
-
-        tax_id_str = "txid{0}[Organism:noexp]".format(tax_ID)
-        properties_str = 'biomol+rna[Properties]'
-        platform_str = 'platform+illumina[Properties]'
-        read_length_str = '100:1000[ReadLength]'
-        layout_paired_str = '"paired"[Layout]'
-
-        return '+AND+'.join((tax_id_str, properties_str, platform_str,
-                             read_length_str, layout_paired_str))
+FETCH = ('https://eutils.ncbi.nlm.nih.gov'
+         '/entrez/eutils/efetch.fcgi?db=sra&id=')
 
 
-def run_sra_search(sra_term):
+def build_sra_search(tax_id):
     """
-    Runs the actual SRA query.
-    :param
+    Builds the SRA search string based on an input taxonomy id number.
+    An example search string:
+
+    (((((txid39946[Organism:noexp]) AND "biomol rna"[Properties]) AND
+    "illumina"[Platform]) AND "type rnaseq"[Filter])) AND 100:1000[ReadLength]
+
     """
-    # &retmax= sets the maximum number of retrivable terms.
-    # the value 100000 is the maximum allowed.
-    query = QUERY + sra_term + "&retmax=100000"
+
+    # Define discreet portions of the search string.
+    tax_id_str = "txid{}[Organism:noexp]".format(tax_id)
+    properties_str = 'biomol+rna[Properties]'
+    platform_str = 'platform+illumina[Properties]'
+    read_length_str = '100:1000[ReadLength]'
+    layout_paired_str = '"paired"[Layout]'
+
+    # Build the output string.
+    out_str = '+AND+'.join((
+        tax_id_str,
+        properties_str,
+        platform_str,
+        read_length_str,
+        layout_paired_str))
+
+    return out_str
+
+
+def run_sra_search(sra_query_str):
+    """
+    Runs the actual query.
+
+    :param sra_query_str:
+        A string that defines the desired search term.
+
+    :returns:
+        Eutils server response formatted as a dictionary.
+
+    """
+
+    # Build the query string, &retmax=100000 is the maximum number
+    # of values that eutils will be return.
+    query = QUERY + sra_query_str + "&retmax=100000"
+
+    # Query the remote source and read the response.
     with urllib.request.urlopen(query) as response:
         response_xml = response.read()
 
+    # Parse the returned XML and return the data as a dictionary.
     response = xmltodict.parse(response_xml)
-    retr_id_l = response['eSearchResult']['IdList']['Id']
 
-    return retr_id_l
+    return response
+
+
+def fetch_sra_info(sra_ID):
+    """
+    Retrieves the information associated with a response ID.
+
+    :param sra_ID:
+        A query ID returned by run_sra_search().
+
+    """
+
+    # Build the search string.
+    fetch_str = FETCH + sra_ID
+
+    # Query the remote source and save the response.
+    with urllib.request.urlopen(fetch_str) as response:
+        response_xml = response.read()
+
+    # Parse the XML returned and return an dictionary.
+    response = xmltodict.parse(response_xml)
+
+    return response
