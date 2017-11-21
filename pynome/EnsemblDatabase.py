@@ -26,7 +26,8 @@ ENSEMBL_KINGDOMS = ['fungi', 'metazoa', 'plants', 'protists']
 
 
 class EnsemblDatabase(GenomeDatabase):
-    """The EnsemblDatabase class. This handles finding and downloading
+    """
+    The EnsemblDatabase class. This handles finding and downloading
     genomes from the ensembl genome database. The database url is:
 
         ``ftp.ensemblgenomes.org``
@@ -36,42 +37,79 @@ class EnsemblDatabase(GenomeDatabase):
     """
 
     def __init__(self, release_version=37, **kwargs):
-        super().__init__(**kwargs)  # Call parent class init
-        self._release_version = None  # set by the release version setter
-        self._release_number = None  # set by the release version setter
+        
+        # Call parent class init function.
+        super().__init__(**kwargs)
+        
+        # Define private attributes / properties. These are the private
+        # values that setter functions will store their values in.
+        self._release_version = None
+        self._release_number = None
+
+        # Assign attributes from user input. The setter for
+        # release_version populates release version and number.
         self.release_version = release_version
-        self.ftp = ftplib.FTP()  # the ftp instance for the database
+        
+        # Create an instance of the FTP() class for the database.
+        self.ftp = ftplib.FTP()
+        
+        # Create an attribute that for the pandas dataframe of the
+        # species metadata, as parsed from species.txt on ensembl.
         self.species_metadata = None
 
     @property
     def release_version(self):
-        """Release version property. Should be in the form:
-            ``"release-#", "release-36"``"""
+        """
+        Release version property. Should be in the form:
+            ``"release-#", "release-36"``
+        """
         return self._release_version
 
     @release_version.setter
     def release_version(self, value):
-        """Setter for the release_version. Accepts an input integer and returns
-        a string in the form: 'release-##' """
+        """
+        Setter for the release_version. Accepts an input integer and returns
+        a string in the form: 'release-##' 
+        """
         self._release_number = value
         self._release_version = 'release-' + str(value)
 
     def generate_metadata_uri(self):
-        """Generates a URI that will locate the metadata. This URI is of the
+        """
+        Generates a URI that will locate the metadata. This URI is of the
         form:
 
         ``/pub/release-36/species.txt``
+        
+        ..todo::
+            This functions design is bizzare and should be refactored.
+            The only other function that uses it appears to be
+            `download_metadata()`.
+
         """
+        
+        # Create a dictonary to store the uri strings to be generated.
         uri_dict = {}
+        
+        # This is the name of the file on the remote server.
         species_txt = 'species.txt'
+        
+        # Join by the '/' character to build the uri.
         uri = '/'.join(('pub', self._release_version, species_txt))
+        
+        # Assign the metadata file to the corresponding key.
         uri_dict[uri] = species_txt
+        
+        # Return the dictionary.
         return uri_dict
 
     def download_metadata(self):
-        """Downloads the `species.txt` files. This is a tab delimited listing
-        of metadata. """
+        """
+        Downloads the `species.txt` files. This is a tab delimited listing
+        of metadata.
+        """
 
+        # Build the URI bases of the phylogenetic families to download.
         metadata_uri_dict = self.generate_metadata_uri()
 
         self.ftp.connect(ENSEMBL_FTP_URI)
@@ -107,7 +145,8 @@ class EnsemblDatabase(GenomeDatabase):
         return
 
     def generate_uri(self):
-        """Generates the uri strings needed to download the genomes
+        """
+        Generates the uri strings needed to download the genomes
         from the ensembl database.
 
         **Returns**: List of Strings of URIs for the ensembl database. eg::
@@ -116,7 +155,8 @@ class EnsemblDatabase(GenomeDatabase):
             'pub/metazoa/release-36/gff3/',
             ...
 
-        This is an extremely case-specific function."""
+        This is an extremely case-specific function.
+        """
         uri_list = []
         # Unique permutations of data types and kingdoms.
         uri_gen = itertools.product(ENSEMBL_DATA_TYPES, ENSEMBL_KINGDOMS)
@@ -129,7 +169,8 @@ class EnsemblDatabase(GenomeDatabase):
         return uri_list
 
     def ensembl_line_parser(self, line, top_dir):
-        """This function parses one 'line' at a time retrieved from an
+        """
+        This function parses one 'line' at a time retrieved from an
         ``ftp.dir()`` command. This line has already been confirmed to
         not be a directory.
 
@@ -157,7 +198,8 @@ class EnsemblDatabase(GenomeDatabase):
             + [7]:    Year
             + [8]:    filename
 
-        Either adds a genome, or returns nothing."""
+        Either adds a genome, or returns nothing.
+        """
 
         bad_words = ('chromosome', 'abinitio')
 
