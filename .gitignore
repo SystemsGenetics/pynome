@@ -1,6 +1,4 @@
 *.log
 .cache/
 .idea/*
-.ipynb_checkpoints/*
-pynome/__pycache__/*
-tests/__pycache__/*
+/.ipynb_checkpoints/

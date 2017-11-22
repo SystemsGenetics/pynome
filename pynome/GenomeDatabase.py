@@ -3,6 +3,7 @@
 import os
 from pynome.GenomeAssembly import GenomeAssembly
 
+
 class GenomeDatabase(object):
     """
     Base Genome Database class. 

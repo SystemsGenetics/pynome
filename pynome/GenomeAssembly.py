@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+
 class GenomeAssembly:
     
     def __init__(self, taxonomic_name, **kwargs):
@@ -41,11 +42,9 @@ class GenomeAssembly:
         # table columns accordingly. 
         for key, value in kwargs.items():  
             setattr(self, key, value)
-            
-        
+
     def __str__(self):
         return str(self.taxonomic_name)
     
     def save(self):
-        self.storage.save();
-        
+        self.storage.save()

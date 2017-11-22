@@ -16,7 +16,6 @@ import pandas
 import subprocess
 from pynome.GenomeDatabase import GenomeDatabase
 from pynome.utils import cd, crawl_ftp_dir
-from pynome.sra import build_sra_search_string, run_sra_search
 from tqdm import tqdm
 
 
@@ -735,28 +734,4 @@ class EnsemblDatabase(GenomeDatabase):
                     gft_file, output_file))
             # with cd(gen.local_path):
             subprocess.run(cmd, shell=True)
-        return
-
-    def write_SRA_accession_list(self):
-        """
-        Builds the SRA search query for every genome, runs this
-        query to get the list of SRA acession numbers. This list
-        is then writen to the appropriate local genome directory.
-        """
-
-        genome_list = self.get_genomes()
-
-        for gen in tqdm(genome_list):
-            # build the search string.
-            search_str = build_sra_search_string(gen.taxonomy_id)
-            # run the query and return a list.
-            retr_sra_list = run_sra_search(search_str)
-            # if the list is not empty, write the results to the
-            # genome directory.
-            if retr_sra_list:
-                sra_id_file = os.path.join(
-                    gen.local_path,
-                    gen.base_filename + "SRA_accessions.txt")
-                with open(sra_id_file, 'w') as sra_file:
-                    sra_file.write('\n'.join(retr_sra_list))
         return
