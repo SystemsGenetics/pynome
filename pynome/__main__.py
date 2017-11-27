@@ -72,112 +72,120 @@ the pynome dir)::
 
 """
 
-import logging
-import argparse
+
+import click
 from pynome.EnsemblDatabase import EnsemblDatabase
 from pynome.SQLiteStorage import SQLiteStorage
 
 
-logging.getLogger(__name__)
-logging.basicConfig(
-    filename='main.log',
-    filemode='w',
-    level='INFO'
-)
+@click.command
+def
 
 
-def entry_find_genomes(database):
-    """The entry point to find genomes with default options. This should
-    be called from the command line."""
-    # Generate the base uri list:
-    uri_list = database.generate_uri()
-    database.find_genomes(uri_list=uri_list)
-
-
-def entry_download_genomes(database):
-    print("Downloading in progresss!\n")
-    database.download_genomes()
-
-
-def main():
-    """The main command line parser for the Pynome module."""
-    parser = argparse.ArgumentParser()  # Create the parser
-    parser.add_argument('database_path',   # required positional argument
-                        metavar='database-path', nargs=1)
-    parser.add_argument('download_path',   # required positional argument
-                        metavar='download-path', nargs=1)
-    parser.add_argument('-f', '--find-genomes', action='store_true')
-    parser.add_argument('-p', '--print-genomes', action='store_true')
-    parser.add_argument('-d', '--download-genomes', action='store_true')
-    parser.add_argument('-m', '--download-metadata', action='store_true')
-    parser.add_argument('-r', '--read-metadata', action='store_true')
-    parser.add_argument('-u', '--uncompress', action='store_true')
-    parser.add_argument('-i', '--hisat-index', action='store_true')
-    parser.add_argument('-g', '--gen-gtf', action='store_true')
-    parser.add_argument('-s', '--gen-splice', action='store_true')
-    parser.add_argument('-v', '--verbose', help='Set output to verbose.',
-                        action='store_true')
-    args = parser.parse_args()  # Parse the arguments
-    logging.info('\nChecking for or creating the database.\n')
-
-    # create the database path if it does not already exist
-    # if not os.path.exists(args.download_path[0]):
-    #     os.makedirs(args.download_path[0])
-
-    try:
-        storage = SQLiteStorage(download_path = args.download_path[0])
-        main_database = EnsemblDatabase(
-          database_path = args.database_path[0],
-          Storage = storage
-        )
-    except:
-        print("Unable to create or read the database!")
-        print('Database Path: {0}'.format(args.database_path[0]))
-        exit()
-
-    if args.verbose:  # Enable verbose logging mode
-        logging.basicConfig(level=logging.DEBUG)
-
-    # check if the database is populated:
-    # if not, and find gemoes is not enabled
-    # exit and print a
-
-    if args.find_genomes:
-        print('Finding Genomes!')
-        entry_find_genomes(main_database)
-
-    if args.print_genomes:
-        print('Printing Genomes!')
-        print(main_database.get_genomes())
-
-    if args.download_metadata:
-        print("Downloading Metadata!")
-        main_database.download_metadata()
-
-    if args.download_genomes:
-        print('Downloading Genomes!')
-        entry_download_genomes(main_database)
-
-    if args.read_metadata:
-        try:
-            main_database.read_species_metadata()
-            main_database.add_taxonomy_ids()
-        except:
-            print('Unable to read the metadata file: species.txt')
-
-    if args.uncompress:
-        main_database.decompress_genomes()
-
-    if args.hisat_index:
-        main_database.generate_hisat_index()
-
-    if args.gen_gtf:
-        main_database.generate_gtf()
-
-    if args.gen_splice:
-        main_database.generate_splice_sites()
-
-    exit()
-
-if __name__ == '__main__':
-    main()
+# import logging
+# import argparse
+#
+#
+# logging.getLogger(__name__)
+# logging.basicConfig(
+#     filename='main.log',
+#     filemode='w',
+#     level='INFO'
+# )
+#
+#
+# def entry_find_genomes(database):
+#     """The entry point to find genomes with default options. This should
+#     be called from the command line."""
+#     # Generate the base uri list:
+#     uri_list = database.generate_uri()
+#     database.find_genomes(uri_list=uri_list)
+#
+#
+# def entry_download_genomes(database):
+#     print("Downloading in progresss!\n")
+#     database.download_genomes()
+#
+#
+# def main():
+#     """The main command line parser for the Pynome module."""
+#     parser = argparse.ArgumentParser()  # Create the parser
+#     parser.add_argument('database_path',   # required positional argument
+#                         metavar='database-path', nargs=1)
+#     parser.add_argument('download_path',   # required positional argument
+#                         metavar='download-path', nargs=1)
+#     parser.add_argument('-f', '--find-genomes', action='store_true')
+#     parser.add_argument('-p', '--print-genomes', action='store_true')
+#     parser.add_argument('-d', '--download-genomes', action='store_true')
+#     parser.add_argument('-m', '--download-metadata', action='store_true')
+#     parser.add_argument('-r', '--read-metadata', action='store_true')
+#     parser.add_argument('-u', '--uncompress', action='store_true')
+#     parser.add_argument('-i', '--hisat-index', action='store_true')
+#     parser.add_argument('-g', '--gen-gtf', action='store_true')
+#     parser.add_argument('-s', '--gen-splice', action='store_true')
+#     parser.add_argument('-v', '--verbose', help='Set output to verbose.',
+#                         action='store_true')
+#     args = parser.parse_args()  # Parse the arguments
+#     logging.info('\nChecking for or creating the database.\n')
+#
+#     # create the database path if it does not already exist
+#     # if not os.path.exists(args.download_path[0]):
+#     #     os.makedirs(args.download_path[0])
+#
+#     try:
+#         storage = SQLiteStorage(download_path = args.download_path[0])
+#         main_database = EnsemblDatabase(
+#           database_path = args.database_path[0],
+#           Storage = storage
+#         )
+#     except:
+#         print("Unable to create or read the database!")
+#         print('Database Path: {0}'.format(args.database_path[0]))
+#         exit()
+#
+#     if args.verbose:  # Enable verbose logging mode
+#         logging.basicConfig(level=logging.DEBUG)
+#
+#     # check if the database is populated:
+#     # if not, and find gemoes is not enabled
+#     # exit and print a
+#
+#     if args.find_genomes:
+#         print('Finding Genomes!')
+#         entry_find_genomes(main_database)
+#
+#     if args.print_genomes:
+#         print('Printing Genomes!')
+#         print(main_database.get_genomes())
+#
+#     if args.download_metadata:
+#         print("Downloading Metadata!")
+#         main_database.download_metadata()
+#
+#     if args.download_genomes:
+#         print('Downloading Genomes!')
+#         entry_download_genomes(main_database)
+#
+#     if args.read_metadata:
+#         try:
+#             main_database.read_species_metadata()
+#             main_database.add_taxonomy_ids()
+#         except:
+#             print('Unable to read the metadata file: species.txt')
+#
+#     if args.uncompress:
+#         main_database.decompress_genomes()
+#
+#     if args.hisat_index:
+#         main_database.generate_hisat_index()
+#
+#     if args.gen_gtf:
+#         main_database.generate_gtf()
+#
+#     if args.gen_splice:
+#         main_database.generate_splice_sites()
+#
+#     exit()
+#
+# if __name__ == '__main__':
+#     main()

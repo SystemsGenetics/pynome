@@ -79,6 +79,9 @@ class EnsemblDatabase(GenomeDatabase):
         form:
 
         ``/pub/release-36/species.txt``
+
+        :returns:
+
         
         ..todo::
             This functions design is bizzare and should be refactored.
@@ -116,7 +119,7 @@ class EnsemblDatabase(GenomeDatabase):
 
         for uri, file_name in metadata_uri_dict.items():
 
-            size_estimate = self.ftp.size(uri) / 8.192
+            size_estimate = self.ftp.size(uri)
             target_dir = os.path.join(self.download_path, file_name)
 
             if os.path.isfile(target_dir):
@@ -148,7 +151,7 @@ class EnsemblDatabase(GenomeDatabase):
         Generates the uri strings needed to download the genomes
         from the ensembl database.
 
-        **Returns**: List of Strings of URIs for the ensembl database. eg::
+        :returns: List of Strings of URIs for the ensembl database. eg::
 
             'pub/fungi/release-36/gff3/',
             'pub/metazoa/release-36/gff3/',
