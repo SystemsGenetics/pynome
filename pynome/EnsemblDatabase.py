@@ -3,7 +3,7 @@
 Ensembl Database
 ================
 
-The ensembl database module. A child class of the genome database class,
+The ensembl database module. A child class of the `pynome.GenomeDatabase` class,
 this module cotains all code directly related to connecting and parsing data
 from the ensembl geneome database.
 """
