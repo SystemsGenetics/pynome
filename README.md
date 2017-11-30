@@ -12,6 +12,7 @@ A script to handle the collection and pre-processing for the SciDAS work-flow.
 - [x] Write SRA functionality.
 - [ ] Write SRA test functions and test sra functionality.
 - [ ] Refactor `EnsemblDatabase`.
+- [ ] Add `setuptools` integration.
 
 ### `utils.py`
 
@@ -41,9 +42,10 @@ A script to handle the collection and pre-processing for the SciDAS work-flow.
 
 ### 'EnsemblDatabase.py'
 
+- [ ] Fix exception handling within.
 - [ ] Write `GenomeAssembly` unit tests.
 
 ### '__main__.py'
 
-- [ ] Re-factor CLI interface, consider using Click.
+- [ ] Refactor CLI interface, consider using Click.
 
