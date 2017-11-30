@@ -93,7 +93,7 @@ def run_sra_query(sra_query_str):
 def fetch_sra_info(sra_id):
     """
     Retrieves the information associated with a response ID.
-    
+
     ..todo::
         Confirm that the XML returned by this function is the
         `*.sra.json` file as outlined in the project notes.
@@ -122,23 +122,23 @@ def parse_sra_query_response(response):
     """
     Parses an OrderedDict response object, as retrieved 
     from `fetch_sra_info`.
-    
+
     The desired fetch IDs are in the nested list:
-    
+
     ``response['eSearchResult']['IdList']['Id']``
-    
+
     :returns:
         A list of fetch IDs.
-    
+
     """
-    
+
     # Return correct list from the response if it exists,
     # otherwise return `None`.
     if response['eSearchResult']['IdList']['Id'] is not None:
         return response['eSearchResult']['IdList']['Id']
     else:
         return None
-    
+
 
 def write_sra_json(base_path, sra_dict):
     """
@@ -152,17 +152,16 @@ def write_sra_json(base_path, sra_dict):
 
     There are three other keys at the `'SAMPLE'` level that have
     `[@accession]` entries: `'EXPERIMENT', 'SUBMISSION', 'STUDY'`.
-    
+
     :param base_path:
         The complete path to save write the file to.
-        
+
     :param sra_dict:
         The response XML to save.
     """
 
     # Get the accession number from sra_dict.
-    accession_number = sra_dict['EXPERIMENT_PACKAGE_SET']\
-        ['EXPERIMENT_PACKAGE']['SAMPLE']['@accession']
+    accession_number = sra_dict['EXPERIMENT_PACKAGE_SET']['EXPERIMENT_PACKAGE']['SAMPLE']['@accession']
 
     # Use the retrieved accession number to build the SRA path.
     new_sra_path = build_sra_path(accession_number)
@@ -199,15 +198,14 @@ def build_sra_path(sra_dict):
 
     :param sra_dict:
         The accession number of an entry.
-        
+
     :returns:
         A file path from `RNA-Seq/` to
         `[ES]RR/[0..9]/[0..9]/[0..9]/[0..9]/`.
     """
 
     # Get the sample accession number from sra_dict.
-    accession_ID = sra_dict['EXPERIMENT_PACKAGE_SET']\
-        ['EXPERIMENT_PACKAGE']['SAMPLE']['@accession']
+    accession_ID = sra_dict['EXPERIMENT_PACKAGE_SET']['EXPERIMENT_PACKAGE']['SAMPLE']['@accession']
 
     # Break the SRA ID into chunks, and construct the path.
     chunk_list = chunk_accession_id(accession_ID, chunk_size=2)
