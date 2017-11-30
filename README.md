@@ -11,6 +11,7 @@ A script to handle the collection and pre-processing for the SciDAS work-flow.
 - [ ] Re-comment `EnsemblDatabase.py`.
 - [x] Write SRA functionality.
 - [ ] Write SRA test functions and test sra functionality.
+- [ ] Refactor `EnsemblDatabase`.
 
 ### `utils.py`
 

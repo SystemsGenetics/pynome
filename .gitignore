@@ -4,3 +4,5 @@
 /.spyproject/*
 .idea/*
 /.ipynb_checkpoints/
+
+tests/\.ipynb_checkpoints/
