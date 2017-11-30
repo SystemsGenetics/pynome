@@ -1,11 +1,13 @@
+# -*- coding: utf-8 -*-
+
 """
 ================
 Ensembl Database
 ================
 
-The ensembl database module. A child class of the genome database class,
-this module cotains all code directly related to connecting and parsing data
-from the ensembl geneome database.
+The ensembl database module. A child class of the `pynome.GenomeDatabase`
+class, this module cotains all code directly related to connecting and
+parsing data from the ensembl geneome database.
 """
 
 import ftplib
@@ -36,10 +38,10 @@ class EnsemblDatabase(GenomeDatabase):
     """
 
     def __init__(self, release_version=37, **kwargs):
-        
+
         # Call parent class init function.
         super().__init__(**kwargs)
-        
+
         # Define private attributes / properties. These are the private
         # values that setter functions will store their values in.
         self._release_version = None
@@ -48,10 +50,10 @@ class EnsemblDatabase(GenomeDatabase):
         # Assign attributes from user input. The setter for
         # release_version populates release version and number.
         self.release_version = release_version
-        
+
         # Create an instance of the FTP() class for the database.
         self.ftp = ftplib.FTP()
-        
+
         # Create an attribute that for the pandas dataframe of the
         # species metadata, as parsed from species.txt on ensembl.
         self.species_metadata = None
@@ -68,7 +70,7 @@ class EnsemblDatabase(GenomeDatabase):
     def release_version(self, value):
         """
         Setter for the release_version. Accepts an input integer and returns
-        a string in the form: 'release-##' 
+        a string in the form: 'release-##'
         """
         self._release_number = value
         self._release_version = 'release-' + str(value)
@@ -79,26 +81,29 @@ class EnsemblDatabase(GenomeDatabase):
         form:
 
         ``/pub/release-36/species.txt``
-        
+
+        :returns:
+
+
         ..todo::
             This functions design is bizzare and should be refactored.
             The only other function that uses it appears to be
             `download_metadata()`.
 
         """
-        
+
         # Create a dictonary to store the uri strings to be generated.
         uri_dict = {}
-        
+
         # This is the name of the file on the remote server.
         species_txt = 'species.txt'
-        
+
         # Join by the '/' character to build the uri.
         uri = '/'.join(('pub', self._release_version, species_txt))
-        
+
         # Assign the metadata file to the corresponding key.
         uri_dict[uri] = species_txt
-        
+
         # Return the dictionary.
         return uri_dict
 
@@ -116,7 +121,7 @@ class EnsemblDatabase(GenomeDatabase):
 
         for uri, file_name in metadata_uri_dict.items():
 
-            size_estimate = self.ftp.size(uri) / 8.192
+            size_estimate = self.ftp.size(uri)
             target_dir = os.path.join(self.download_path, file_name)
 
             if os.path.isfile(target_dir):
@@ -148,7 +153,7 @@ class EnsemblDatabase(GenomeDatabase):
         Generates the uri strings needed to download the genomes
         from the ensembl database.
 
-        **Returns**: List of Strings of URIs for the ensembl database. eg::
+        :returns: List of Strings of URIs for the ensembl database. eg::
 
             'pub/fungi/release-36/gff3/',
             'pub/metazoa/release-36/gff3/',
@@ -433,103 +438,6 @@ class EnsemblDatabase(GenomeDatabase):
                             # Check if the file size is 0, if so delete it.
                             if os.stat(target_file).st_size == 0:
                                 os.remove(target_file)
-        self.ftp.quit()  # close the ftp connection
-        return
-
-    def check_local_genome_integrity(self):
-        """
-        Checks the local genome files downloaded and ensures that they match
-        the linux sum provided by ensemble. Returns True if the genome is good,
-        and false otherwise. Assumes the files are still zipped.
-        """
-        def get_checksum_uri(uri):
-            """
-            Breaks apart a remote uri to ensure the correct checksum file is
-            considered.
-
-            :param uri: The base uri where the deisred CHECKSUMS file is.
-            :param tag: The tag to apply, this allows us to discern between the
-            fasta and gff3 checksum files.
-
-            :returns: A list that contains the URI of the target CHECKSUMS file
-            and the corresponding filename that is to be checked.
-            """
-            uri, filename = uri.rsplit("/", 1)
-            return [uri + "/CHECKSUMS", filename]
-
-        def download_checksum_file(checksum_URI, local_download_path, tag):
-            """
-            Downloads a given checksum for the fasta and gff3 files for a
-            given genome. Assumes an FTP connection is already initialized.
-
-            :param checksum_URI:
-            :param local_download_path:
-
-            :returns:
-            """
-            target_local_dir = os.path.join(
-                local_download_path,
-                "CHECKSUMS" + tag)
-
-            self.ftp.retrbinary(
-                "RETR {}".format(checksum_URI),
-                open(target_local_dir, "wb").write)
-            return
-
-        def read_genome_checksum_files(genome, curr_file):
-            """
-            Reads a downloaded checksum file, and compares the values
-            therein to a locally computed one. The blocks and checksum are
-            generated with the standard UNIX `sum` utility.
-
-            :param genome:
-            :param curr_file:
-
-            :returns: A list that contains the checksum and block count.
-            """
-            with open(local_checksum_filepath, "r") as chk_file:
-                content = chk_file.readlines()
-
-            for line in content:
-                line = content.split()
-                if line[-1] == curr_file:  # then this is the right line
-                    chksum, blocks = line[0:1]
-            return [chksum, blocks]
-
-        def calculate_local_unix_sum(file):
-            """
-            Calculates the unix sum of a given file.
-            TODO: Perhaps move this to the utils.py file.
-
-            :param file:
-            :returns:
-            """
-            cmd = ["sum", file]
-            subprocess.run(cmd, stdout=subprocess.PIPE)
-            chksum, blocks = command.stdout.strip().split()
-            return [chksum, blocks]
-
-        # Connect and login to the ftp server.
-        self.ftp.connect(ENSEMBL_FTP_URI)
-        self.ftp.login()
-
-        # Get all the genomes
-        for genome in tqdm(self.get_genomes()):
-
-            # Get the gff3 CHECKSUMS file.
-            gff3_sum_uri, gff3_filename = get_checksum_uri(
-                genome.gff3_uri)
-            download_checksum_file(gff3_sum_uri, genome.local_path, "_gff3")
-
-            # Get the fasta CHECKSUMS file.
-            fasta_sum_uri, fasta_filename = get_checksum_uri(
-                genome.fasta_uri)
-            download_checksum_file(gff3_sum_uri, genome.local_path, "_fasta")
-
-            # Check the GFF3 file.
-            good_check_vals = read_genome_checksum_files(genome, gff3_filename)
-            local_check_vals = calculate_local_unix_sum()
-
         self.ftp.quit()  # close the ftp connection
         return
 

@@ -24,26 +24,34 @@ class cd:
 
 
 def crawl_ftp_dir(database, top_dir, parsing_function):
-    """Recursively crawl a target directory. Takes as an input a
+    """
+    Recursively crawl a target directory. Takes as an input a
     target directory and a parsing function. The ftplib.FTP.dir()
     function is used to retrieve a directory listing, line by line,
     in string format. These are appended to a newly generated list.
     Each item in this list is subject to the parsing function.
 
-    :param ftp_instance: An instance of ftplib.FTP()
-    :param top_dir: The directory from which contents will be retrieved.
-    :param parsing_function: The function to parse each non-directory
-                             result.
+    :param ftp_instance:
+        An instance of ftplib.FTP()
+    :param top_dir:
+        The directory from which contents will be retrieved.
+    :param parsing_function:
+        The function to parse each non-directory result.
     """
-
-    retrieved_dir_list = []  # empty list to hold the callback
+    # Create an empty list to hold the callback
+    retrieved_dir_list = []
 
     def dir_check(dir_value):
-        """Checks if the input: dir_value is a directory. Assumes the input
+        """
+        Checks if the input: dir_value is a directory. Assumes the input
         will be in the following format:
+
              ``"drwxr-sr-x  2 ftp   ftp    4096 Jan 13  2015 filename"``
+
         This works by checking the first letter of the input string,
-        and returns True for a directory or False otherwise."""
+        and returns True for a directory or False otherwise.
+        """
+        # TODO: Comment this.
         if dir_value[0][0] == 'd':
             return True
         else:
