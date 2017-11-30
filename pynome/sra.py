@@ -28,6 +28,8 @@ Filter criteria
 
 """
 
+import os
+import json
 import urllib
 import xmltodict
 
@@ -120,7 +122,7 @@ def fetch_sra_info(sra_id):
 
 def parse_sra_query_response(response):
     """
-    Parses an OrderedDict response object, as retrieved 
+    Parses an OrderedDict response object, as retrieved
     from `fetch_sra_info`.
 
     The desired fetch IDs are in the nested list:
@@ -161,7 +163,8 @@ def write_sra_json(base_path, sra_dict):
     """
 
     # Get the accession number from sra_dict.
-    accession_number = sra_dict['EXPERIMENT_PACKAGE_SET']['EXPERIMENT_PACKAGE']['SAMPLE']['@accession']
+    accession_number = sra_dict['EXPERIMENT_PACKAGE_SET']
+    ['EXPERIMENT_PACKAGE']['SAMPLE']['@accession']
 
     # Use the retrieved accession number to build the SRA path.
     new_sra_path = build_sra_path(accession_number)
@@ -205,7 +208,8 @@ def build_sra_path(sra_dict):
     """
 
     # Get the sample accession number from sra_dict.
-    accession_ID = sra_dict['EXPERIMENT_PACKAGE_SET']['EXPERIMENT_PACKAGE']['SAMPLE']['@accession']
+    accession_ID = sra_dict['EXPERIMENT_PACKAGE_SET']
+    ['EXPERIMENT_PACKAGE']['SAMPLE']['@accession']
 
     # Break the SRA ID into chunks, and construct the path.
     chunk_list = chunk_accession_id(accession_ID, chunk_size=2)
@@ -213,7 +217,6 @@ def build_sra_path(sra_dict):
     out_path = os.path.join(
         'RNA-Seq',
         'SRA',
-        sra_letters,
         chunk_list,
     )
 
@@ -247,8 +250,8 @@ def chunk_accession_id(accession_id, chunk_size):
 
     # Iterate through the sra_numbers by the chunk_size.
     for i in range(0, len(sra_numbers), chunk_size):
-        # Build the chunk.
-        chunk = sra_numbers[i:i + n]
+        # Build the splice chunk.
+        chunk = sra_numbers[i:i + chunk_size]
         # If the chunk is large enough, append it to the out_list.
         if len(chunk) < chunk_size:
             out_list.append(chunk)
