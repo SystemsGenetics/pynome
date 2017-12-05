@@ -89,14 +89,22 @@ def download_sra_json(taxonomy_id_list, base_download_path):
                 # can be a list of values.
                 SRA_accession_list = get_SRA_accession(fetch_result)
 
-                # Iterate over this new list to write the different
-                # SRA files.
-                # for sra_id in SRA_accession_list:
+                for sra_id in SRA_accession_list:
+                    print('sra_id', sra_id)
 
+                    # Create the broken up path.
+                    path = build_sra_path(sra_id)
+                    print(path)
 
-                # Build the path for this SRA file.
+                    # Create this path if it does not exist.
+                    if not os.path.exists(path):
+                        os.makedirs(path)
 
-                # Write the file.
+                    # Write the file.
+                    with open(
+                        os.path.join(
+                            path, sra_id + '.sra.json'), 'w') as nfp:
+                        nfp.write(json.dumps(fetch_result))
 
                 # Update the output status dictionary.
 
@@ -122,14 +130,16 @@ def get_SRA_accession(fetched_dict):
     sra_out_list = list()
 
     # Collect the runs from the dictionary.
-    runs = (fetched_dict
+    runs = (
+        fetched_dict
         ['EXPERIMENT_PACKAGE_SET']
         ['EXPERIMENT_PACKAGE']
         ['RUN_SET']
         ['RUN'])
 
     # If this value is not a list, convert it into one.
-    if type(runs) is not list: runs = [runs]
+    if type(runs) is not list:
+        runs = [runs]
 
     # Iterate over the list of runs.
     for run in runs:
@@ -243,7 +253,8 @@ def parse_sra_query_response(response):
         out_list = response['eSearchResult']['IdList']['Id']
 
         # Convert the value to a list if it is not already one.
-        if type(out_list) is not list: out_list = [out_list]
+        if type(out_list) is not list:
+            out_list = [out_list]
 
         return out_list
 
@@ -286,7 +297,7 @@ def write_sra_json(sra_accession, base_path, sra_dict):
         nfp.write(json.dumps(sra_dict))
 
 
-def build_sra_path(sra_dict):
+def build_sra_path(sra_id_str):
     """
     Builds an sra file path based on the `sra_id` parameter.
 
@@ -299,12 +310,7 @@ def build_sra_path(sra_dict):
                 [ES]RR[#].sra.json
     ``
 
-    The accession number is found within sra_dict.
-
-    ``['EXPERIMENT_PACKAGE_SET']['EXPERIMENT_PACKAGE']
-      ['SAMPLE']['@accession']``
-
-    :param sra_dict:
+    :param sra_id_str:
         The accession number of an entry.
 
     :returns:
@@ -313,16 +319,14 @@ def build_sra_path(sra_dict):
     """
 
     # Get the sample accession number from sra_dict.
-    accession_ID = (sra_dict['EXPERIMENT_PACKAGE_SET']
-        ['EXPERIMENT_PACKAGE']['SAMPLE']['@accession'])
+    chunked_id = chunk_accession_id(sra_id_str)
 
-    # Break the SRA ID into chunks, and construct the path.
-    chunk_list = chunk_accession_id(accession_ID)
-
+    # Create the directory path on the system if it
+    # does not already exist.
     out_path = os.path.join(
         'RNA-Seq',
         'SRA',
-        chunk_list,
+        *chunked_id,
     )
 
     # Return the intermediary path.
@@ -358,7 +362,7 @@ def chunk_accession_id(accession_id, chunk_size=2):
         # Build the splice chunk.
         chunk = sra_numbers[i:i + chunk_size]
         # If the chunk is large enough, append it to the out_list.
-        if len(chunk) < chunk_size:
+        if len(chunk) == chunk_size:
             out_list.append(chunk)
         else:
             pass
