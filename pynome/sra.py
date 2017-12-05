@@ -41,6 +41,105 @@ FETCH = ('https://eutils.ncbi.nlm.nih.gov'
          '/entrez/eutils/efetch.fcgi?db=sra&id=')
 
 
+def download_sra_json(taxonomy_id_list, base_download_path):
+    """
+    Downloads the SRA metadata for each ID found in the
+    `taxonomy_id_list`. These files are saved under a series of
+    two-digit file  paths generated from the SRA accession number.
+
+    :param taxonomy_id_list:
+        A list of taxonomy identification values.
+    :param base_download_path:
+        The base location where the SRA accession number folders
+        will be placed.
+    :return:
+        A list of success or failures, indexed the same as the
+        input `taxonomy_id_list`.
+    """
+
+    # Create the output status dictionary to track whether a given
+    # taxonomy ID was downloaded successfully or not.
+    status_list = dict()
+
+    # For each of the taxonomy ID numbers provided.
+    for id in taxonomy_id_list:
+
+        # Generate the corresponding query.
+        query = build_sra_query_string(id)
+
+        # Run the query.
+        query_response = run_sra_query(query)
+
+        # Parse the response, get the list of SRA identification
+        # numbers so that the corresponding metadata can be
+        # downloaded.
+        fetch_id_list = parse_sra_query_response(query_response)
+
+        # If there are any accession values found.
+        if fetch_id_list is not None:
+
+            # Iterate through the fetch ID numbers.
+            for fetch_id in fetch_id_list:
+
+                # Get the desired *.json file associated with
+                # the current fetch ID.
+                fetch_result = fetch_sra_info(fetch_id)
+
+                # Get the ERR or SRR from the fetched result. This
+                # can be a list of values.
+                SRA_accession_list = get_SRA_accession(fetch_result)
+
+                # Iterate over this new list to write the different
+                # SRA files.
+                # for sra_id in SRA_accession_list:
+
+
+                # Build the path for this SRA file.
+
+                # Write the file.
+
+                # Update the output status dictionary.
+
+    return status_list
+
+
+def get_SRA_accession(fetched_dict):
+    """
+    Reads an input dictionary, and returns either the ERR or SRR
+    accession identification string.
+
+    :param fetched_dict:
+        A dictionary of SRA metadata from Eutils.
+
+    :return:
+        An list of accession identification strings.
+    """
+
+    # Return the accession number, in some cases there is a list of
+    # runs. To handle this all inputs will be converted to a list.
+
+    # Create the empty list that will be returned.
+    sra_out_list = list()
+
+    # Collect the runs from the dictionary.
+    runs = (fetched_dict
+        ['EXPERIMENT_PACKAGE_SET']
+        ['EXPERIMENT_PACKAGE']
+        ['RUN_SET']
+        ['RUN'])
+
+    # If this value is not a list, convert it into one.
+    if type(runs) is not list: runs = [runs]
+
+    # Iterate over the list of runs.
+    for run in runs:
+
+        # Get the accession identification string.
+        sra_out_list.append(run['@accession'])
+
+    return sra_out_list
+
+
 def build_sra_query_string(tax_id):
     """
     Builds the SRA search string based on an input taxonomy id number.
@@ -134,15 +233,25 @@ def parse_sra_query_response(response):
 
     """
 
-    # Return correct list from the response if it exists,
-    # otherwise return `None`.
-    if response['eSearchResult']['IdList']['Id'] is not None:
-        return response['eSearchResult']['IdList']['Id']
+    # The search result gives None if there are no IDs to return.
+    if response['eSearchResult']['IdList'] is None:
+        return None
+
+    # Otherwise we should find at least one ID.
+    elif response['eSearchResult']['IdList']['Id'] is not None:
+
+        out_list = response['eSearchResult']['IdList']['Id']
+
+        # Convert the value to a list if it is not already one.
+        if type(out_list) is not list: out_list = [out_list]
+
+        return out_list
+
     else:
         return None
 
 
-def write_sra_json(base_path, sra_dict):
+def write_sra_json(sra_accession, base_path, sra_dict):
     """
     Creates an `"[sra_id].sra.json"` file and saves it to the
     supplied directory.
@@ -162,15 +271,11 @@ def write_sra_json(base_path, sra_dict):
         The response XML to save.
     """
 
-    # Get the accession number from sra_dict.
-    accession_number = sra_dict['EXPERIMENT_PACKAGE_SET']
-    ['EXPERIMENT_PACKAGE']['SAMPLE']['@accession']
-
     # Use the retrieved accession number to build the SRA path.
-    new_sra_path = build_sra_path(accession_number)
+    new_sra_path = build_sra_path(sra_accession)
 
     # Create the filename.
-    new_file_name = accession_number + '.sra.json'
+    new_file_name = sra_accession + '.sra.json'
 
     # Combine the base path, the sra_path and the new file name
     new_full_path = os.path.abspath(os.path.join(
@@ -208,11 +313,11 @@ def build_sra_path(sra_dict):
     """
 
     # Get the sample accession number from sra_dict.
-    accession_ID = sra_dict['EXPERIMENT_PACKAGE_SET']
-    ['EXPERIMENT_PACKAGE']['SAMPLE']['@accession']
+    accession_ID = (sra_dict['EXPERIMENT_PACKAGE_SET']
+        ['EXPERIMENT_PACKAGE']['SAMPLE']['@accession'])
 
     # Break the SRA ID into chunks, and construct the path.
-    chunk_list = chunk_accession_id(accession_ID, chunk_size=2)
+    chunk_list = chunk_accession_id(accession_ID)
 
     out_path = os.path.join(
         'RNA-Seq',
@@ -224,7 +329,7 @@ def build_sra_path(sra_dict):
     return out_path
 
 
-def chunk_accession_id(accession_id, chunk_size):
+def chunk_accession_id(accession_id, chunk_size=2):
     """
     Breaks an accession id into chunks of `chunk_size` and returns a
     list of all chunks in order that are full-sized.
