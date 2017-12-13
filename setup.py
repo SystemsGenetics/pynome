@@ -21,9 +21,9 @@ setup(
     install_requires=[
         'Click',
     ],
-    entry_points='''
-        [console_scripts]
-        pynome=pynome:cli
-    ''',
+    entry_points={
+        'console_scripts': [
+            'sra_by_taxID = pynome.cli:download_sra_json_by_taxID'
+        ]
+    },
 )
-

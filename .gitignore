@@ -6,3 +6,7 @@
 /.ipynb_checkpoints/
 
 tests/\.ipynb_checkpoints/
+
+docs/build/
+
+pynome\.egg-info/

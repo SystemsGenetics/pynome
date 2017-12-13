@@ -32,6 +32,8 @@ import os
 import json
 import urllib
 import xmltodict
+import collections
+
 
 # Define the query and fetch URL strings.
 QUERY = ("https://eutils.ncbi.nlm.nih.gov"
@@ -59,13 +61,13 @@ def download_sra_json(taxonomy_id_list, base_download_path):
 
     # Create the output status dictionary to track whether a given
     # taxonomy ID was downloaded successfully or not.
-    status_list = dict()
+    status_dict = collections.defaultdict()
 
     # For each of the taxonomy ID numbers provided.
-    for id in taxonomy_id_list:
+    for tid in taxonomy_id_list:
 
         # Generate the corresponding query.
-        query = build_sra_query_string(id)
+        query = build_sra_query_string(tid)
 
         # Run the query.
         query_response = run_sra_query(query)
@@ -90,11 +92,14 @@ def download_sra_json(taxonomy_id_list, base_download_path):
                 SRA_accession_list = get_SRA_accession(fetch_result)
 
                 for sra_id in SRA_accession_list:
-                    print('sra_id', sra_id)
+                    # print('sra_id', sra_id)
 
                     # Create the broken up path.
                     path = build_sra_path(sra_id)
-                    print(path)
+                    # print(path)
+
+                    # Write the accession number to the output dictionary.
+                    status_dict[tid].extend(sra_id)
 
                     # Create this path if it does not exist.
                     if not os.path.exists(path):
@@ -106,9 +111,7 @@ def download_sra_json(taxonomy_id_list, base_download_path):
                             path, sra_id + '.sra.json'), 'w') as nfp:
                         nfp.write(json.dumps(fetch_result))
 
-                # Update the output status dictionary.
-
-    return status_list
+    return status_dict
 
 
 def get_SRA_accession(fetched_dict):
@@ -326,8 +329,7 @@ def build_sra_path(sra_id_str):
     out_path = os.path.join(
         'RNA-Seq',
         'SRA',
-        *chunked_id,
-    )
+        *chunked_id)
 
     # Return the intermediary path.
     return out_path

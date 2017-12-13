@@ -10,17 +10,21 @@ class, this module cotains all code directly related to connecting and
 parsing data from the ensembl geneome database.
 """
 
-import ftplib
+# Basic Python imports.
 import os
+import pandas
+import ftplib
 import logging
 import itertools
-import pandas
 import subprocess
-from pynome.GenomeDatabase import GenomeDatabase
-from pynome.utils import cd, crawl_ftp_dir
 from tqdm import tqdm
 
+# Intra-package imports.
+from pynome.GenomeDatabase import GenomeDatabase
+from pynome.utils import cd, crawl_ftp_dir
 
+
+# Declare constants.
 ENSEMBL_FTP_URI = 'ftp.ensemblgenomes.org'
 ENSEMBL_DATA_TYPES = ['gff3', 'fasta']
 ENSEMBL_KINGDOMS = ['fungi', 'metazoa', 'plants', 'protists']
@@ -525,32 +529,6 @@ class EnsemblDatabase(GenomeDatabase):
                 subprocess.run(cmd)
                 # subprocess.run('gunzip *', shell=True)
         return
-
-    # def slurm_decompress_genome(self, slurm_index):
-    #     """
-    #     This function is to be used in a slurm array. The slurm_index value
-    #     refers to a list entry from a sorted call of get_genomes.
-    #     This will fail if new entries are added to the database while the
-    #     decompression command runs.
-
-    #     This command should be called in slurm scripts in this way:
-
-    #     >>> python3 -m pynome --slurm-decompress <idx>
-
-    #     .. todo:: Implement the CLI interface for the above example.
-    #     """
-    #     # Find all genomes in the database
-    #     genomes = self.get_genomes()
-    #     # Sort these alphabetically and store them as a tuple
-    #     genomes.sort()
-    #     # Retrieve the index based on slurm index
-    #     active_genome = genomes[slurm_index]
-    #     # Build the target dir
-    #     path = os.path.join(self.download_path, active_genome.taxonomic_name)
-    #     # Run the decompression command
-    #     with cd(path):
-    #         subprocess.run('gunzip *', shell=True)
-    #     return
 
     def generate_hisat_index(self):
         """

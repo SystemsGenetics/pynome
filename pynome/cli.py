@@ -72,14 +72,106 @@ the pynome dir)::
 
 """
 
-
+# Basic Python package imports.
+import os
+import json
 import click
-from pynome.EnsemblDatabase import EnsemblDatabase
-from pynome.SQLiteStorage import SQLiteStorage
+import collections
+from tqdm import tqdm
+
+# Intra-package imports.
+from pynome.sra import (
+    build_sra_query_string,
+    run_sra_query,
+    fetch_sra_info,
+    parse_sra_query_response,
+    get_SRA_accession,
+    build_sra_path
+)
+# from pynome.EnsemblDatabase import EnsemblDatabase
+# from pynome.SQLiteStorage import SQLiteStorage
 
 
-@click.command
-def
+@click.command()
+@click.option(
+    '--tax_ID_list',
+    help=('The taxonomy ID on which to base the search.'))
+@click.option(
+    '--path',
+    help='The base path to download SRA .json files.')
+def download_sra_json_by_taxID(tax_id_list, path):
+    """
+    Runs a query for accession numbers based on an given
+    taxonomy identification number.
+
+    This is a modified functino from the `sra` module with
+    added progress bars for CLI usage.
+
+    :param tax_id_list:
+        The taxonomy ID that forms the basis of the query
+        for the returned accession numnbers.
+
+    :param path:
+        The path to download the SRA .json files.
+
+    :returns:
+        Prints to the terminal a list of matching accession
+        numbers.
+    """
+    # Create the output status dictionary to track whether a given
+    # taxonomy ID was downloaded successfully or not.
+    click.echo('Function called.')
+    status_dict = collections.defaultdict()
+
+    # For each of the taxonomy ID numbers provided.
+    for tid in tqdm(tax_id_list):
+
+        # Generate the corresponding query.
+        query = build_sra_query_string(tid)
+
+        # Run the query.
+        query_response = run_sra_query(query)
+
+        # Parse the response, get the list of SRA identification
+        # numbers so that the corresponding metadata can be
+        # downloaded.
+        fetch_id_list = parse_sra_query_response(query_response)
+
+        # If there are any accession values found.
+        if fetch_id_list is not None:
+
+            # Iterate through the fetch ID numbers.
+            for fetch_id in tqdm(fetch_id_list):
+
+                # Get the desired *.json file associated with
+                # the current fetch ID.
+                fetch_result = fetch_sra_info(fetch_id)
+
+                # Get the ERR or SRR from the fetched result. This
+                # can be a list of values.
+                SRA_accession_list = get_SRA_accession(fetch_result)
+
+                for sra_id in tqdm(SRA_accession_list):
+                    # print('sra_id', sra_id)
+
+                    # Create the broken up path.
+                    path = build_sra_path(sra_id)
+                    # print(path)
+
+                    # Write the accession number to the output dictionary.
+                    status_dict[tid].extend(sra_id)
+
+                    # Create this path if it does not exist.
+                    if not os.path.exists(path):
+                        os.makedirs(path)
+
+                    # Write the file.
+                    with open(
+                        os.path.join(
+                            path, sra_id + '.sra.json'), 'w') as nfp:
+                        nfp.write(json.dumps(fetch_result))
+
+    click.echo(status_dict)
 
 
 # import logging
