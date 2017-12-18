@@ -7,12 +7,18 @@ A script to handle the collection and pre-processing for the SciDAS work-flow.
 - [x] Gather todos here.
 - [ ] Refactor command line interface
 - [ ] Refactor unit tests.
-- [ ] Add a `setup.py`.
+- [x] Add a `setup.py`.
 - [ ] Re-comment `EnsemblDatabase.py`.
 - [x] Write SRA functionality.
 - [ ] Write SRA test functions and test sra functionality.
 - [ ] Refactor `EnsemblDatabase`.
 - [ ] Add `setuptools` integration.
+
+### `cli.py`
+
+- [x] Create command group. ie `pynome command --arguments.`
+- [ ] SRA - create directory from accession number.
+- [ ] SRA - download SRA metadata.
 
 ### `utils.py`
 

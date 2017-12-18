@@ -35,13 +35,13 @@ class GenomeDatabase(object):
         if not os.path.exists(self.download_path):
             os.makedirs(self.download_path)
 
-    def __str__(self):
-        """
-        Prints the list of genomes currently loaded for this genome database.
+    # def __str__(self):
+    #     """
+    #     Prints the list of genomes currently loaded for this genome database.
 
-        """
-        genomes = self.get_genomes()
-        return str([str(genome) for genome in genomes])
+    #     """
+    #     genomes = self.get_genomes()
+    #     return str([str(genome) for genome in genomes])
 
     def save_genome(self, **kwargs):
         """
@@ -80,5 +80,5 @@ class GenomeDatabase(object):
         Retrieves a list of all genomes loaded for this genome database.
 
         """
-        query = self.session.query(GenomeAssembly).all()
+        query = self.storage.session.query(GenomeAssembly).all()
         return query

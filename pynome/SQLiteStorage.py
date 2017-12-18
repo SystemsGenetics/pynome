@@ -22,11 +22,12 @@ class SQLiteStorage(Storage):
 
         # The full path where the sqlite databse is housed.
         self.database_path = kwargs['database_path']
-        self.database_path = 'sqlite:///' + self.database_path
+        self.database_path = 'sqlite:///{0}'.format(
+            os.path.abspath(self.database_path))
 
         # Create the database path if it does not exist.
-        if not os.path.exists(self.database_path):
-            os.makedirs(self.database_path)
+        # if not os.path.exists(self.database_path):
+            # os.makedirs(self.database_path)
 
         # Open the SQLAlchemy database where genome details are stored.
         logging.debug('Opening database at: {}'.format(self.database_path))

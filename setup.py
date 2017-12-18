@@ -23,7 +23,7 @@ setup(
     ],
     entry_points={
         'console_scripts': [
-            'sra_by_taxID = pynome.cli:download_sra_json_by_taxID'
+            'pynome = pynome.cli:entry_point'
         ]
     },
 )
