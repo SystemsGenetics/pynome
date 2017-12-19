@@ -204,15 +204,13 @@ def run_sra_query(sra_query_str):
     return response
 
 
-def fetch_sra_info(sra_id):
+def fetch_sra_info(fetch_id):
     """
     Retrieves the information associated with a response ID.
+    The data returned by this function is that which will be
+    saved within the `*.sra.json` file.
 
-    ..todo::
-        Confirm that the XML returned by this function is the
-        `*.sra.json` file as outlined in the project notes.
-
-    :param sra_id:
+    :param fetch_id:
         A query ID returned by run_sra_search().
 
     :returns:
@@ -220,7 +218,7 @@ def fetch_sra_info(sra_id):
     """
 
     # Build the search string.
-    fetch_str = FETCH + sra_id
+    fetch_str = FETCH + fetch_id
 
     # Query the remote source and save the response.
     with urllib.request.urlopen(fetch_str) as response:
@@ -322,7 +320,7 @@ def build_sra_path(sra_id_str):
     """
 
     # Get the sample accession number from sra_dict.
-    chunked_id = chunk_accession_id(sra_id_str)
+    chunked_id = _chunk_accession_id(sra_id_str)
 
     # Create the directory path on the system if it
     # does not already exist.
@@ -335,7 +333,7 @@ def build_sra_path(sra_id_str):
     return out_path
 
 
-def chunk_accession_id(accession_id, chunk_size=2):
+def _chunk_accession_id(accession_id, chunk_size=2):
     """
     Breaks an accession id into chunks of `chunk_size` and returns a
     list of all chunks in order that are full-sized.

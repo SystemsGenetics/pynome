@@ -31,7 +31,7 @@ def crawl_ftp_dir(database, top_dir, parsing_function):
     in string format. These are appended to a newly generated list.
     Each item in this list is subject to the parsing function.
 
-    :param ftp_instance:
+    :param database:
         An instance of ftplib.FTP()
     :param top_dir:
         The directory from which contents will be retrieved.

@@ -40,6 +40,14 @@ def entry_point():
     pass
 
 
+@entry_point.group()
+def sra():
+    """
+    The group handler for SRA subscripts.
+    """
+    pass
+
+
 @entry_point.command()
 @click.option('--sql_path')
 @click.option('--genome_path')
@@ -92,7 +100,7 @@ def new_db(sql_path, genome_path):
 @click.option('--sql_path')
 @click.option('--genome_path')
 @click.option('--source', default='ensembl')
-def update_database_metadata(sql_path, genome_path, source='ensembl'):
+def update_database(sql_path, genome_path, source='ensembl'):
     """
     Update the sqldatabase provided in `database_path` with
     data pulled from `source`.
@@ -123,6 +131,7 @@ def update_database_metadata(sql_path, genome_path, source='ensembl'):
     uri_list = main_database.generate_uri()
     click.echo('URI list generated, finding genomes...\n')
     main_database.find_genomes(uri_list=uri_list)
+    # TODO: Download the species.txt file and parse it.
 
 
 @entry_point.command()

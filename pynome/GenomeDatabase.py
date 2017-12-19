@@ -4,16 +4,15 @@ import os
 from pynome.GenomeAssembly import GenomeAssembly
 
 
-class GenomeDatabase(object):
+class GenomeDatabase:
     """
     Base Genome Database class.
 
     This class is not intended to be called directly but should be implemented
     via child classes.
-
     """
 
-    def __init__(self, download_path, Storage, **kwargs):
+    def __init__(self, download_path, storage, **kwargs):
         """
         Initialization of the GenomeDatabase class.
 
@@ -26,7 +25,7 @@ class GenomeDatabase(object):
             does exist then existing data will be used.
 
         """
-        self.storage = Storage
+        self.storage = storage
 
         # The root location where downloaded genomes will be stored.
         self.download_path = download_path

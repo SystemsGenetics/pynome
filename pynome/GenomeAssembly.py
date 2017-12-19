@@ -46,5 +46,5 @@ class GenomeAssembly:
     def __str__(self):
         return str(self.taxonomic_name)
 
-    def save(self):
-        self.storage.save()
+    # def save(self):
+    #     self.storage.save()

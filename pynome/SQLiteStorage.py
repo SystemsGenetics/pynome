@@ -16,6 +16,11 @@ Base = declarative_base()
 class SQLiteStorage(Storage):
 
     def __init__(self, **kwargs):
+        """
+        Initialize the SQLiteStorage function. Assumes the path to
+        the database exists, and will exit with an error if it does
+        not.
+        """
 
         # The SQLAlchemy session object.
         self.session = Session()
@@ -27,7 +32,7 @@ class SQLiteStorage(Storage):
 
         # Create the database path if it does not exist.
         # if not os.path.exists(self.database_path):
-            # os.makedirs(self.database_path)
+        # os.makedirs(self.database_path)
 
         # Open the SQLAlchemy database where genome details are stored.
         logging.debug('Opening database at: {}'.format(self.database_path))
