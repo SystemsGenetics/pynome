@@ -496,8 +496,9 @@ class EnsemblDatabase(GenomeDatabase):
             logging.error(
                 'Unable to find a taxonomy id for {}'.format(species))
             return None
-        logging.debug('Found taxonomy id: {0}'.format(taxonomy_id))
-        return str(taxonomy_id[0])
+        else:
+            logging.debug('Found taxonomy id: {0}'.format(taxonomy_id))
+            return str(taxonomy_id[0])
 
     def add_taxonomy_ids(self):
         # Read the metadata file to get the pandas dataframe:

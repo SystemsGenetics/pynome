@@ -37,11 +37,57 @@ class GenomeAssembly:
             >>> newGenome = GenomeAssembly([taxonomic_name], **kwargs)
 
         """
+        # Define public attributes, these can be directly set.
+        self.species = None
+        self.assembly_name = None
+        self.genus = None
+        self.taxonomy_id = None
+        self.intraspecific_name = None
 
-        # Iterater through the kwargs parameter and set the SQLAlchemy
-        # table columns accordingly.
+        # Define private attributes, these cannot be directly assigned.
+        # Instead they are constructed from the above attributes at the
+        # whenever they are requested.
+        self._taxonomic_name = None
+        self._base_filename = None
+
+        # Iterate through the kwargs parameter and set the key: value
+        # pairs to the attributes.
         for key, value in kwargs.items():
             setattr(self, key, value)
+
+    @property
+    def taxonomic_name(self):
+        """
+        The 'getter' of the taxonomic name of the genome assembly. This
+        property is constructed with the genus, species and intraspecific
+        name, if it exists.
+        """
+        # Check if the intraspecific name is populated.
+        if self.intraspecific_name is not None:
+            # Construct the taxonomic_name from other attributes.
+            return '_'.join(self.genus, self.species, self.intraspecific_name)
+        # Otherwise, simply return the genus and species separated by an '_'.
+        else:
+            return '_'.join(self.genus, self.species)
+
+    @property
+    def base_filename(self):
+        """
+        The 'getter' of the base filename of the genome assembly.
+        """
+        # Check if the intraspecific name is populated.
+        if self.intraspecific_name is not None:
+            # Construct the base_filename from other attributes.
+            return ''.join(
+                self.genus, '_',
+                self.species, '_',
+                self.intraspecific_name, '-',
+                self.assembly_name)
+        else:
+            return ''.join(
+                self.genus, '_',
+                self.species, '-',
+                self.assembly_name)
 
     def __str__(self):
         return str(self.taxonomic_name)

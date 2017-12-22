@@ -14,6 +14,13 @@ Base = declarative_base()
 
 
 class SQLiteStorage(Storage):
+    """
+    An implementation of the Storage class for an SQLite database.
+
+    This class holds any information needed for the operation of
+    the SQLite database. It also must provide functions for saving
+    instances of GenomeAssembly
+    """
 
     def __init__(self, **kwargs):
         """

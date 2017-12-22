@@ -320,7 +320,7 @@ def build_sra_path(sra_id_str):
     """
 
     # Get the sample accession number from sra_dict.
-    chunked_id = _chunk_accession_id(sra_id_str)
+    chunked_id = chunk_accession_id(sra_id_str)
 
     # Create the directory path on the system if it
     # does not already exist.
@@ -333,7 +333,7 @@ def build_sra_path(sra_id_str):
     return out_path
 
 
-def _chunk_accession_id(accession_id, chunk_size=2):
+def chunk_accession_id(accession_id, chunk_size=2):
     """
     Breaks an accession id into chunks of `chunk_size` and returns a
     list of all chunks in order that are full-sized.
