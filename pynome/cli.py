@@ -9,11 +9,11 @@ Command Line Interface
 # Basic Python package imports.
 import os
 import sys
-import json
+# import json
 import errno
 import click
-import collections
-from tqdm import tqdm
+# import collections
+# from tqdm import tqdm
 
 # Intra-package imports.
 from pynome.sra import (
@@ -23,8 +23,8 @@ from pynome.sra import (
     parse_sra_query_response,
     get_SRA_accession,
     build_sra_path)
-from pynome.EnsemblDatabase import EnsemblDatabase
-from pynome.SQLiteStorage import SQLiteStorage
+from pynome.ensembldatabase import EnsemblDatabase
+from pynome.sqliteStorage import SQLiteStorage
 
 # Error handling imports.
 from sqlalchemy.exc import SQLAlchemyError, DBAPIError

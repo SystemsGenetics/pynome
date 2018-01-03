@@ -1,46 +1,29 @@
 # -*- coding: utf-8 -*-
 
-import os
-from pynome.GenomeAssembly import GenomeAssembly
+# import os
+from abc import ABC, abstractmethod
+
+from pynome.genomeassembly import GenomeAssembly
 
 
-class GenomeDatabase:
+class GenomeDatabase(ABC):
     """
-    Base Genome Database class.
+    Base Genome Database class, this models a remote source of
+    Genome Assemblies.
 
-    This class is not intended to be called directly but should be implemented
-    via child classes.
+    This class is not intended to be called directly but should
+    be implemented via child classes.
     """
 
-    def __init__(self, download_path, storage, **kwargs):
+    def __init__(self, storage, **kwargs):
         """
         Initialization of the GenomeDatabase class.
 
-        :param download_path:
-            The path where genomes will be saved to.
-        :param database_path:
-            The path where the SQLite database is located. The
-            SQLite database that stores metadata about a genome assembly.
-            If the SQLite file does not exist it will be created. If it
-            does exist then existing data will be used.
+        :param storage:
+            TODO
 
         """
         self.storage = storage
-
-        # The root location where downloaded genomes will be stored.
-        self.download_path = download_path
-
-        # If the download or database paths don't exist then create them.
-        if not os.path.exists(self.download_path):
-            os.makedirs(self.download_path)
-
-    # def __str__(self):
-    #     """
-    #     Prints the list of genomes currently loaded for this genome database.
-
-    #     """
-    #     genomes = self.get_genomes()
-    #     return str([str(genome) for genome in genomes])
 
     def save_genome(self, **kwargs):
         """

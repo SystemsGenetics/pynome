@@ -32,6 +32,7 @@ A script to handle the collection and pre-processing for the SciDAS work-flow.
 ### 'sra.py'
 
 - [ ] Write SRA unit tests.
+- [ ] Add a trailing underscore handler for the chunk_accession_id() function.
 
 ### 'SQLiteStorage.py'
 
@@ -43,8 +44,8 @@ A script to handle the collection and pre-processing for the SciDAS work-flow.
 
 ### 'GenomeAssembly.py'
 
-- [ ] Write `GenomeAssembly` unit tests.
-- [ ] Comment the `GenomeAssembly` class.
+- [x] Write `GenomeAssembly` unit tests.
+- [x] Comment the `GenomeAssembly` class.
 
 ### 'EnsemblDatabase.py'
 
@@ -53,5 +54,4 @@ A script to handle the collection and pre-processing for the SciDAS work-flow.
 
 ### '__main__.py'
 
-- [ ] Refactor CLI interface, consider using Click.
-
+- [x] Refactor CLI interface using Click.

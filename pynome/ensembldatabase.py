@@ -20,7 +20,7 @@ import subprocess
 from tqdm import tqdm
 
 # Intra-package imports.
-from pynome.GenomeDatabase import GenomeDatabase
+from pynome.genomedatabase import GenomeDatabase
 from pynome.utils import cd, crawl_ftp_dir
 
 

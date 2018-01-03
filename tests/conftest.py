@@ -3,9 +3,12 @@ This file is run as part of pytest.
 It's use in this application is to load command line options.
 """
 
+# General testing imports.
 import pytest
-# import logging
-from pynome.ensembl import EnsemblDatabase
+
+# Pynome-specific imports.
+from pynome.ensembldatabase import EnsemblDatabase
+from pynome.sqlitestorage import SQLiteStorage
 
 
 def pytest_addoption(parser):
@@ -31,14 +34,17 @@ def genome(request):
 
 @pytest.fixture(scope='module')
 def create_database(database, genome):
-    # database_path='/media/tylerbiggs/genomic/test.db',
-    # download_path='/media/tylerbiggs/genomic/test_genomes'):
-    """Create a database instance. The empty path should create the database
-    in memory. Without scope='module', this would be run for every test."""
-    # logging.info('\nCreating the database.\n')
-    print('Starting pytest database fixture.')
-    database_instance = EnsemblDatabase(
+    """
+    Create a database instance. The empty path should create the database
+    in memory. Without scope='module', this would be run for every test.
+    """
+    # Create an instance of the SQLiteStorage class.
+    sql_storage = SQLiteStorage(
         download_path=genome,
         database_path=database,
+    )
+
+    database_instance = EnsemblDatabase(
+        storage=sql_storage
     )
     yield database_instance

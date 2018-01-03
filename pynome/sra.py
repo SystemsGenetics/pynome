@@ -43,17 +43,17 @@ FETCH = ('https://eutils.ncbi.nlm.nih.gov'
          '/entrez/eutils/efetch.fcgi?db=sra&id=')
 
 
-def download_sra_json(taxonomy_id_list, base_download_path):
+def download_sra_json(base_download_path, taxonomy_id_list):
     """
     Downloads the SRA metadata for each ID found in the
     `taxonomy_id_list`. These files are saved under a series of
     two-digit file  paths generated from the SRA accession number.
 
-    :param taxonomy_id_list:
-        A list of taxonomy identification values.
     :param base_download_path:
         The base location where the SRA accession number folders
         will be placed.
+    :param taxonomy_id_list:
+        A list of taxonomy identification values.
     :return:
         A list of success or failures, indexed the same as the
         input `taxonomy_id_list`.
@@ -353,6 +353,14 @@ def chunk_accession_id(accession_id, chunk_size=2):
 
     # Assign the remaining numbers.
     sra_numbers = accession_id[3:]
+
+    # Check if an underscore exists in the ID, if so, remove the underscore
+    # and all other trailing characters. These will not be used in the
+    # construction of any filepaths.
+    # Split after '_', one time, and return the first item in that
+    # resulting list. If the separator is not present, the entire
+    # string will be returned.
+    sra_numbers = sra_numbers.split('_', 1)[0]
 
     # Create the output list, the first entry should be the letters.
     out_list = [sra_letters]

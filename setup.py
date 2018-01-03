@@ -16,10 +16,12 @@ setup(
     author='Tyler Biggs',
     author_email='biggstd@gmail.com',
     version='0.1',
-    packages=find_packages(),
+    packages=find_packages(exclude=['tests']),
     py_modules=['pynome'],
     install_requires=[
         'Click',
+        'pandas',
+        'ftplib',
     ],
     entry_points={
         'console_scripts': [

@@ -7,50 +7,46 @@ Run from the top dir via::
     ``pytest -sv tests\database_test.py``
 """
 
-import pytest
-import logging
-from pynome.database import GenomeDatabase
+# import logging
 
-logging.getLogger(__name__)
-logging.basicConfig(
-    filename='database_test.log',
-    filemode='w',
-    level='DEBUG'
-)
+from pynome.genomeassembly import GenomeAssembly
 
-
-@pytest.fixture(scope='module')
-def create_database(database_path=':memory:', download_path='tmp'):
-    """Create a database instance. The empty path should create the database
-    in memory. Without scope='module', this would be run for every test."""
-    logging.info('\nCreating the database.\n')
-    database_instance = GenomeDatabase(
-        database_path=':memory:',
-        download_path='tmp')
-    yield database_instance
+# logging.getLogger(__name__)
+# logging.basicConfig(
+#     filename='database_test.log',
+#     filemode='w',
+#     level='DEBUG'
+# )
 
 
 def test_save_genome(create_database):
     """Test saving databases."""
     arguments1 = {
-        'taxonomic_name': 'Acyrthosiphon_pisum',
-        'fasta_uri': 'uri/to/fasta/file.fa.gz',
-        'fasta_size': 1234
-    }
-    arguments2 = {
-        'taxonomic_name': 'Acyrthosiphon_pisum',
-        'gff3_uri': 'uri/to/gff3/',
-        'gff3_size': 4321
-    }
-    arguments3 = {
-        'taxonomic_name': 'Acyrthosiphon_pisum',
-        'local_path': 'local/path/to/TEST/',
-        'fasta_size': None
+        'genus': 'Rozella',
+        'speices': 'allomycis',
+        'fasta_uri': (
+            'pub/fungi/release-36/fasta/fungi_rozellomycota1_collection/'
+            'rozella_allomycis_csf55/dna_index/Rozella_allomycis_csf55.'
+            'Rozella_k41_t100.dna.toplevel.fa.gz'),
+        'fasta_size': 3700778
     }
 
-    create_database.save_genome(**arguments1)
-    create_database.save_genome(**arguments2)
-    create_database.save_genome(**arguments3)
+    test_assembly_1 = GenomeAssembly(**arguments1)
+
+    arguments2 = {
+        'genus': 'Rozella',
+        'speices': 'allomycis',
+        'gff3_uri': (
+            'pub/fungi/release-36/gff3/fungi_rozellomycota1_collection/'
+            'rozella_allomycis_csf55/Rozella_allomycis_csf55.'
+            'Rozella_k41_t100.36.gff3.gz'),
+        'gff3_size': 965829
+    }
+
+    test_assembly_2 = GenomeAssembly(**arguments2)
+
+    create_database.save_genome(test_assembly_1)
+    create_database.save_genome(test_assembly_2)
 
 
 def test_get_all_genomes(create_database):

@@ -8,13 +8,13 @@ SRA Testing Module
 import csv
 from pynome.sra import (
     build_sra_query_string,
-    run_sra_query,
+    chunk_accession_id,
 )
 
 
 # Import the sample list of taxonomy IDs from the test_data file.
-with open('test_data/taxonomy_ids.txt', 'r') as sra_id_file:
-    sra_list = [id for id in csv.reader(sra_id_file)]
+# with open('test_data/taxonomy_ids.txt', 'r') as sra_id_file:
+#     sra_list = [id for id in csv.reader(sra_id_file)]
 
 
 def test_build_sra_query_string():
@@ -33,8 +33,11 @@ def test_build_sra_query_string():
     assert build_sra_query_string('3702') == expected_output
 
 
-def test_run_sra_query():
+def test_chunk_accession_id():
     """
-
-    :return:
+    Test breaking SRA accession strings into component lists
+    for future generation of filepaths.
     """
+    assert chunk_accession_id('SRR447617') == ['SRR', '44', '76', '17']
+    assert chunk_accession_id('SRR2106895') == ['SRR', '21', '06', '89']
+    assert chunk_accession_id('SRR2106895_1') == ['SRR', '21', '06', '89']

@@ -2,13 +2,13 @@
 
 
 class GenomeAssembly:
+    """
+    This models a Genome Assembly.
+    """
 
-    def __init__(self, taxonomic_name, **kwargs):
+    def __init__(self, **kwargs):
         """
         Creates a new GenomeAssembly instances.
-
-        :param taxonomic_name:
-          The taxonomic name of the species that the assembly belongs to.
 
         :param kwargs:
           A list of key/value pairs defining the genome assembly.  The
@@ -65,10 +65,11 @@ class GenomeAssembly:
         # Check if the intraspecific name is populated.
         if self.intraspecific_name is not None:
             # Construct the taxonomic_name from other attributes.
-            return '_'.join(self.genus, self.species, self.intraspecific_name)
+            return '_'.join(
+                [self.genus, self.species, self.intraspecific_name])
         # Otherwise, simply return the genus and species separated by an '_'.
         else:
-            return '_'.join(self.genus, self.species)
+            return '_'.join([self.genus, self.species])
 
     @property
     def base_filename(self):
@@ -78,19 +79,16 @@ class GenomeAssembly:
         # Check if the intraspecific name is populated.
         if self.intraspecific_name is not None:
             # Construct the base_filename from other attributes.
-            return ''.join(
+            return ''.join([
                 self.genus, '_',
                 self.species, '_',
                 self.intraspecific_name, '-',
-                self.assembly_name)
+                self.assembly_name])
         else:
-            return ''.join(
+            return ''.join([
                 self.genus, '_',
                 self.species, '-',
-                self.assembly_name)
+                self.assembly_name])
 
     def __str__(self):
         return str(self.taxonomic_name)
-
-    # def save(self):
-    #     self.storage.save()
