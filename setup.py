@@ -18,7 +18,7 @@ setup(
     packages=find_packages(),
     install_requires=[
         'Click',
-        'SQLAlchemy'
+        'SQLAlchemy',
         'tqdm',
         'pandas',
         'xmltodict',
