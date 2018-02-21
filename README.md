@@ -27,7 +27,9 @@ download desired genome assembly files from the
 - [x] assemblystorage.add_source()
 - [x] assemblystorage.prepare()
 - [x] Consider the changes needed to the CLI for SRA functionality.
-- [ ] Download function from CLI interface needs to call all needed ensembl functions
+- [x] Download function from CLI interface needs to call all needed ensembl functions
+- [x] Write metadata.json creation function.
+- [x] Edit output of sra json to meta.json.
 - [ ] assemblystorage.push_irods()
 - [ ] cli.push_irods()
 - [ ] Create Docker image.
@@ -36,5 +38,27 @@ download desired genome assembly files from the
 
 ## Installation
 
-- [ ] Go over setup.py
+```bash
+$ python setup.py install
+```
+
+- [x] Go over setup.py
 - [ ] Write instructions.
+
+## Usage
+
+```bash
+$ pynome discover
+$ pynome list
+$ pynome download
+$ pynome sra
+$ pynome prepare
+```
+
+```bash
+pynome discover && pynome download && pynome sra && pynome prepare
+```
+
+```bash
+pynome discover download sra prepare
+```

@@ -11,6 +11,7 @@
 
 # General Python imports.
 import os
+import json
 import ftplib
 import itertools
 import logging
@@ -84,6 +85,12 @@ class EnsemblDatabase(AssemblyDatabase):
         self.bad_filenames = bad_filenames
         self.crawl_urls = crawl_urls
         self.assemblies = list()
+
+        # Define the base_path. This attribute is set by AssemblyStorage,
+        # upon undergoing an add_source(). This value defaults a folder
+        # named "pynome_download" in the cwd if this does not occur.
+        self.base_path = os.path.join(os.getcwd(), 'pynome_download')
+        self.base_genome_path = os.path.join(self.base_path, 'Genome')
 
         # Define private attributes of the class.
         self.metadata_df = None
@@ -337,14 +344,14 @@ class EnsemblDatabase(AssemblyDatabase):
         # Close the FTP connection.
         self.ftp.quit()
 
-    def download_metadata(self, base_path=None):
+    def download_metadata(self):
         """
         """
-        if base_path is None:
-            base_path = os.path.join(os.getcwd(), 'genomes')
 
         # Build the path to the local file.
-        target_file = os.path.join(base_path, 'species.txt')
+        target_file = os.path.join(self.base_path, 'species.txt')
+        print(f'Downloading species.txt to {target_file}.')
+        logging.debug(f'Downloading species.txt to {target_file}.')
 
         # Check if the file already exists, and that it is not 0 bytes.
         if os.path.isfile(target_file) and os.path.getsize(target_file) > 0:
@@ -357,14 +364,13 @@ class EnsemblDatabase(AssemblyDatabase):
                 index_col=False)
             return
 
+        # Otherwise, ensure any intermediate files are created as needed.
+        if not os.path.exists(self.base_path):
+            os.makedirs(self.base_path)
+
         # Connect to the FTP server and login with anonymous credentials.
-        # TODO: Change the FTP connection to use a context manager, then
-        # refactor this function so that progress bars can be more easily
-        # implemented by the cli.
         self.ftp.connect(self.ftp_url)
         self.ftp.login()
-
-        # size_estimate = self.ftp.size(self.metadata_uri)
 
         self.ftp.retrbinary(
             cmd='RETR {}'.format(self.metadata_uri),
@@ -382,14 +388,9 @@ class EnsemblDatabase(AssemblyDatabase):
             sep="\t",
             index_col=False)
 
-    def download(self, assemblies, base_path=None):
+    def download(self, assemblies):
         """
         """
-        # TODO: Consider how this function is called from AssemblyStorage.
-        # If a base_path is not given, create a folder called 'genomes',
-        # and place it in the current directory.
-        if base_path is None:
-            base_path = os.path.join(os.getcwd(), 'genomes')
 
         # Connect to the FTP server and login with anonymous credentials.
         self.ftp.connect(self.ftp_url)
@@ -398,7 +399,8 @@ class EnsemblDatabase(AssemblyDatabase):
         for gen in tqdm(assemblies, desc='Downloading Assemblies...'):
 
             # Create the base_path for this genome assembly.
-            curr_base_path = os.path.join(base_path, gen.base_filepath)
+            curr_base_path = os.path.join(
+                self.base_genome_path, gen.base_filepath)
 
             # Create the intermediary folders if they do not exist.
             if not os.path.exists(curr_base_path):
@@ -424,6 +426,56 @@ class EnsemblDatabase(AssemblyDatabase):
 
         # Close the FTP connection.
         self.ftp.quit()
+
+    def prep_assembly_json(self, tax_name):
+        """Reads the species.txt for tax_name, and generates a json entry.
+
+        :param tax_name:
+
+        :returns:
+            A json object for tax_name.
+        """
+        tax_metadata = self.metadata_df[self.metadata_df['species'].str.match(
+            tax_name.lower()).values]
+
+        # Check to ensure a set of values was found.
+        if tax_metadata.empty:
+            return None
+
+        tax_metadata = tax_metadata.to_json(orient='records')
+
+        return json.loads(tax_metadata)
+
+    def write_metadata_jsons(self, assemblies=None):
+        """Writes a .json metadata file for each given assembly.
+        """
+        if assemblies is None:
+            assemblies = self.assemblies
+
+        for gen in assemblies:
+
+            # Build the corresponding json file.
+            curr_json = self.prep_assembly_json(gen.taxonomy_name)
+
+            # Ignore this entry if it was not found.
+            if curr_json is None:
+                continue
+
+            # Create the base_path for this genome assembly.
+            curr_base_path = os.path.join(
+                self.base_genome_path, gen.base_filepath)
+
+            # Create the intermediary folders if they do not exist.
+            if not os.path.exists(curr_base_path):
+                os.makedirs(curr_base_path)
+
+            file_name = os.path.join(
+                curr_base_path,
+                gen.base_filename + '.meta.json')
+
+            # Otherwise, write this json file.
+            with open(file_name, 'w') as json_file:
+                json.dump(curr_json, json_file)
 
     def find_taxonomy_id(self, tax_name):
         """Searches the self.metadata_df attribute for a matching taxonomy ID.

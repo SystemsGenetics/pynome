@@ -100,6 +100,7 @@ class Assembly(Base):
             '\n'
             f'Base filename:         {self.base_filename}\n'
             f'Base filepath:         {self.base_filepath}\n'
+            f'Taxonomy Name:         {self.taxonomy_name}\n'
             f'Species:               {self.species}\n'
             f'Genus:                 {self.genus}\n'
             f'Intraspecific Name:    {self.intraspecific_name}\n'

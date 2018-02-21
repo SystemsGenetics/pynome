@@ -32,7 +32,9 @@ import os
 import json
 import urllib
 import collections
+
 import xmltodict
+from tqdm import tqdm
 
 
 # Define the query and fetch URL strings.
@@ -64,7 +66,7 @@ def download_sra_json(base_download_path, taxonomy_id_list):
     status_dict = collections.defaultdict(list)
 
     # For each of the taxonomy ID numbers provided.
-    for tid in taxonomy_id_list:
+    for tid in tqdm(taxonomy_id_list):
 
         # Generate the corresponding query.
         query = build_sra_query_string(tid)

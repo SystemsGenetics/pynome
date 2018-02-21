@@ -45,18 +45,13 @@ def test_AssemblyStorage(test_config, test_ed):
     for pk, update_dict in tax_id_update:
         test_assembly_storage.update_assembly(pk, update_dict)
 
+    test_assembly_storage.sources['ensembl'].write_metadata_jsons()
+
     # Assign all found genomes to a list.
     found_genomes = test_assembly_storage.query_local_assemblies()
 
     # Download the SRA files of the found genomes.
     test_assembly_storage.download_all_sra()
-
-    # Get the taxonomy_IDs from the SQLite database.
-    # tax_ids = [gen.taxonomy_id for gen in found_genomes]
-    # print(f'Taxonomy IDs: {tax_ids}')
-
-    # Use those taxonomy IDs to fetch the SRA metadata files.
-    # download_sra_json(test_assembly_storage.base_sra_path, tax_ids)
 
     # test_assembly_storage.download(found_genomes)
     test_assembly_storage.download_all()

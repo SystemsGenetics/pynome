@@ -65,7 +65,7 @@ class AssemblyStorage:
         # If no base_path is given, creata a folder named "Genomes" in
         # the current working directory for use as the base_path.
         if base_path is None:
-            base_path = 'genomes'
+            base_path = 'pynome_download'
 
         self.base_path = base_path
 
@@ -75,12 +75,11 @@ class AssemblyStorage:
 
         # Define the public attributes of the class.
         self.sources = dict()
-
-        # self.sqlite_session = sqlite_session
         self.irods_base_path = irods_base_path
-        Session = sessionmaker()
+
 
         # Prepare the SQLite engine and session.
+        Session = sessionmaker()
         self.engine = create_engine(self.sqlite_path)
         # Create the tables.
         Base.metadata.create_all(self.engine)
@@ -113,6 +112,8 @@ class AssemblyStorage:
         """
         self.session.query(Assembly).filter_by(
             base_filename=assembly_base_filename).update(update_dict)
+
+        self.session.commit()
 
     def query_local_assemblies(self):
         """Queries the local SQLite database, and returns a list of all
@@ -191,7 +192,7 @@ class AssemblyStorage:
             src_assemblies = self.query_local_assemblies_by(
                 'source_database', src_name)
 
-            source.download(src_assemblies, self.base_genome_path)
+            source.download(src_assemblies)
 
     def download_all_sra(self):
         """
@@ -202,6 +203,10 @@ class AssemblyStorage:
 
     def add_source(self, new_source):
         """Append a new source to the sources dictionary."""
+        # Set the base_path attribute of the new source.
+        new_source.base_path = self.base_path
+        new_source.base_genome_path = self.base_genome_path
+
         # Get the name attribute of this new database.
         db_name = new_source.database_name
 
