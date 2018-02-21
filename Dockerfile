@@ -14,13 +14,14 @@ RUN apt-get install -y git
 RUN python3.6 -m pip install pip --upgrade
 RUN python3.6 -m pip install wheel
 
-# Install Pynome's requirements.
-RUN python3.6 -m pip install -r requirements.txt
 
 RUN mkdir /opt/pynome
 
 # Copy the pynome dir.
 COPY . /opt/pynome/
+
+# Install Pynome's requirements.
+RUN python3.6 -m pip install -r /opt/pynome/requirements.txt
 
 # Install Pynome.
 RUN python3.6 /opt/pynome/setup.py
