@@ -21,7 +21,7 @@ RUN mkdir /opt/pynome
 COPY . /opt/pynome/
 
 # Install Pynome's requirements.
-RUN python3.6 -m pip install -r /opt/pynome/requirements.txt
+# RUN python3.6 -m pip install -r /opt/pynome/requirements.txt
 
 # Install Pynome.
 RUN python3.6 /opt/pynome/setup.py install
