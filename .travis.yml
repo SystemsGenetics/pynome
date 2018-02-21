@@ -1,3 +1,4 @@
+# Control what github branches are testsed.
 branches:
     only:
         - refactor
