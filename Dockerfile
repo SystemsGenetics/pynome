@@ -20,11 +20,8 @@ RUN mkdir /opt/pynome
 # Copy the pynome dir.
 COPY . /opt/pynome/
 
-# Install Pynome's requirements.
-# RUN python3.6 -m pip install -r /opt/pynome/requirements.txt
-
 # Install Pynome.
-RUN python3.6 /opt/pynome/setup.py install
+RUN python3.6 -m pip install .
 
 # Copy the config file to the image.
 COPY /opt/pynome/pynome_config.json /pynome/pynome_config.json
