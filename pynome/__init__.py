@@ -1,4 +1,3 @@
-"""
-Initialization module for pynome.
-"""
-__docformat__ = 'reStructuredText'  # Set the formatting for the documentation
+import logging
+
+logging.basicConfig(filename='pynome_test.log', level=logging.DEBUG)

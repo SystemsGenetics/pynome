@@ -31,8 +31,8 @@ Filter criteria
 import os
 import json
 import urllib
-import xmltodict
 import collections
+import xmltodict
 
 
 # Define the query and fetch URL strings.
@@ -61,7 +61,7 @@ def download_sra_json(base_download_path, taxonomy_id_list):
 
     # Create the output status dictionary to track whether a given
     # taxonomy ID was downloaded successfully or not.
-    status_dict = collections.defaultdict()
+    status_dict = collections.defaultdict(list)
 
     # For each of the taxonomy ID numbers provided.
     for tid in taxonomy_id_list:
@@ -95,8 +95,10 @@ def download_sra_json(base_download_path, taxonomy_id_list):
                     # print('sra_id', sra_id)
 
                     # Create the broken up path.
-                    path = build_sra_path(sra_id)
+                    sra_path = build_sra_path(sra_id)
                     # print(path)
+
+                    path = os.path.join(base_download_path, sra_path, sra_id)
 
                     # Write the accession number to the output dictionary.
                     status_dict[tid].extend(sra_id)
@@ -106,12 +108,10 @@ def download_sra_json(base_download_path, taxonomy_id_list):
                         os.makedirs(path)
 
                     # Write the file.
-                    with open(
-                        os.path.join(
-                            path, sra_id + '.sra.json'), 'w') as nfp:
+                    with open(os.path.join(path, sra_id + '.sra.json'), 'w') as nfp:
                         nfp.write(json.dumps(fetch_result))
 
-    return status_dict
+    # return status_dict
 
 
 def get_SRA_accession(fetched_dict):
@@ -325,7 +325,7 @@ def build_sra_path(sra_id_str):
     # Create the directory path on the system if it
     # does not already exist.
     out_path = os.path.join(
-        'RNA-Seq',
+        # 'RNA-Seq',
         'SRA',
         *chunked_id)
 

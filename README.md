@@ -1,57 +1,40 @@
 # Pynome
 
-A script to handle the collection and pre-processing for the SciDAS work-flow.
+Pynome, a Python command line interface tool, provides the user with a way to
+download desired genome assembly files from the
+[Ensembl](https://www.ensembl.org/) database.
 
-## To Do:
 
-- [x] Gather todos here.
-- [ ] Refactor command line interface
-- [ ] Refactor unit tests.
-- [x] Add a `setup.py`.
-- [ ] Re-comment `EnsemblDatabase.py`.
-- [x] Write SRA functionality.
-- [ ] Write SRA test functions and test sra functionality.
-- [ ] Refactor `EnsemblDatabase`.
-- [ ] Add `setuptools` integration.
+## TODO
 
-### `cli.py`
+- [x] Gather TODOs.
+- [x] Add metadata json files - one with pynome info, the other with ensembl info.
+- [x] Factor out cd from prepare methods.
+- [x] Docstring for prepare methods.
+- [x] Update hisat2 indexing to use more than one CPU.
+- [x] Consider API linkage to the crawl command.
+- [x] assembly.delete() -- move to AssemblyStorage
+- [x] assembly.prepare() -- move to AssemblyStorage
+- [x] assembly.update() -- move to AssemblyStorage
+- [x] Create api for selecting assemblies by:
+  + Species
+  + Genus
+  + Intraspecific_name
+  + Assembly_ID
+- [x] Add a column that records the source remote database.
+- [x] assemblystorage.download()
+- [x] assemblystorage.query_local_assemblies_by()
+- [x] assemblystorage.add_source()
+- [x] assemblystorage.prepare()
+- [x] Consider the changes needed to the CLI for SRA functionality.
+- [ ] Download function from CLI interface needs to call all needed ensembl functions
+- [ ] assemblystorage.push_irods()
+- [ ] cli.push_irods()
+- [ ] Create Docker image.
+- [ ] Add Travis-CI integration.
 
-- [x] Create command group. ie `pynome command --arguments.`
-- [ ] SRA - create directory from accession number.
-- [ ] SRA - download SRA metadata.
 
-### `utils.py`
+## Installation
 
-- [ ] Comment the `cd` class.
-- [ ] Completely comment the `crawl_ftp_dir` class.
-
-### 'Storage.py'
-
-- [ ] Comment the `Storage` class.
-
-### 'sra.py'
-
-- [ ] Write SRA unit tests.
-- [ ] Add a trailing underscore handler for the chunk_accession_id() function.
-
-### 'SQLiteStorage.py'
-
-- [ ] Write SRA unit tests.
-
-### 'GenomeDatabase.py'
-
-- [ ] Write `GenomeDatabase` unit tests.
-
-### 'GenomeAssembly.py'
-
-- [x] Write `GenomeAssembly` unit tests.
-- [x] Comment the `GenomeAssembly` class.
-
-### 'EnsemblDatabase.py'
-
-- [ ] Fix exception handling within.
-- [ ] Write `GenomeAssembly` unit tests.
-
-### '__main__.py'
-
-- [x] Refactor CLI interface using Click.
+- [ ] Go over setup.py
+- [ ] Write instructions.

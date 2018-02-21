@@ -1,31 +1,34 @@
-"""
-Utilities for Pynome
+"""This module contains utilities for Pynome not specific to any class.
+
+.. module:: untils
+    :platform: Unix
+    :synopsis: Functions that are needed by Pynome, but are not specific
+    to any class or module.
+
+..moduleauthor:: Tyler Biggs <biggstd@gmail.com>
 """
 
+# Import general Python packages.
 import os
+import json
+import logging
+from sqlalchemy import create_engine
 
 
-class cd:
+def read_json_config(config_file='pynome_config.json'):
+    """Reads a json config file for required variables.
     """
-    Context manager for changing the current working directory.
-    Borrowed from Stackoverflow:
-    stackoverflow.com/questions/431684/how-do-i-cd-in-python
-    """
 
-    def __init__(self, newPath):
-        self.newPath = os.path.expanduser(newPath)
+    # Open the file, get the informaiton, then close it.
+    with open(config_file) as cfg:
+        config_dict = json.load(cfg)
 
-    def __enter__(self):
-        self.savedPath = os.getcwd()
-        os.chdir(self.newPath)
-
-    def __exit__(self, etype, value, traceback):
-        os.chdir(self.savedPath)
+    # Return the loaded configuration dictionary.
+    return config_dict
 
 
-def crawl_ftp_dir(database, top_dir, parsing_function):
-    """
-    Recursively crawl a target directory. Takes as an input a
+def crawl_ftp_dir(ftp, top_dir, parsing_function, ignored_dirs):
+    """Recursively crawl a target directory. Takes as an input a
     target directory and a parsing function. The ftplib.FTP.dir()
     function is used to retrieve a directory listing, line by line,
     in string format. These are appended to a newly generated list.
@@ -33,36 +36,52 @@ def crawl_ftp_dir(database, top_dir, parsing_function):
 
     :param database:
         An instance of ftplib.FTP()
+
     :param top_dir:
         The directory from which contents will be retrieved.
+
     :param parsing_function:
         The function to parse each non-directory result.
+
     """
+    logging.debug(f'Top dir: {top_dir}')
+
     # Create an empty list to hold the callback
     retrieved_dir_list = []
 
-    def dir_check(dir_value):
-        """
-        Checks if the input: dir_value is a directory. Assumes the input
-        will be in the following format:
+    # The last argument passed to ftplib.dir acts as a callback if it
+    # is a function. In this case the given function is a call to
+    # append() the retrieved directory list.
+    ftp.dir(top_dir, retrieved_dir_list.append)
 
-             ``"drwxr-sr-x  2 ftp   ftp    4096 Jan 13  2015 filename"``
-
-        This works by checking the first letter of the input string,
-        and returns True for a directory or False otherwise.
-        """
-        # TODO: Comment this.
-        if dir_value[0][0] == 'd':
-            return True
-        else:
-            return False
-
-    database.ftp.dir(top_dir, retrieved_dir_list.append)
-
+    # For each line / directory listing retrieved.
     for line in retrieved_dir_list:
-        if dir_check(line):  # Then the line is a dir and should be crawled.
-            target_dir = ''.join((top_dir, line.split()[-1], '/'))
-            crawl_ftp_dir(database, target_dir, parsing_function)
-        else:  # otherwise the line must be parsed.
-            parsing_function(database, line, top_dir)
-    return
+
+        # Split the line by whitespace.
+        split_line = line.split()
+
+        # Check if this entry is a directory.
+        if split_line[0][0] == 'd':
+
+            # If so, ensure it is not one of the dirs to be ignored.
+            if split_line[-1] in ignored_dirs:
+
+                # If this is the case, simply ignore this entry and
+                # continue on this loop listing.
+                continue
+
+            # Otherwise this is a valid directory to start a new crawl in.
+            else:
+
+                # Construct the new top directory to start a crawl.
+                target_dir = ''.join((top_dir, line.split()[-1], '/'))
+                # Start a new crawl at this directory.
+                crawl_ftp_dir(ftp, target_dir, parsing_function, ignored_dirs)
+
+        # Check to make sure the filename is not on the 'bad list'
+        # elif any(bw in split_line[-1] for bw in bad_words):
+        #     continue
+
+        # Otherwise the line is not a directory, and must be parsed.
+        else:
+            parsing_function(line, top_dir)

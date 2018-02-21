@@ -1,4 +1,0 @@
-pub/fungi/release-36/gff3/fungi_rozellomycota1_collection/
-pub/fungi/release-36/fasta/fungi_rozellomycota1_collection/
-pub/fungi/release-36/gff3/fungi_ascomycota1_collection/_candida_glabrata/
-pub/fungi/release-36/fasta/fungi_ascomycota1_collection/_candida_glabrata/

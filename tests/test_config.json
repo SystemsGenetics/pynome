@@ -1,0 +1,24 @@
+{
+  "ensembl_config":{
+    "name": "Ensembl Database",
+    "ftp_url": "ftp.ensemblgenomes.org",
+    "data_types": ["gff3", "fasta"],
+    "kingdoms": ["fungi", "metazoa", "plants", "protists"],
+    "ignored_dirs": ["cdna", "cds", "dna_index", "ncrna", "pep"],
+    "release_version": "release-38",
+    "description": "The Ensembl genome annotation system.",
+    "url": "http://ensemblgenomes.org/",
+    "bad_filenames": ["chromosome", "abinitio", "README", "CHECKSUMS"],
+    "crawl_urls": [
+      "/pub/fungi/release-38/fasta/fungi_ascomycota1_collection/_candida_glabrata/",
+      "/pub/fungi/release-38/fasta/fungi_ascomycota1_collection/acremonium_chrysogenum_atcc_11550/",
+      "/pub/fungi/release-38/gff3/fungi_ascomycota1_collection/acremonium_chrysogenum_atcc_11550/",
+      "/pub/fungi/release-38/gff3/fungi_ascomycota1_collection/_candida_glabrata/"
+    ]
+  },
+  "storage_config":{
+    "irods_base_path": "/ScidasZone/Sysbio/genomes/",
+    "sqlite_path": "sqlite:///:memory:",
+    "base_path": "/media/tylerbiggs/genomic/genTest"
+  }
+}

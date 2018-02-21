@@ -1,31 +1,34 @@
-# -*- coding: utf-8 -*-
+"""This is the setup script for Pynome.
+
+It should install Pynome on the local system / environment.
 
 """
-============
-Pynome Setup
-============
 
-
-
-"""
 
 from setuptools import setup, find_packages
 
+
+# A good blog entry on entry points:
+# http://amir.rachum.com/blog/2017/07/28/python-entry-points/
+# Run the setup function to install the program.
+
 setup(
     name='pynome',
-    author='Tyler Biggs',
-    author_email='biggstd@gmail.com',
-    version='0.1',
-    packages=find_packages(exclude=['tests']),
-    py_modules=['pynome'],
+    version='0.3',
+    packages=find_packages(),
     install_requires=[
         'Click',
+        'SQLAlchemy'
+        'tqdm',
         'pandas',
-        'ftplib',
+        'xmltodict',
     ],
     entry_points={
+        # Console scripts are those that can be run directly from the terminal.
+        # String entries here will be the cli invocation for their corresponding
+        # python modulefiles:functions.
         'console_scripts': [
-            'pynome = pynome.cli:entry_point'
+            'pynome = pynome.cli:pynome',
         ]
-    },
+    }
 )

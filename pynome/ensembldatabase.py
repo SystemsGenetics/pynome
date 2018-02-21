@@ -1,624 +1,487 @@
-# -*- coding: utf-8 -*-
+"""This module contains the EnsemblDatabase class.
 
+.. module:: ensembldatabase
+    :platform: Unix
+    :synopsis: A child class of AssemblyDatabase that implements Ensembl
+    specific functions for crawling, parsing and downloading genome
+    assembly files.
+
+.. moduleauthor:: Tyler Biggs <biggstd@gmail.com>
 """
-================
-Ensembl Database
-================
 
-The ensembl database module. A child class of the `pynome.GenomeDatabase`
-class, this module cotains all code directly related to connecting and
-parsing data from the ensembl geneome database.
-"""
-
-# Basic Python imports.
+# General Python imports.
 import os
-import pandas
 import ftplib
-import logging
 import itertools
-import subprocess
+import logging
+
+# Externam package imports.
+import pandas
 from tqdm import tqdm
 
-# Intra-package imports.
-from pynome.genomedatabase import GenomeDatabase
-from pynome.utils import cd, crawl_ftp_dir
+# Inter-package imports.
+from pynome.assembly import Assembly
+from pynome.assemblydatabase import AssemblyDatabase
+from pynome.utils import crawl_ftp_dir
 
 
-# Declare constants.
-ENSEMBL_FTP_URI = 'ftp.ensemblgenomes.org'
-ENSEMBL_DATA_TYPES = ['gff3', 'fasta']
-ENSEMBL_KINGDOMS = ['fungi', 'metazoa', 'plants', 'protists']
+# pylint: disable=too-many-instance-attributes
 
 
-class EnsemblDatabase(GenomeDatabase):
-    """
-    The EnsemblDatabase class. This handles finding and downloading
-    genomes from the ensembl genome database. The database url is:
-
-        ``ftp.ensemblgenomes.org``
-
-    It does so by recursively walking the ftp directory. It only collects
-    those genomes that have a ``*.gff3.gz`` or a ``*.fa.gz`` file.
+class EnsemblDatabase(AssemblyDatabase):
+    """Class to handle the crawling, parsing and downloading of
+    genome assembly files from the Ensembl database.
     """
 
-    def __init__(self, release_version=37, **kwargs):
+    def __init__(self, ignored_dirs, data_types, ftp_url, kingdoms,
+                 release_version, bad_filenames, crawl_urls=None, **kwargs):
+        """The initialization function for EnsemblDatabase.
 
-        # Call parent class init function.
+        Calls the constructor of AssemblyDatabase, and creates
+        attributes and properties specific to the Ensembl database.
+
+        :param ignored_dirs:
+            Names of directories the crawler should never enter.
+
+        :param ftp_url:
+            The base URL of the ensembl FTP server to be connected to.
+
+        :param data_types:
+            The types of data to be considered. Used in construction of
+            starting url paths for the crawler. Parsers only currenlty
+            support the 'gff3' and 'fasta' data types.
+
+        :param kingdoms:
+            A list of genome kingdoms to be used in the construction of
+            starting url paths. Available options include ['fungi', 'metazoa',
+            'plants', 'protists']
+
+        :param release_version:
+            The release version of Ensembl to be used.
+
+        :param bad_filenames:
+            A list of files to be ignored by the crawl utility.
+
+        :param [crawl_urls]:
+            An optinal list of urls. If given these will be used as starting
+            points for calls to crawl().
+
+        :param [**kwargs]:
+            Remaining arguments are passed to AssemblyDatabase.
+        """
+
+        # Call the parent constructor / __init__ function, pass keywords
+        # to the parent constructor.
         super().__init__(**kwargs)
 
-        # Define private attributes / properties. These are the private
-        # values that setter functions will store their values in.
-        self._release_version = None
-        self._release_number = None
-
-        # Assign attributes from user input. The setter for
-        # release_version populates release version and number.
-        self.release_version = release_version
-
-        # Create an instance of the FTP() class for the database.
+        # Define public attributes of the class.
         self.ftp = ftplib.FTP()
+        self.ignored_dirs = ignored_dirs
+        self.ftp_url = ftp_url
+        self.data_types = data_types
+        self.kingdoms = kingdoms
+        self.release_version = release_version
+        self.bad_filenames = bad_filenames
+        self.crawl_urls = crawl_urls
+        self.assemblies = list()
 
-        # Create an attribute that for the pandas dataframe of the
-        # species metadata, as parsed from species.txt on ensembl.
-        self.species_metadata = None
+        # Define private attributes of the class.
+        self.metadata_df = None
+        self.database_name = 'ensembl'
 
     @property
-    def release_version(self):
+    def metadata_uri(self):
+        """Getter function for the metadata_uri property.
+
+        Builds the sub-directory of the Ensembl FTP server wherein the
+        species.txt metadata file can be found.
         """
-        Release version property. Should be in the form:
-            ``"release-#", "release-36"``
-        """
-        return self._release_version
+        return '/'.join(('/pub', self.release_version, 'species.txt'))
 
-    @release_version.setter
-    def release_version(self, value):
-        """
-        Setter for the release_version. Accepts an input integer and returns
-        a string in the form: 'release-##'
-        """
-        self._release_number = value
-        self._release_version = 'release-' + str(value)
+    @property
+    def top_dirs(self):
+        """Getter function for the top_dirs property.
 
-    def generate_metadata_uri(self):
-        """
-        Generates a URI that will locate the metadata. This URI is of the
-        form:
-
-        ``/pub/release-36/species.txt``
-
-        :returns:
-
-
-        ..todo::
-            This functions design is bizzare and should be refactored.
-            The only other function that uses it appears to be
-            `download_metadata()`.
-
+        Builds a list of URIs that will act as the starting points for the
+        crawling function.
         """
 
-        # Create a dictonary to store the uri strings to be generated.
-        uri_dict = {}
+        # Create the list to be output.
+        uri_list = list()
 
-        # This is the name of the file on the remote server.
-        species_txt = 'species.txt'
+        # Generate the ordered pairs of datatypes and kingdoms.
+        datatype_kingdom_pairs = itertools.product(
+            self.data_types, self.kingdoms)
 
-        # Join by the '/' character to build the uri.
-        uri = '/'.join(('pub', self._release_version, species_txt))
-
-        # Assign the metadata file to the corresponding key.
-        uri_dict[uri] = species_txt
-
-        # Return the dictionary.
-        return uri_dict
-
-    def download_metadata(self):
-        """
-        Downloads the `species.txt` files. This is a tab delimited listing
-        of metadata.
-        """
-
-        # Build the URI bases of the phylogenetic families to download.
-        metadata_uri_dict = self.generate_metadata_uri()
-
-        self.ftp.connect(ENSEMBL_FTP_URI)
-        self.ftp.login()
-
-        for uri, file_name in metadata_uri_dict.items():
-
-            size_estimate = self.ftp.size(uri)
-            target_dir = os.path.join(self.download_path, file_name)
-
-            if os.path.isfile(target_dir):
-                return
-
-            if not os.path.exists(os.path.dirname(target_dir)):
-                os.makedirs(os.path.dirname(target_dir))
-
-            with tqdm(total=int(size_estimate), unit_scale=True,
-                      unit='MB') as meta_pbar:
-
-                with open(target_dir, 'wb') as curr_file:
-
-                    def callback(data):
-                        update_size = len(data) / 8.192
-                        meta_pbar.update(int(update_size))
-                        curr_file.write(data)
-
-                    try:
-                        self.ftp.retrbinary(
-                            cmd='RETR {}'.format(uri),
-                            callback=callback)
-                    except:
-                        logging.warning('UNABLE TO DOWNLOAD METADATA!')
-        return
-
-    def generate_uri(self):
-        """
-        Generates the uri strings needed to download the genomes
-        from the ensembl database.
-
-        :returns: List of Strings of URIs for the ensembl database. eg::
-
-            'pub/fungi/release-36/gff3/',
-            'pub/metazoa/release-36/gff3/',
-            ...
-
-        This is an extremely case-specific function.
-        """
-        uri_list = []
-        # Unique permutations of data types and kingdoms.
-        uri_gen = itertools.product(ENSEMBL_DATA_TYPES, ENSEMBL_KINGDOMS)
-        # For each iteration, return the desired URI.
-        for item in uri_gen:
-            uri = '/'.join(('pub', item[1],  # the clade or kingdom
-                            self._release_version,
-                            item[0], '',))  # the data type
+        # For each pair, generate the corresponding URI.
+        for datatype, kingdom in datatype_kingdom_pairs:
+            uri = '/'.join(('pub', kingdom, self.release_version, datatype, ''))
             uri_list.append(uri)
+
+        # Return the list of uris.
         return uri_list
 
-    def ensembl_line_parser(self, line, top_dir):
-        """
+    def ensembl_file_parser(self, line, top_dir):
+        """Examines a line and add creates a GenomeAssembly if appropriate.
+
         This function parses one 'line' at a time retrieved from an
         ``ftp.dir()`` command. This line has already been confirmed to
         not be a directory.
 
-        :param top_dir: The parent directory.
-        :param line: An input line, described in detail below.
+        :param line:
+            An input line, described in detail below.
 
-        An example of one such line:
+        :param top_dir:
+            The parent directory.
 
-            ``"drwxr-sr-x  2 ftp   ftp    4096 Jan 13  2015 filename"``
-
-        The files are consistently named following this pattern:
-
-            ``<species>.<assembly>.<_version>.gff3.gz``
-
-        This line is split by whitespace. For future reference, the indexes
-        correspond (usually) to::
-
-            + [0]:    the directory information.
-            + [1]:    the number of items therein?
-            + [2]:    unknown always 'ftp'
-            + [3]:    unknown always 'ftp'
-            + [4]:    the file size in bytes, 4096 is one block
-            + [5]:    Month
-            + [6]:    Day
-            + [7]:    Year
-            + [8]:    filename
-
-        Either adds a genome, or returns nothing.
+        :param bad_dirs:
+            A list of words / strings. Files found with these terms in
+            them will be rejected by the parser.
         """
 
-        bad_words = ('chromosome', 'abinitio')
+        # Parse the line.
+        parsed_line = self.parse_ensembl_dir_line(line)
 
-        def split_line(in_line):
-            """Parse an individual item line from an ftp.dir() call.
-            This function handles splitting, without assuming the line
-            contains a valid genome file."""
-
-            # Split the listing by whitespace.
-            item = in_line.split()
-            return {
-                'dir_info': item[0],
-                'dir_subfolders': item[1],
-                'size': item[4],
-                'item_name': item[-1]
-            }
-
-        def parse_genome_name(line_dict):
-            """Takes an item line dictionary and splits the genomes name
-            to get the desired values from it."""
-            name_list = line_dict['item_name'].split('.', 2)
-            genus_species = name_list[0]
-            assembly_name = name_list[1]
-            # Some species have sub-names
-            try:
-                gen_species_list = genus_species.split('_')
-                gen_species_list = list(filter(None, gen_species_list))
-                logging.debug('filtered_gen_species_list')
-                logging.debug(gen_species_list)
-                # The first element should be the genus
-                genus = gen_species_list[0]
-                # The second should be the species
-                species = gen_species_list[1]
-                # The remainder should be the intra-specific name
-                if len(gen_species_list) > 2:
-                    intraspecific_name = '_'.join(gen_species_list[2:])
-
-                    taxonomic_name = '_'.join(
-                        [genus, species, intraspecific_name])
-
-                    local_path = os.path.join(
-                        self.download_path,
-                        genus + '_' + species + '_' + intraspecific_name,
-                        assembly_name)
-
-                    base_filename = "".join([
-                        genus,
-                        "_",
-                        species,
-                        "_",
-                        intraspecific_name,
-                        "-",
-                        assembly_name
-                    ])
-
-                else:
-                    taxonomic_name = '_'.join([genus, species])
-
-                    intraspecific_name = None
-
-                    local_path = os.path.join(
-                        self.download_path,
-                        genus + '_' + species, assembly_name)
-
-                    base_filename = "".join([
-                        genus,
-                        "_",
-                        species,
-                        "-",
-                        assembly_name
-                    ])
-
-            except:
-                taxonomic_name = name_list[0]
-                assembly_name = name_list[1]
-                genus, species = genus_species.split('_', 1)
-                intraspecific_name = None
-                local_path = os.path.join(
-                    self.download_path,
-                    genus + '_' + species, assembly_name)
-                base_filename = "".join([
-                    genus,
-                    "_",
-                    species,
-                    "-",
-                    assembly_name
-                ])
-
-            return {
-                'taxonomic_name': taxonomic_name,
-                'genus': genus,
-                'assembly_name': assembly_name,
-                'species': species,
-                'local_path': local_path,
-                'base_filename': base_filename,
-                'intraspecific_name': intraspecific_name}
-
-        def add_fasta(line_dict):
-            fasta_genome = parse_genome_name(line_dict)
-            update_dict = {
-                'fasta_size': line_dict['size'],
-                'fasta_uri': ''.join((top_dir, line_dict['item_name'])),
-            }
-            fasta_genome.update(update_dict)
-            self.save_genome(**fasta_genome)
+        # If the parse_ensembl_dir_line returns None, do not examine
+        # the listing.
+        if parsed_line is None:
             return
 
-        def add_gff3(line_dict):
-            gff3_genome = parse_genome_name(line_dict)
-            update_dict = {
-                'gff3_size': line_dict['size'],
-                'gff3_uri': ''.join((top_dir, line_dict['item_name'])),
-            }
-            gff3_genome.update(update_dict)
-            self.save_genome(**gff3_genome)
-            return
-
-        line_dict = split_line(line)
-
-        if any(bw in line_dict['item_name'] for bw in bad_words):
+        # If the filename contains a 'bad word', we should exit the function.
+        if any(bw in parsed_line['file_name'] for bw in self.bad_filenames):
             # This means that one of the undesired files has been located.
             return
 
-        elif line_dict['item_name'].endswith('dna.toplevel.fa.gz'):
-            add_fasta(line_dict)
+        # Examine the parsed output to determine if a GenomeAssembly object
+        # should be created. Create a dictinoary of kwargs and filter off
+        # any values of 'None', then use this dictinoaryto create a
+        # new Assembly instance.
+        if parsed_line['file_name'].endswith('.dna.toplevel.fa.gz'):
+            # Then this file is a fasta file.
+
+            # Remove the trailing filename from the file_name.
+            # Create the corresponding argument dictionary.
+            new_assembly_kwargs = {
+                'source_database': self.database_name,
+                'species': parsed_line['species'],
+                'genus': parsed_line['genus'],
+                'intraspecific_name': parsed_line['intraspecific_name'],
+                'assembly_id': parsed_line['assebly_name'].replace(
+                    '.dna.toplevel.fa.gz', ''),
+                'version': self.release_version,
+                'fasta_remote_path': ''.join((
+                    top_dir, parsed_line['file_name'])),
+                'fasta_remote_size': parsed_line['file_size']}
+
+            # Create the new Assembly object.
+            new_genome_assembly = Assembly(**new_assembly_kwargs)
+
+            # Append it to the assemblies list, which is defined in the
+            # AssemblyDatabase parent class.
+            self.assemblies.append(new_genome_assembly)
+
+            # Exit the if loop.
             return
 
-        elif line_dict['item_name'].endswith('gff3.gz'):
-            add_gff3(line_dict)
+        elif parsed_line['file_name'].endswith('.gff3.gz'):
+            # Then this file is a gff3 file.
+            # Split by periods to remove the version and file extension.
+            assembly_id = parsed_line['assebly_name'].rsplit('.', 3)
+
+            new_assembly_kwargs = {
+                'source_database': self.database_name,
+                'species': parsed_line['species'],
+                'genus': parsed_line['genus'],
+                'intraspecific_name': parsed_line['intraspecific_name'],
+                'assembly_id': assembly_id[0],
+                'version': self.release_version,
+                'gff3_remote_path': ''.join((
+                    top_dir, parsed_line['file_name'])),
+                'gff3_remote_size': parsed_line['file_size']}
+
+            # Create the new Assembly object.
+            new_genome_assembly = Assembly(**new_assembly_kwargs)
+
+            # Append it to the assemblies list, which is defined in the
+            # AssemblyDatabase parent class.
+            self.assemblies.append(new_genome_assembly)
+
+            # Exit the if loop.
             return
 
-    def find_genomes(self, uri_list, parsing_function=ensembl_line_parser):
-        """Private function that handles finding the list of genomes.
+    def parse_ensembl_dir_line(self, in_line):
+        """Parse an individual line item from an ftp.dir() call.
 
-        :param uri_list: This should be a list of base URIs to start
-            the ftp crawler from.
-        :param parsing_function: This should be a function that reads an
-            ``ftplib.dir()`` line output. The  output sent to such a function
-            will always be a file, not a directory.
+        This function splits a line retrieved from the ensembl ftp server
+        from a call to ftp.dir().
 
+        :param in_line:
+            A filename (string). This function assumes these strings are from
+            the Ensembl database, and parses them appropriately.
+
+        :returns:
+            A dictionary of keywords that can be used in the construction of a
+            GenomeAssembly object.
+
+
+        An example line, and its index locations, are shown below::
+
+            ``"drwxr-sr-x  2 ftp   ftp    4096 Jan 13  2015 filename"
+               [0]        [1][2]   [3]    [4]  [5] [6] [7]  [8] or [-1]``
+
+        Parses a filename to retrieve the species, assembly, version and other
+        information needed to greate a new instance of GenomeAssembly.
+
+        The filenames themselves are assumed to be either gff3 or fasta files.
+        Examples of these files, extracted from README files, are shown below.
+
+        gff3 files::
+
+            ``<species>.<assembly>.<_version>.gff3.gz``
+
+        fasta files::
+
+            ``<species>.<assembly>.<sequence type>.<id type>.<id>.fa.gz``
         """
-        self.ftp.connect(ENSEMBL_FTP_URI)  # connect to the ensemble ftp
+
+        # Split the input string by whitespace.
+        dir_list = in_line.split()
+
+        # Pull needed information out of this list. It is always the last item.
+        file_name = dir_list[-1]
+        file_size = dir_list[4]
+
+        # If the filename contains a 'bad word', we should exit the function.
+        if any(bw in file_name for bw in self.bad_filenames):
+            # This means that one of the undesired files has been located.
+            return
+
+        logging.debug(f'parsing the line: {in_line}')
+
+        # Split the file_name by the first two '.'.
+        # This will give a string that contains the genus and species
+        # informaiton, and a string that contains the assembly name.
+        try:
+            name_list = file_name.split('.', 2)
+            genus_species, assembly_name = name_list[0], name_list[1]
+        except:
+            logging.warning(f'Unable to parse {file_name}')
+            return
+
+        # Begin the parsing of the genus_species string. These strings can be
+        # further split by intraspecific names and identifiers.
+        try:
+
+            # Split the genus and species by underscores.
+            gen_species_list = genus_species.split('_')
+
+            # Some entries have leading underscores -- this caueses 'None' to
+            # appear in the list. 'None' entries must be removed.
+            gen_species_list = list(filter(None, gen_species_list))
+
+            genus = gen_species_list[0]
+            species = gen_species_list[1]
+
+
+            # If the length of gen_species_list is greater than 2, an
+            # intraspecific name is present.
+            if len(gen_species_list) > 2:
+
+                # intraspecific name is present, and should be the third
+                # element in the list to the end of the list.
+                intraspecific_name = '_'.join(gen_species_list[2:])
+
+            # Otherwise there is no intraspecific name.
+            else:
+
+                # Set intraspecific_name to None.
+                intraspecific_name = None
+
+                # Get the genus and species from the gen_species_list.
+                # Since there is no intraspecific name, split the list once.
+                # genus, species = genus_species.split('_', 1)
+
+        except Exception as error:
+            print('Unable to parse ensembl ftp filename.', error)
+
+        # Return the dictionary of values parsed from the directory listing.
+        return {
+            'genus': genus,
+            'assebly_name': assembly_name,
+            'species': species,
+            'intraspecific_name': intraspecific_name,
+            'file_name': file_name,
+            'file_size': file_size,
+        }
+
+    def crawl(self, uri_list=None):
+        """
+        """
+        # If no uri_list is provided, set it to the class property.
+        if uri_list is None:
+            uri_list = self.top_dirs
+
+        # Connect to the FTP server and login with anonymous credentials.
+        self.ftp.connect(self.ftp_url)
         self.ftp.login()
-        for uri in tqdm(uri_list):
-            # logging.info('Parent crawl dir initialized as: {}'.format(uri))
+
+        # Start a crawl at each uri.
+        for uri in tqdm(uri_list, desc='Crawling. This make take some time.'):
             crawl_ftp_dir(
-                database=self,
+                ftp=self.ftp,
                 top_dir=uri,
-                parsing_function=parsing_function)
-        self.ftp.quit()  # close the ftp connection
-        return
+                parsing_function=self.ensembl_file_parser,
+                ignored_dirs=self.ignored_dirs,
+            )
 
-    def estimate_download_size(self):
-        size = []
-        genomes = self.get_genomes()
-        for genome in genomes:
-            size.extend((
-                genome.gff3_size,
-                genome.fasta_size
-            ))
-        return sum(filter(None, size))
+        # Close the FTP connection.
+        self.ftp.quit()
 
-    def download_genomes(self):
-        """This function downloads all genomes that have been found and stored
-        in the database.
-
-        The directory structure to fit the files downloaded is as follows::
-
-            Genome/
-              [genus]_[species]{_[intraspecific_name]}/
-                [assembly_name]/
-                  [genus]_[species]{_[intraspecific_name]}-[assembly_name].gff3
-                  [genus]_[species]{_[intraspecific_name]}-[assembly_name].fasta
-
+    def download_metadata(self, base_path=None):
         """
-        size_estimate = self.estimate_download_size() / 8.192
-        genomes = self.get_genomes()
-        self.ftp.connect(ENSEMBL_FTP_URI)
+        """
+        if base_path is None:
+            base_path = os.path.join(os.getcwd(), 'genomes')
+
+        # Build the path to the local file.
+        target_file = os.path.join(base_path, 'species.txt')
+
+        # Check if the file already exists, and that it is not 0 bytes.
+        if os.path.isfile(target_file) and os.path.getsize(target_file) > 0:
+            # Then the file is already there, and we can quit this function
+            # early. We still need to read the csv to get the dataframe.
+            self.metadata_df = pandas.read_csv(
+                filepath_or_buffer=target_file,
+                error_bad_lines=False,
+                sep="\t",
+                index_col=False)
+            return
+
+        # Connect to the FTP server and login with anonymous credentials.
+        # TODO: Change the FTP connection to use a context manager, then
+        # refactor this function so that progress bars can be more easily
+        # implemented by the cli.
+        self.ftp.connect(self.ftp_url)
         self.ftp.login()
 
-        with tqdm(total=int(size_estimate), unit_scale=True,
-                  unit='B') as total_pbar:
-            # Iterate through the list of acquired genomes.
-            for genome in genomes:
-                # Create a dictionary. This is kind of awkward.
-                download_dict = {
-                    genome.fasta_uri: '.fa.gz',
-                    genome.gff3_uri: '.gff3.gz',
-                }
-                # Create the target directory.
-                target_dir = genome.local_path
-                if not os.path.exists(target_dir):
-                    os.makedirs(target_dir)
+        # size_estimate = self.ftp.size(self.metadata_uri)
 
-                # Iterate through the download dictionary
-                for uri, file_ext in download_dict.items():
-                    if genome.intraspecific_name:
-                        filename = "".join([
-                            genome.genus,
-                            "_",
-                            genome.species,
-                            "_",
-                            genome.intraspecific_name,
-                            "-",
-                            genome.assembly_name
-                        ])
-                    else:
-                        filename = "".join([
-                            genome.genus,
-                            "_",
-                            genome.species,
-                            "-",
-                            genome.assembly_name
-                        ])
+        self.ftp.retrbinary(
+            cmd='RETR {}'.format(self.metadata_uri),
+            callback=open(target_file, 'wb').write
+        )
 
-                    target_file = os.path.join(
-                        target_dir, filename + file_ext)
+        # Close the FTP connection.
+        self.ftp.quit()
 
-                    with open(target_file, 'wb') as curr_file:
-                        def callback(data):
-                            update_size = len(data) / 8.192
-                            total_pbar.update(int(update_size))
-                            curr_file.write(data)
-                        try:
-                            self.ftp.retrbinary(
-                                cmd='RETR {}'.format(uri),
-                                callback=callback)
-                        except:
-                            logging.warning('UNABLE TO DOWNLOAD A GENOME')
-                            logging.warning(genome.taxonomic_name)
-                        finally:
-                            # Check if the file size is 0, if so delete it.
-                            if os.stat(target_file).st_size == 0:
-                                os.remove(target_file)
-        self.ftp.quit()  # close the ftp connection
-        return
-
-    def read_species_metadata(self, file_name="species.txt"):
-        """
-        Reads the downloaded metadata file: ``species.txt`` file and returns a
-        pandas data frame.
-
-        :param file_name: The name of ``species.txt``.
-
-        The following are the column names in the dataframe:
-
-        #name
-        species
-        division
-        **taxonomy_id** <-- The one we are interested in.
-        assembly
-        assembly_accession
-        genebuild
-        variation
-        pan_compara
-        peptide_compara
-        genome_alignments
-        other_alignments
-        core_db
-        species_id
-        """
-        # Build the path of the target file.
-        species_path = os.path.join(self.download_path, file_name)
-        # Read the csv.
-        metadata_df = pandas.read_csv(
-            filepath_or_buffer=species_path,
+        # Read the species.txt metadata file, and assign it to a dataframe
+        # attribute of the EnsemblDatabase class.
+        self.metadata_df = pandas.read_csv(
+            filepath_or_buffer=target_file,
             error_bad_lines=False,
             sep="\t",
-            index_col=False,
-        )
-        self.species_metadata = metadata_df
-        return
+            index_col=False)
 
-    def get_taxonomy_id(self, species):
+    def download(self, assemblies, base_path=None):
         """
-        Looks an individual taxonomy_id in the given pandas data frame.
-
-        :param species: The species to return the taxonomy id of.
-
-        :returns: A taxonomy id
         """
-        taxonomy_id = self.species_metadata[
-            self.species_metadata['species'].str.match(
-                species.lower())]['taxonomy_id'].values
-        if taxonomy_id.size == 0:
-            logging.error(
-                'Unable to find a taxonomy id for {}'.format(species))
-            return None
-        else:
-            logging.debug('Found taxonomy id: {0}'.format(taxonomy_id))
-            return str(taxonomy_id[0])
+        # TODO: Consider how this function is called from AssemblyStorage.
+        # If a base_path is not given, create a folder called 'genomes',
+        # and place it in the current directory.
+        if base_path is None:
+            base_path = os.path.join(os.getcwd(), 'genomes')
 
-    def add_taxonomy_ids(self):
-        # Read the metadata file to get the pandas dataframe:
-        self.read_species_metadata()
-        for genome in tqdm(self.get_genomes()):
-            taxonomy_id = self.get_taxonomy_id(genome.taxonomic_name)
-            update_dict = {
-                'taxonomic_name': genome.taxonomic_name,
-                'taxonomy_id': taxonomy_id
-            }
-            self.save_genome(**update_dict)
+        # Connect to the FTP server and login with anonymous credentials.
+        self.ftp.connect(self.ftp_url)
+        self.ftp.login()
 
-    def decompress_genomes(self):
-        """
-        Decompresses the genomes that have been downloaded. This will be
-        changed to use a slurm array.
-        """
-        # Get all the genomes that have been found and saved in the SQLite db
-        genomes = self.get_genomes()
+        for gen in tqdm(assemblies, desc='Downloading Assemblies...'):
 
-        # Iterate over the list of genomes
-        for genome in genomes:
-            # Go to the target directory and unzip the files therein.
-            with cd(genome.local_path):
-                cmd = [
-                    'srun', '--account=ficklin', '--partition=ficklin',
-                    'gunzip', genome.base_filename + '.fa.gz',
-                    genome.base_filename + '.gff3.gz']
-                subprocess.run(cmd)
-                # subprocess.run('gunzip *', shell=True)
-        return
+            # Create the base_path for this genome assembly.
+            curr_base_path = os.path.join(base_path, gen.base_filepath)
 
-    def generate_hisat_index(self):
-        """
-        Run the hisat conversion tool on the supplied path list.
+            # Create the intermediary folders if they do not exist.
+            if not os.path.exists(curr_base_path):
+                os.makedirs(curr_base_path)
 
-        HISAT tool options:
+            # Create the local filenames.
+            new_gff3 = os.path.join(
+                curr_base_path,
+                gen.base_filename + '.gff3.gz')
 
-        -f
+            new_fasta = os.path.join(
+                curr_base_path,
+                gen.base_filename + '.fa.gz')
 
-        Reads (specified with <m1>, <m2>, <s>) are FASTA files. FASTA files
-        usually have extension .fa, .fasta, .mfa, .fna or similar. FASTA
-        files do not have a way of specifying quality values, so when -f
-        is set, the result is as if --ignore-quals is also set.
+            # Download the desired files.
+            self.ftp.retrbinary(
+                cmd=f'RETR {gen.fasta_remote_path}',
+                callback=open(new_fasta, 'wb').write)
 
-        If your computer has multiple processors/cores, use -p
+            self.ftp.retrbinary(
+                cmd=f'RETR {gen.gff3_remote_path}',
+                callback=open(new_gff3, 'wb').write)
 
-        The -p option causes HISAT to launch a specified number of parallel
-        search threads. Each thread runs on a different processor/core and
-        all threads find alignments in parallel, increasing alignment
-        throughput by approximately a multiple of the number of threads
-        (though in practice, speedup is somewhat worse than linear).
+        # Close the FTP connection.
+        self.ftp.quit()
 
-        """
-        genome_list = self.get_genomes()
+    def find_taxonomy_id(self, tax_name):
+        """Searches the self.metadata_df attribute for a matching taxonomy ID.
 
-        # The hisat tool will create the indexes in the current directory.
-        for gen in tqdm(genome_list):
-            # build the filename
-            fa_file = gen.base_filename + '.fa'
-            # build the hisat2-build command
-            cmd = [
-                'srun', '--account=ficklin', '--partition=ficklin',
-                'hisat2-build', '-f', fa_file, gen.base_filename]
-            # change to the path, and try to run the command.
-            # Log an error if it fails.
-            with cd(gen.local_path):
-                try:
-                    subprocess.run(cmd)
-                except:
-                    logging.warning(
-                        'Unable to build ht2 index of {}'.format(
-                            gen.base_filename))
-        return
+        :param tax_name:
+            A string representing the taxonomic name of an assembly.
 
-    def generate_gtf(self):
-        """
-        Uses **gffread** command to generate `\*.gtf` files.
-
-        ``gffread -T <TARGET-FILE>.gff3 -o <TARGET-FILE>.gtf``
-
-        Should output to the `.gtf2` file format by default.
-        """
-        genome_list = self.get_genomes()
-
-        for gen in tqdm(genome_list):
-            # build the file name
-            gff3_file = gen.base_filename + '.gff3'
-            gff_out_file = gen.base_filename + '.gtf'
-            # Build the command:
-            cmd = [
-                'srun', '--account=ficklin', '--partition=ficklin',
-                'gffread', '-T', gff3_file, '-o', gff_out_file]
-            with cd(gen.local_path):
-                try:
-                    subprocess.run(cmd)
-                except:
-                    logging.warning(
-                        'Unable to generate gtf file for {}'.format(
-                            gen.base_filename))
-
-        return
-
-    def generate_splice_sites(self):
-        """
-        Command example for splice site generation:
-
-        >>> python hisat2_extract_splice_sites.py GRCh38.gtf > Splice_Sites.txt
         :returns:
+            A string of the found taxnomy ID, or `None`.
         """
-        genome_list = self.get_genomes()
 
-        for gen in tqdm(genome_list):
-            gft_file = os.path.join(gen.local_path, gen.base_filename + '.gtf')
-            output_file = os.path.join(
-                gen.local_path, gen.base_filename + '.Splice_sites.txt')
-            cmd = (
-                'srun --account=ficklin --partition=ficklin --output={1} '
-                'hisat2_extract_splice_sites.py {0}'.format(
-                    gft_file, output_file))
-            # with cd(gen.local_path):
-            subprocess.run(cmd, shell=True)
-        return
+        # Search the pandas dataframe with the metadata parsed from species.txt.
+        taxonomy_id = self.metadata_df[
+            self.metadata_df['species'].str.match(
+                tax_name.lower())]['taxonomy_id'].values
+
+        # Check if this actually found a value, if it did not, log the failure.
+        if taxonomy_id.size == 0:
+            logging.warning(
+                'Unable to find a taxonomy id for {}'.format(tax_name))
+            return None
+
+        return str(taxonomy_id[0])
+
+    def add_taxonomy_ids(self, assemblies=None):
+        """Calls `find_taxonomy_id` on a list of assemblies, and returns a list
+        of tuples containing the base_filename and an update dictionary.
+
+        :param [assemblies=None]:
+            If no list of assembly objects is given, the contents of
+            self.assemblies is used instead.
+
+        :returns:
+            A list of tuples, containing the assemblies base filename and an
+            update dictionary containing the newly found taxnomy_ID.
+        """
+        # Output list holder.
+        tax_update_list = list()
+
+        # Iterate through the list of assemblies, if none are provided, use
+        # those found in the self.assemblies list.
+        if assemblies is None:
+            assemblies = self.assemblies
+
+        for gen in assemblies:
+
+            # Search the metadata dataframe for a matching entry.
+            tax_id = self.find_taxonomy_id(gen.taxonomy_name)
+
+            # If `None` is returned from self.find_taxonomy_id, continue
+            # with the loop without creating an update dictionary.
+            if tax_id is None:
+                continue
+
+            # Otherwise, create the update dictionary and append it to the
+            # output list.
+            update_dict = {'taxonomy_id': tax_id}
+            tax_update_list.append(
+                (gen.base_filename, update_dict))
+
+        return tax_update_list

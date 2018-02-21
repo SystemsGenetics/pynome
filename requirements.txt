@@ -1,4 +1,5 @@
-pandas
-tqdm
-xmltodict
 sqlalchemy
+click
+tqdm
+pandas
+xmltodict
