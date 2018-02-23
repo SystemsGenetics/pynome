@@ -30,7 +30,8 @@ download desired genome assembly files from the
 - [x] Download function from CLI interface needs to call all needed ensembl functions
 - [x] Write metadata.json creation function.
 - [x] Edit output of sra json to meta.json.
-- [ ] assemblystorage.push_irods()
+- [ ] Add delete() functions.
+- [ ] assemblystorage.push_irods() -- use the put methods
 - [ ] cli.push_irods()
 - [ ] Create Docker image.
 - [ ] Add Travis-CI integration.
@@ -53,10 +54,6 @@ $ pynome list
 $ pynome download
 $ pynome sra
 $ pynome prepare
-```
-
-```bash
-pynome discover && pynome download && pynome sra && pynome prepare
 ```
 
 ```bash
