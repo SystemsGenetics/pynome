@@ -125,12 +125,10 @@ def prepare(ctx):
 
 
 @pynome.command()
-def push_irods():
+@click.pass_context
+def putirods(ctx):
     """Push all of the local genome files to an iRODs server."""
-    # TODO: Look up irods pyton API to implement this function.
-
-
-    pass
+    ctx.obj['as'].push_irods()
 
 
 @pynome.command()

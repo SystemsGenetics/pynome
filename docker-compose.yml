@@ -1,0 +1,6 @@
+version: '3.5'
+services:
+  pynome:
+    build: .
+    volumes:
+      - /media/tylerbiggs/genomic/march_genomes:/pynome

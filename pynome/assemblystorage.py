@@ -16,6 +16,9 @@ import collections
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
+# iRODs imports.
+from irods.session import iRODSSession
+
 # Inter-package imports.
 from pynome.assembly import Base
 from pynome.assembly import Assembly
@@ -215,8 +218,16 @@ class AssemblyStorage:
 
     def push_irods(self):
         """Pushes all the files within each source to an iRODs server.
+
+        iput -r Genome/ /scidasZone/sysbio/testgenomes
         """
-        pass
+        cmd_iput = [
+            'iput',
+            '-r',  # Recursive
+            'Genome/',
+            self.irods_base_path,
+        ]
+        subprocess.run(cmd_iput)
 
     def decompress(self, assembly):
         """Decompress (GNU Unzip) a single set of assembly files.

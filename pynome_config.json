@@ -8,17 +8,11 @@
     "release_version": "release-38",
     "description": "The Ensembl genome annotation system.",
     "url": "http://ensemblgenomes.org/",
-    "bad_filenames": ["chromosome", "abinitio", "README", "CHECKSUMS"],
-    "crawl_urls": [
-      "/pub/fungi/release-38/fasta/fungi_ascomycota1_collection/_candida_glabrata/",
-      "/pub/fungi/release-38/fasta/fungi_ascomycota1_collection/acremonium_chrysogenum_atcc_11550/",
-      "/pub/fungi/release-38/gff3/fungi_ascomycota1_collection/acremonium_chrysogenum_atcc_11550/",
-      "/pub/fungi/release-38/gff3/fungi_ascomycota1_collection/_candida_glabrata/"
-    ]
+    "bad_filenames": ["chromosome", "abinitio", "README", "CHECKSUMS"]
   },
   "storage_config":{
-    "irods_base_path": "/ScidasZone/Sysbio/genomes/",
-    "base_path": "/media/tylerbiggs/genomic/genTest",
-    "sqlite_path": "/media/tylerbiggs/genomic/genTest"
+    "irods_base_path": "/scidasZone/sysbio/testgenomes",
+    "base_path": "/pynome",
+    "sqlite_path": "/pynome"
   }
 }
