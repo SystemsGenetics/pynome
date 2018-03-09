@@ -68,7 +68,7 @@ ENV IRODS_USER_NAME=biggst
 ENV IRODS_ZONE_NAME=scidasZone
 ENV IRODS_CWD=/ScidasZone/Sysbio/testgenomes
 # TODO: remove pw -- convert to docker secret.
-ENV IRODS_PASSWORD=PASSWORD
+ENV IRODS_PASSWORD=3t5fpQLVynUw
 # UID / GID settings
 ENV UID_IRODS=998
 ENV GID_IRODS=998

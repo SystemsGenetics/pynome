@@ -16,8 +16,8 @@ def test_AssemblyStorage(test_config, test_ed):
 
     # Initialize an instance of AssemblyStorage with the test session.
     test_assembly_storage = AssemblyStorage(
-        sqlite_path=test_config["storage_config"]["sqlite_path"],
-        base_path=test_config["storage_config"]["base_path"])
+        sqlite_path=test_config["storage_config"].get("sqlite_path"),
+        base_path=test_config["storage_config"].get("base_path"))
 
     # Add the test EnsemblDatabase fixture to the sources list.
     test_assembly_storage.add_source(test_ed)

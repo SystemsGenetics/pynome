@@ -9,10 +9,27 @@
 """
 
 # Import general Python packages.
-import os
 import json
+import hashlib
 import logging
-from sqlalchemy import create_engine
+
+
+def calculate_md5(filename):
+    """Calculates the MD5 hash of assembly files associated with the
+    given Assembly object.
+
+    Thie function does not try to hold the entire file in memmory, and
+    should work for large files.
+
+    :param assembly:
+        An assembly object. The associated files are assumed to have
+        already been created.
+    """
+    md5 = hashlib.md5()
+    with open(filename, 'rb') as cfile:
+        for chunk in iter(lambda: cfile.read(4096), b''):
+            md5.update(chunk)
+    return md5.digest()
 
 
 def read_json_config(config_file='pynome_config.json'):

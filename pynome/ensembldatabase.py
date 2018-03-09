@@ -27,6 +27,7 @@ from pynome.utils import crawl_ftp_dir
 
 
 # pylint: disable=too-many-instance-attributes
+# pylint: disable=too-many-arguments
 
 
 class EnsemblDatabase(AssemblyDatabase):
@@ -261,7 +262,7 @@ class EnsemblDatabase(AssemblyDatabase):
         # If the filename contains a 'bad word', we should exit the function.
         if any(bw in file_name for bw in self.bad_filenames):
             # This means that one of the undesired files has been located.
-            return
+            return None
 
         logging.debug(f'parsing the line: {in_line}')
 
@@ -271,9 +272,9 @@ class EnsemblDatabase(AssemblyDatabase):
         try:
             name_list = file_name.split('.', 2)
             genus_species, assembly_name = name_list[0], name_list[1]
-        except:
+        except ValueError:
             logging.warning(f'Unable to parse {file_name}')
-            return
+            return None
 
         # Begin the parsing of the genus_species string. These strings can be
         # further split by intraspecific names and identifiers.
@@ -304,12 +305,8 @@ class EnsemblDatabase(AssemblyDatabase):
                 # Set intraspecific_name to None.
                 intraspecific_name = None
 
-                # Get the genus and species from the gen_species_list.
-                # Since there is no intraspecific name, split the list once.
-                # genus, species = genus_species.split('_', 1)
-
-        except Exception as error:
-            print('Unable to parse ensembl ftp filename.', error)
+        except ValueError as error:
+            print('Unable to parse ensembl ftp filename due to %s.', error)
 
         # Return the dictionary of values parsed from the directory listing.
         return {
@@ -322,7 +319,11 @@ class EnsemblDatabase(AssemblyDatabase):
         }
 
     def crawl(self, uri_list=None):
-        """
+        """Crawl the ensmebl database, starting at each of the URI's given in
+        uri_list.
+
+        :param uri_list:
+            A list of URI strings to start the crawl at.
         """
         # If no uri_list is provided, set it to the class property.
         if uri_list is None:
@@ -345,7 +346,7 @@ class EnsemblDatabase(AssemblyDatabase):
         self.ftp.quit()
 
     def download_metadata(self):
-        """
+        """Downloads the metadata file from the Ensembl site.
         """
 
         # Build the path to the local file.
@@ -389,7 +390,14 @@ class EnsemblDatabase(AssemblyDatabase):
             index_col=False)
 
     def download(self, assemblies):
-        """
+        """Download assembly files from the Ensembl Database.
+
+        Either downloads the list of assembly objects given, or if none are
+        provided, downloads all assembly objects stored in the local SQL
+        database.
+
+        :param assemblies:
+            A list of Assembly objects.
         """
 
         # Connect to the FTP server and login with anonymous credentials.
@@ -442,9 +450,27 @@ class EnsemblDatabase(AssemblyDatabase):
         if tax_metadata.empty:
             return None
 
-        tax_metadata = tax_metadata.to_json(orient='records')
+        # Convert the dataframe to a dictionary.
+        tax_metadata = tax_metadata.to_dict()
 
-        return json.loads(tax_metadata)
+        # Add the commands used to process downloaded files.
+        tax_metadata['hisat_index_gen'] = ' '.join(
+            ['hisat2-build', '--quiet', '-p', '<numb_proc>',
+             '-f', '<file_path>', '<out_base>'])
+
+        tax_metadata['gtf_conversion'] = ' '.join(
+            ['gffread', '-T', '<gff3_file>' + '.gff3', '-o', '<gff3_file>' + '.gtf'])
+
+        tax_metadata['splice_site_gen'] = ' '.join(
+            ['hisat2_extract_splice_sites.py', '<gft_file>'])
+
+        # Convert the pandas dataframe into a json string.
+        # tax_metadata = tax_metadata.to_json(orient='records')
+
+        # Conver the json string to a Python dictionary.
+        # metadata_dict = json.loads(tax_metadata)
+
+        return tax_metadata
 
     def write_metadata_jsons(self, assemblies=None):
         """Writes a .json metadata file for each given assembly.
@@ -494,8 +520,7 @@ class EnsemblDatabase(AssemblyDatabase):
 
         # Check if this actually found a value, if it did not, log the failure.
         if taxonomy_id.size == 0:
-            logging.warning(
-                'Unable to find a taxonomy id for {}'.format(tax_name))
+            logging.warning('Unable to find a taxonomy id for %s', tax_name)
             return None
 
         return str(taxonomy_id[0])

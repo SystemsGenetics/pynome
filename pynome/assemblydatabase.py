@@ -65,7 +65,7 @@ class AssemblyDatabase(abc.ABC):
                 'objects.'.format(type(self).__name__))
 
     @abc.abstractmethod
-    def crawl(self):
+    def crawl(self, uri_list=None):
         """An abstract method. Child classes must define crawl functions.
         """
         pass

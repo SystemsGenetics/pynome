@@ -18,7 +18,6 @@
   },
   "storage_config":{
     "irods_base_path": "/ScidasZone/Sysbio/genomes/",
-    "sqlite_path": "sqlite:///:memory:",
-    "base_path": "/media/tylerbiggs/genomic/genTest"
+    "base_path": "/media/tylerbiggs/genomic1/genTest"
   }
 }

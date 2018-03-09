@@ -9,6 +9,7 @@
 
 # General Python imports.
 import os
+import glob
 import subprocess
 import collections
 
@@ -16,13 +17,13 @@ import collections
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-# iRODs imports.
-from irods.session import iRODSSession
-
 # Inter-package imports.
 from pynome.assembly import Base
 from pynome.assembly import Assembly
 from pynome.sra import download_sra_json
+from pynome.utils import calculate_md5
+
+# pylint: disable=too-many-instance-attributes
 
 
 class AssemblyStorage:
@@ -198,14 +199,18 @@ class AssemblyStorage:
             source.download(src_assemblies)
 
     def download_all_sra(self):
-        """
+        """Downloads sra metadata by taxonomy_id in the local database.
         """
         tax_ids = [gen.taxonomy_id for gen in self.query_local_assemblies()]
 
         download_sra_json(self.base_sra_path, tax_ids)
 
     def add_source(self, new_source):
-        """Append a new source to the sources dictionary."""
+        """Append a new source to the sources dictionary.
+
+        :param new_source:
+            An instance of AssemblyDatabase.
+        """
         # Set the base_path attribute of the new source.
         new_source.base_path = self.base_path
         new_source.base_genome_path = self.base_genome_path
@@ -317,10 +322,49 @@ class AssemblyStorage:
             assembly.base_filepath,
             assembly.base_filename + '.Splice_sites')
 
-        with open(splice_output, 'w') as f:
+        with open(splice_output, 'w') as cfile:
             cmd = ['hisat2_extract_splice_sites.py', gft_file]
 
-            subprocess.run(cmd, stdout=f)
+            subprocess.run(cmd, stdout=cfile)
+
+    def write_md5_hashes(self, assembly):
+        """Writes the MD5 hashes of the files associated with a given
+        assembly.
+
+        Finds all files matching the assembly that end with the following
+        extensions:
+
+            ``'*.ht2', '*.fa', '*.gtf', '*.Splice_sites'``
+
+        Calculates the MD5 hash of each and saves that value in binary
+        format to a file with the same name + .md5.
+        """
+        # Get the base path of the given assembly.
+        base_path = os.path.join(self.base_genome_path, assembly.base_filepath)
+
+        # Create a list of all file extensions of interest.
+        extensions = ['*.ht2', '*.fa', '*.gtf', '*.Splice_sites']
+
+        # Create the lists of paths to work through.
+        for ext in extensions:
+
+            # Generate the filepath.
+            glob_path = os.path.join(base_path, ext)
+
+            # Glob all the files that match the desired extensions.
+            files = glob.glob(glob_path)
+
+            for fpath in files:
+
+                # Append .md5 to the end of the file name.
+                file_name = fpath + '.md5'
+
+                # Calculate the MD5 hash.
+                md5_hash = calculate_md5(fpath)
+
+                # Write the hash and corresponding filename.
+                with open(file_name, 'wb') as md5_file:
+                    md5_file.write(md5_hash)
 
     def prepare(self, assembly):
         """Prepares assembly files for downstream use."""
@@ -328,3 +372,4 @@ class AssemblyStorage:
         self.hisat_index(assembly)
         self.gtf(assembly)
         self.splice_site(assembly)
+        self.write_md5_hashes(assembly)

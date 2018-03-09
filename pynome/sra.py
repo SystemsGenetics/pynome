@@ -33,8 +33,8 @@ import json
 import urllib
 import collections
 
-import xmltodict
 from tqdm import tqdm
+import xmltodict
 
 
 # Define the query and fetch URL strings.
@@ -91,9 +91,9 @@ def download_sra_json(base_download_path, taxonomy_id_list):
 
                 # Get the ERR or SRR from the fetched result. This
                 # can be a list of values.
-                SRA_accession_list = get_SRA_accession(fetch_result)
+                sra_accession_list = get_sra_accession(fetch_result)
 
-                for sra_id in SRA_accession_list:
+                for sra_id in sra_accession_list:
                     # print('sra_id', sra_id)
 
                     # Create the broken up path.
@@ -113,10 +113,8 @@ def download_sra_json(base_download_path, taxonomy_id_list):
                     with open(os.path.join(path, sra_id + '.sra.json'), 'w') as nfp:
                         nfp.write(json.dumps(fetch_result))
 
-    # return status_dict
 
-
-def get_SRA_accession(fetched_dict):
+def get_sra_accession(fetched_dict):
     """
     Reads an input dictionary, and returns either the ERR or SRR
     accession identification string.
@@ -143,7 +141,7 @@ def get_SRA_accession(fetched_dict):
         ['RUN'])
 
     # If this value is not a list, convert it into one.
-    if type(runs) is not list:
+    if not isinstance(runs, list):
         runs = [runs]
 
     # Iterate over the list of runs.
@@ -256,7 +254,7 @@ def parse_sra_query_response(response):
         out_list = response['eSearchResult']['IdList']['Id']
 
         # Convert the value to a list if it is not already one.
-        if type(out_list) is not list:
+        if not isinstance(out_list, list):
             out_list = [out_list]
 
         return out_list
