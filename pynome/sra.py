@@ -31,10 +31,11 @@ Filter criteria
 import os
 import json
 import urllib
-import collections
 
 from tqdm import tqdm
 import xmltodict
+
+from pynome.utils import retry
 
 
 # Define the query and fetch URL strings.
@@ -60,10 +61,6 @@ def download_sra_json(base_download_path, taxonomy_id_list):
         A list of success or failures, indexed the same as the
         input `taxonomy_id_list`.
     """
-
-    # Create the output status dictionary to track whether a given
-    # taxonomy ID was downloaded successfully or not.
-    status_dict = collections.defaultdict(list)
 
     # For each of the taxonomy ID numbers provided.
     for tid in tqdm(taxonomy_id_list):
@@ -94,16 +91,15 @@ def download_sra_json(base_download_path, taxonomy_id_list):
                 sra_accession_list = get_sra_accession(fetch_result)
 
                 for sra_id in sra_accession_list:
-                    # print('sra_id', sra_id)
 
                     # Create the broken up path.
                     sra_path = build_sra_path(sra_id)
-                    # print(path)
-
                     path = os.path.join(base_download_path, sra_path, sra_id)
+                    file_path = os.path.join(path, sra_id + 'sra.json')
 
-                    # Write the accession number to the output dictionary.
-                    status_dict[tid].extend(sra_id)
+                    # If the file_path already exists, skip this sra_id.
+                    if os.path.exists(file_path):
+                        continue
 
                     # Create this path if it does not exist.
                     if not os.path.exists(path):
@@ -125,9 +121,6 @@ def get_sra_accession(fetched_dict):
     :return:
         An list of accession identification strings.
     """
-
-    # Return the accession number, in some cases there is a list of
-    # runs. To handle this all inputs will be converted to a list.
 
     # Create the empty list that will be returned.
     sra_out_list = list()
@@ -204,6 +197,7 @@ def run_sra_query(sra_query_str):
     return response
 
 
+@retry(urllib.error.URLError, tries=4, delay=3, backoff=2)
 def fetch_sra_info(fetch_id):
     """
     Retrieves the information associated with a response ID.
@@ -245,7 +239,7 @@ def parse_sra_query_response(response):
     """
 
     # The search result gives None if there are no IDs to return.
-    if response['eSearchResult']['IdList'] is None:
+    if response['eSearchResult'].get('IdList') is None:
         return None
 
     # Otherwise we should find at least one ID.

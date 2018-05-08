@@ -12,7 +12,7 @@
   },
   "storage_config":{
     "irods_base_path": "/scidasZone/sysbio/testgenomes",
-    "base_path": "/pynome",
-    "sqlite_path": "/pynome"
+    "base_path": "/media/tylerbiggs/genomic1/march_genomes",
+    "sqlite_path": "/media/tylerbiggs/genomic1/march_genomes"
   }
 }
