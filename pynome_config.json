@@ -1,7 +1,7 @@
 {
   "ensembl_config":{
     "name": "Ensembl Database",
-    "ftp_url": "ftp.ensemblgenomes.org",
+    "ftp_url": "ftp.ensembl.org",
     "data_types": ["gff3", "fasta"],
     "kingdoms": ["fungi", "metazoa", "plants", "protists"],
     "ignored_dirs": ["cdna", "cds", "dna_index", "ncrna", "pep"],
@@ -9,7 +9,7 @@
     "description": "The Ensembl genome annotation system.",
     "url": "http://ensemblgenomes.org/",
     "bad_filenames": ["chromosome", "abinitio", "README", "CHECKSUMS"],
-    "crawl_urls": ["ftp://ftp.ensembl.org/pub/release-92/fasta/", "ftp://ftp.ensembl.org/pub/release-92/gff3/"],
+    "crawl_urls": ["ftp.ensembl.org/pub/release-92/fasta/", "ftp.ensembl.org/pub/release-92/gff3/"],
     "metadata_uri": null
   },
   "storage_config":{
