@@ -16,6 +16,9 @@ import time
 from functools import wraps
 
 
+logger = logging.getLogger(__name__)
+
+
 def retry(ExceptionToCheck, tries=4, delay=3, backoff=2, logger=None):
     """Retry calling the decorated function using an exponential backoff.
 
@@ -106,7 +109,7 @@ def crawl_ftp_dir(ftp, top_dir, parsing_function, ignored_dirs):
         The function to parse each non-directory result.
 
     """
-    logging.debug(f'Top dir: {top_dir}')
+    logger.debug(f'Crawl spawned at: {top_dir}')
 
     # Create an empty list to hold the callback
     retrieved_dir_list = []
@@ -115,6 +118,8 @@ def crawl_ftp_dir(ftp, top_dir, parsing_function, ignored_dirs):
     # is a function. In this case the given function is a call to
     # append() the retrieved directory list.
     ftp.dir(top_dir, retrieved_dir_list.append)
+
+    logger.debug(f'Found {len(retrieved_dir_list)} files and folders.')
 
     # For each line / directory listing retrieved.
     for line in retrieved_dir_list:
