@@ -20,6 +20,7 @@ class AssemblyDatabase(abc.ABC):
 
     .. warning:: This class cannot be directly instantiated.
     """
+
     def __init__(self, name, url, description, assemblies=None):
         """Initialization function, set up and assign attributes.
         """

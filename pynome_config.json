@@ -8,7 +8,9 @@
     "release_version": "release-38",
     "description": "The Ensembl genome annotation system.",
     "url": "http://ensemblgenomes.org/",
-    "bad_filenames": ["chromosome", "abinitio", "README", "CHECKSUMS"]
+    "bad_filenames": ["chromosome", "abinitio", "README", "CHECKSUMS"],
+    "crawl_urls": ["ftp://ftp.ensembl.org/pub/release-92/fasta/", "ftp://ftp.ensembl.org/pub/release-92/gff3/"],
+    "metadata_uri": null
   },
   "storage_config":{
     "irods_base_path": "/scidasZone/sysbio/testgenomes",

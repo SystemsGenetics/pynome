@@ -123,7 +123,8 @@ class EnsemblDatabase(AssemblyDatabase):
 
         # For each pair, generate the corresponding URI.
         for datatype, kingdom in datatype_kingdom_pairs:
-            uri = '/'.join(('pub', kingdom, self.release_version, datatype, ''))
+            uri = '/'.join(('pub', kingdom, self.release_version,
+                            datatype, ''))
             uri_list.append(uri)
 
         # Return the list of uris.
@@ -290,7 +291,6 @@ class EnsemblDatabase(AssemblyDatabase):
             genus = gen_species_list[0]
             species = gen_species_list[1]
 
-
             # If the length of gen_species_list is greater than 2, an
             # intraspecific name is present.
             if len(gen_species_list) > 2:
@@ -443,15 +443,19 @@ class EnsemblDatabase(AssemblyDatabase):
         :returns:
             A json object for tax_name.
         """
-        tax_metadata = self.metadata_df[self.metadata_df['species'].str.match(
-            tax_name.lower()).values]
 
-        # Check to ensure a set of values was found.
-        if tax_metadata.empty:
-            return None
+        # If a species metadata file is not found, create a simple
+        # dictionary with one entry.
+        if self.metadata_df.empty:
+            tax_metadata = dict(species=tax_name)
 
-        # Convert the dataframe to a dictionary.
-        tax_metadata = tax_metadata.to_dict()
+        else:
+            tax_metadata = self.metadata_df[
+                self.metadata_df['species'].str.match(
+                    tax_name.lower()).values]
+
+            # Convert the dataframe to a dictionary.
+            tax_metadata = tax_metadata.to_dict()
 
         # Add the commands used to process downloaded files.
         tax_metadata['hisat_index_gen'] = ' '.join(
@@ -459,16 +463,11 @@ class EnsemblDatabase(AssemblyDatabase):
              '-f', '<file_path>', '<out_base>'])
 
         tax_metadata['gtf_conversion'] = ' '.join(
-            ['gffread', '-T', '<gff3_file>' + '.gff3', '-o', '<gff3_file>' + '.gtf'])
+            ['gffread', '-T', '<gff3_file>' +
+             '.gff3', '-o', '<gff3_file>' + '.gtf'])
 
         tax_metadata['splice_site_gen'] = ' '.join(
             ['hisat2_extract_splice_sites.py', '<gft_file>'])
-
-        # Convert the pandas dataframe into a json string.
-        # tax_metadata = tax_metadata.to_json(orient='records')
-
-        # Conver the json string to a Python dictionary.
-        # metadata_dict = json.loads(tax_metadata)
 
         return tax_metadata
 
@@ -513,7 +512,7 @@ class EnsemblDatabase(AssemblyDatabase):
             A string of the found taxnomy ID, or `None`.
         """
 
-        # Search the pandas dataframe with the metadata parsed from species.txt.
+        # Search the pandas dataframe with the metadata from species.txt.
         taxonomy_id = self.metadata_df[
             self.metadata_df['species'].str.match(
                 tax_name.lower())]['taxonomy_id'].values

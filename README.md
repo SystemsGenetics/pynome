@@ -20,14 +20,13 @@ Commands can be run one at a time:
 $ pynome discover
 $ pynome list
 $ pynome download
-$ pynome sra
 $ pynome prepare
 ```
 
 Or strung together.
 
 ```bash
-pynome discover download sra prepare
+pynome discover download prepare
 ```
 
 ## Docker Implementation
