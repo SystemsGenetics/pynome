@@ -6,4 +6,4 @@ Set up the logger.
 
 import logging
 
-logging.basicConfig(filename='pynome_test.log', level=logging.DEBUG)
+logging.basicConfig(filename='pynome.log', level=logging.DEBUG)

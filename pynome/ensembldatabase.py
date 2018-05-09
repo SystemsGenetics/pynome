@@ -25,6 +25,7 @@ from pynome.assembly import Assembly
 from pynome.assemblydatabase import AssemblyDatabase
 from pynome.utils import crawl_ftp_dir
 
+logger = logging.getLogger(__name__)
 
 # pylint: disable=too-many-instance-attributes
 # pylint: disable=too-many-arguments
@@ -96,6 +97,8 @@ class EnsemblDatabase(AssemblyDatabase):
         # Define private attributes of the class.
         self.metadata_df = None
         self.database_name = 'ensembl'
+
+        logger.debug('Ensembl Database Initialized.')
 
     @property
     def metadata_uri(self):
@@ -252,6 +255,7 @@ class EnsemblDatabase(AssemblyDatabase):
 
             ``<species>.<assembly>.<sequence type>.<id type>.<id>.fa.gz``
         """
+        logger.debug(f'parsing the line: {in_line}')
 
         # Split the input string by whitespace.
         dir_list = in_line.split()
@@ -265,8 +269,6 @@ class EnsemblDatabase(AssemblyDatabase):
             # This means that one of the undesired files has been located.
             return None
 
-        logging.debug(f'parsing the line: {in_line}')
-
         # Split the file_name by the first two '.'.
         # This will give a string that contains the genus and species
         # informaiton, and a string that contains the assembly name.
@@ -274,7 +276,7 @@ class EnsemblDatabase(AssemblyDatabase):
             name_list = file_name.split('.', 2)
             genus_species, assembly_name = name_list[0], name_list[1]
         except ValueError:
-            logging.warning(f'Unable to parse {file_name}')
+            logger.warning(f'Unable to parse {file_name}')
             return None
 
         # Begin the parsing of the genus_species string. These strings can be
@@ -352,7 +354,7 @@ class EnsemblDatabase(AssemblyDatabase):
         # Build the path to the local file.
         target_file = os.path.join(self.base_path, 'species.txt')
         print(f'Downloading species.txt to {target_file}.')
-        logging.debug(f'Downloading species.txt to {target_file}.')
+        logger.debug(f'Downloading species.txt to {target_file}.')
 
         # Check if the file already exists, and that it is not 0 bytes.
         if os.path.isfile(target_file) and os.path.getsize(target_file) > 0:
@@ -519,7 +521,7 @@ class EnsemblDatabase(AssemblyDatabase):
 
         # Check if this actually found a value, if it did not, log the failure.
         if taxonomy_id.size == 0:
-            logging.warning('Unable to find a taxonomy id for %s', tax_name)
+            logger.warning('Unable to find a taxonomy id for %s', tax_name)
             return None
 
         return str(taxonomy_id[0])

@@ -14,7 +14,6 @@ import logging
 # SQLAlchemy imports.
 from sqlalchemy import Column, Integer, String
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.ext.hybrid import hybrid_property
 
 # Create the declarative base class.
 Base = declarative_base()
