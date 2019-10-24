@@ -1,0 +1,10 @@
+{
+    "files": [
+    "run.py"
+    ,"pynome2/__main__.py"
+    ,"pynome2/__init__.py"
+    ,"pynome2/genome.py"
+    ,"pynome2/crawl/__init__.py"
+    ,"pynome2/crawl/ensembl.py"
+    ]
+}
