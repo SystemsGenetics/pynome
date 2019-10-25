@@ -14,9 +14,9 @@ def register_crawler(path):
     """
     # Dummy wrapper function that returns the crawler.
     def wrapper(function):
+        # Register the crawler function and return it.
+        Assembly().register_crawler(function,path)
         return function
-    # Register the crawler function and return the dummy wrapper.
-    Assembly().register_crawler(wrapper,path)
     return wrapper
 
 
@@ -60,6 +60,12 @@ class Assembly():
             raise RegisterError(f"Assembly path '{path}' already exists.")
         # Register the given crawler to the given path.
         self.__paths[path] = function
+
+    def crawl(self):
+        """
+        todo
+        """
+        for crawler in self.__paths.values(): crawler()
 
 
 
