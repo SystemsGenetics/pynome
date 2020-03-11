@@ -1,5 +1,5 @@
 """
-Detailed description.
+Contains the Ensembl class.
 """
 from ftplib import FTP
 # For FASTA files: they ALWAYS end in *.toplevel.fa.gz
@@ -26,7 +26,6 @@ class Ensembl(abstract.AbstractCrawler):
     #######################
 
 
-    @abc.abstractmethod
     def crawl(self):
         """
         Detailed description.
