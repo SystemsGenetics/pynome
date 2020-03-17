@@ -1,6 +1,7 @@
 """
 Contains the AbstractCrawler class.
 """
+import abc
 
 
 
@@ -9,8 +10,7 @@ Contains the AbstractCrawler class.
 
 
 
-@abc.ABC
-class AbstractCrawler():
+class AbstractCrawler(abc.ABC):
     """
     Detailed description.
     """
@@ -22,11 +22,16 @@ class AbstractCrawler():
 
 
     @abc.abstractmethod
-    def crawl(self):
+    def crawl(self, species=""):
         """
         Detailed description.
+
+        Parameters
+        ----------
+        species : string
+                  Detailed description.
         """
-        pass
+        abc.ABC.__init__(self)
 
 
     ####################
@@ -51,7 +56,7 @@ class AbstractCrawler():
     #######################
 
 
-    def addEntry(self, species, genus, intraspecificName, assemblyId, taxonomyName, taxonomyId, mirrorJson):
+    def addEntry(self, species, genus, intraspecificName, assemblyId, taxonomyName, taxonomyId, mirrorData):
         """
         Detailed description.
 
@@ -69,7 +74,7 @@ class AbstractCrawler():
                        Detailed description.
         taxonomyId : string
                      Detailed description.
-        mirrorJson : string
+        mirrorData : dictionary
                      Detailed description.
         """
         pass

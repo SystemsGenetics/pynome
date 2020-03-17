@@ -13,7 +13,7 @@ def main():
     """
     Detailed description.
     """
-    core.asembly.registerCrawler(crawler.Ensembl(),"Ensembl")
+    core.assembly.registerCrawler(crawler.Ensembl(),"Ensembl")
     core.assembly.crawl()
 
 
