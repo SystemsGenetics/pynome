@@ -2,6 +2,7 @@
 Contains the Ensembl class.
 """
 import ftplib
+import socket
 from . import abstract
 # For FASTA files: they ALWAYS end in *.toplevel.fa.gz
 # Found in http://ftp.ensemblorg.ebi.ac.uk/pub/release-92/fasta/
@@ -78,7 +79,7 @@ class Ensembl(abstract.AbstractCrawler):
         """
         while True:
             try:
-                self.__ftp = ftplib.FTP(self.__FTP_HOST)
+                self.__ftp = ftplib.FTP(self.__FTP_HOST,timeout=10)
                 self.__ftp.login()
             except ftplib.all_errors:
                 pass
@@ -86,7 +87,7 @@ class Ensembl(abstract.AbstractCrawler):
                 break
 
 
-    def __crawlFasta_(self, directory):
+    def __crawlFasta_(self, directory, depth=0):
         """
         Detailed description.
 
@@ -94,22 +95,34 @@ class Ensembl(abstract.AbstractCrawler):
         ----------
         directory : string
                     Detailed description.
+        UNKNOWN
         """
         try:
             listing = [x.split("/").pop() for x in self.__ftp.nlst(directory)]
         except ftplib.all_errors:
-            print("BUMP")
             self.__connect_()
-            self.__crawlFasta_(directory)
+            self.__crawlFasta_(directory,depth)
             return
+        except socket.timeout:
+            self.__connect_()
+            self.__crawlFasta_(directory,depth)
+            return
+        i = 1
         for file_ in listing:
+            if not depth:
+                print("\r                              ",end="")
+                print("\r[Ensembl] Crawling FASTA %i/%i ..." % (i,len(listing)),end="")
+            i += 1
             if file_.endswith(self.__FASTA_EXTENSION):
-                print(f"{directory}/{file_}")
+                pass
+                #print(f"{directory}/{file_}")
             elif "." not in file_ and file_ not in self.__FTP_IGNORED_DIRS:
-                self.__crawlFasta_(directory+"/"+file_)
+                self.__crawlFasta_(directory+"/"+file_,depth+1)
+        if not depth:
+            print("")
 
 
-    def __crawlGff3_(self, directory, version):
+    def __crawlGff3_(self, directory, version, depth=0):
         """
         Detailed description.
 
@@ -119,19 +132,31 @@ class Ensembl(abstract.AbstractCrawler):
                     Detailed description.
         version : string
                   Detailed description.
+        UNKNOWN
         """
         try:
             listing = [x.split("/").pop() for x in self.__ftp.nlst(directory)]
         except ftplib.all_errors:
-            print("BUMP")
             self.__connect_()
-            self.__crawlGff3_(directory,version)
+            self.__crawlGff3_(directory,version,depth)
             return
+        except socket.timeout:
+            self.__connect_()
+            self.__crawlGff3_(directory,version,depth)
+            return
+        i = 1
         for file_ in listing:
+            if not depth:
+                print("\r                              ",end="")
+                print("\r[Ensembl] Crawling GFF3 %i/%i ..." % (i,len(listing)),end="")
+            i += 1
             if file_.endswith("."+str(version)+self.__GFF3_EXTENSION):
-                print(f"{directory}/{file_}")
+                pass
+                #print(f"{directory}/{file_}")
             elif "." not in file_:
-                self.__crawlGff3_(directory+"/"+file_,version)
+                self.__crawlGff3_(directory+"/"+file_,version,depth+1)
+        if not depth:
+            print("")
 
 
     ##############################
