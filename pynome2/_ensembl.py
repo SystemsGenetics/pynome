@@ -9,7 +9,7 @@ from . import abstract
 #
 # For GFF3 files: they ALWAYS end in *.92.gff3.gz
 # Found in http://ftp.ensemblorg.ebi.ac.uk/pub/release-92/gff3/
-
+import json
 
 
 
@@ -49,23 +49,24 @@ class Ensembl(abstract.AbstractCrawler):
                     if version > release_version:
                         release_version = version
         if release_version:
-            self.__crawlGff3_(
-                (
-                    self.__FTP_ROOT_DIR
-                    + "/"
-                    + self.__FTP_RELEASE_BASENAME
-                    + str(release_version)
-                    + self.__FTP_GFF3_DIR
-                )
-                ,release_version
-            )
-            self.__crawlFasta_(
+            #self.__crawlGff3_(
+            #    (
+            #        self.__FTP_ROOT_DIR
+            #        + "/"
+            #        + self.__FTP_RELEASE_BASENAME
+            #        + str(release_version)
+            #        + self.__FTP_GFF3_DIR
+            #    )
+            #    ,release_version
+            #)
+            links = self.__crawlFasta_(
                 self.__FTP_ROOT_DIR
                 + "/"
                 + self.__FTP_RELEASE_BASENAME
                 + str(release_version)
                 + self.__FTP_FASTA_DIR
             )
+            print(json.dumps(links,indent=4))
 
 
     #####################
@@ -97,29 +98,29 @@ class Ensembl(abstract.AbstractCrawler):
                     Detailed description.
         UNKNOWN
         """
+        ret = {}
         try:
             listing = [x.split("/").pop() for x in self.__ftp.nlst(directory)]
         except ftplib.all_errors:
             self.__connect_()
-            self.__crawlFasta_(directory,depth)
-            return
+            return self.__crawlFasta_(directory,depth)
         except socket.timeout:
             self.__connect_()
-            self.__crawlFasta_(directory,depth)
-            return
+            return self.__crawlFasta_(directory,depth)
         i = 1
         for file_ in listing:
             if not depth:
+                pass
                 print("\r                              ",end="")
                 print("\r[Ensembl] Crawling FASTA %i/%i ..." % (i,len(listing)),end="")
             i += 1
             if file_.endswith(self.__FASTA_EXTENSION):
-                pass
-                #print(f"{directory}/{file_}")
+                ret[file_[:-len(self.__FASTA_EXTENSION)]] = directory+"/"+file_
             elif "." not in file_ and file_ not in self.__FTP_IGNORED_DIRS:
-                self.__crawlFasta_(directory+"/"+file_,depth+1)
+                ret.update(self.__crawlFasta_(directory+"/"+file_,depth+1))
         if not depth:
             print("")
+        return ret
 
 
     def __crawlGff3_(self, directory, version, depth=0):

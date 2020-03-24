@@ -2,6 +2,7 @@
 Contains the AbstractCrawler class.
 """
 import abc
+import json
 
 
 
@@ -56,7 +57,7 @@ class AbstractCrawler(abc.ABC):
     #######################
 
 
-    def addEntry(self, species, genus, intraspecificName, assemblyId, taxonomyName, taxonomyId, mirrorData):
+    def addEntry(self, species, genus, intraspecificName, assemblyId, taxonomyName, taxonomyId, mirrorType, mirrorData):
         """
         Detailed description.
 
@@ -74,7 +75,22 @@ class AbstractCrawler(abc.ABC):
                        Detailed description.
         taxonomyId : string
                      Detailed description.
+        mirrorType : string
+                     Detailed description.
         mirrorData : dictionary
                      Detailed description.
         """
-        pass
+        print(
+            json.dumps(
+                {
+                    "species": species
+                    ,"genus": genus
+                    ,"intraspecific_name": intraspecificName
+                    ,"assembly_id": assemblyId
+                    ,"taxonomy": {"name": taxonomyName, "id": taxonomyId}
+                    ,"mirror_type": mirrorType
+                    ,"mirror_data": mirrorData
+                }
+                ,indent=4
+            )
+        )
