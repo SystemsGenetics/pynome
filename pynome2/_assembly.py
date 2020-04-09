@@ -54,7 +54,7 @@ class Assembly():
                Detailed description.
         """
         if name in self.__crawlers.keys():
-            raise exception.RegisterError(f"Crawler '{name}' already exists.")
+            raise exception.RegisterError("Crawler '"+name+"' already exists.")
         if not isinstance(crawler,abstract.AbstractCrawler):
-            raise exception.RegisterError(f"Given object is not Crawler instance.")
+            raise exception.RegisterError("Given object is not Crawler instance.")
         self.__crawlers[name] = crawler

@@ -9,7 +9,7 @@ from . import abstract
 #
 # For GFF3 files: they ALWAYS end in *.92.gff3.gz
 # Found in http://ftp.ensemblorg.ebi.ac.uk/pub/release-92/gff3/
-import json
+
 
 
 
@@ -21,6 +21,20 @@ class Ensembl(abstract.AbstractCrawler):
     """
     Detailed description.
     """
+
+
+    #######################
+    # PUBLIC - Initialize #
+    #######################
+
+
+    def __init__(self):
+        """
+        Detailed description.
+        """
+        abstract.AbstractCrawler.__init__(self)
+        self.__text = ""
+        self.__taxIds = {}
 
 
     #######################
@@ -49,24 +63,30 @@ class Ensembl(abstract.AbstractCrawler):
                     if version > release_version:
                         release_version = version
         if release_version:
-            #self.__crawlGff3_(
-            #    (
-            #        self.__FTP_ROOT_DIR
-            #        + "/"
-            #        + self.__FTP_RELEASE_BASENAME
-            #        + str(release_version)
-            #        + self.__FTP_GFF3_DIR
-            #    )
-            #    ,release_version
-            #)
-            links = self.__crawlFasta_(
+            self.__getTaxonomyIds_(
+                self.__FTP_ROOT_DIR
+                + "/"
+                + self.__FTP_RELEASE_BASENAME
+                + str(release_version)
+            )
+            fasta = self.__crawlFasta_(
                 self.__FTP_ROOT_DIR
                 + "/"
                 + self.__FTP_RELEASE_BASENAME
                 + str(release_version)
                 + self.__FTP_FASTA_DIR
             )
-            print(json.dumps(links,indent=4))
+            gff3 = self.__crawlGff3_(
+                (
+                    self.__FTP_ROOT_DIR
+                    + "/"
+                    + self.__FTP_RELEASE_BASENAME
+                    + str(release_version)
+                    + self.__FTP_GFF3_DIR
+                )
+                ,release_version
+            )
+            self.__mergeResults_(fasta,gff3)
 
 
     #####################
@@ -135,29 +155,83 @@ class Ensembl(abstract.AbstractCrawler):
                   Detailed description.
         UNKNOWN
         """
+        ret = {}
         try:
             listing = [x.split("/").pop() for x in self.__ftp.nlst(directory)]
         except ftplib.all_errors:
             self.__connect_()
-            self.__crawlGff3_(directory,version,depth)
-            return
+            return self.__crawlGff3_(directory,version,depth)
         except socket.timeout:
             self.__connect_()
-            self.__crawlGff3_(directory,version,depth)
-            return
+            return self.__crawlGff3_(directory,version,depth)
         i = 1
         for file_ in listing:
             if not depth:
                 print("\r                              ",end="")
                 print("\r[Ensembl] Crawling GFF3 %i/%i ..." % (i,len(listing)),end="")
             i += 1
-            if file_.endswith("."+str(version)+self.__GFF3_EXTENSION):
-                pass
-                #print(f"{directory}/{file_}")
+            ending = "."+str(version)+self.__GFF3_EXTENSION
+            if file_.endswith(ending):
+                ret[file_[:-len(ending)]] = directory+"/"+file_
             elif "." not in file_:
-                self.__crawlGff3_(directory+"/"+file_,version,depth+1)
+                ret.update(self.__crawlGff3_(directory+"/"+file_,version,depth+1))
         if not depth:
             print("")
+        return ret
+
+
+    def __getTaxonomyIds_(self, directory):
+        """
+        Detailed description.
+
+        Parameters
+        ----------
+        directory : string
+                    Detailed description.
+        """
+        self.__text = ""
+        self.__taxIds = {}
+        self.__ftp.retrlines("RETR "+directory+self.__TAXONOMY_FILE,self.__write_)
+        for line in self.__text.split("\n")[1:]:
+            parts = line.split("\t")
+            if len(parts)>=5:
+                self.__taxIds[parts[1]+"."+parts[4]] = parts[3]
+
+
+    def __mergeResults_(self, fasta, gff3):
+        """
+        Detailed description.
+
+        Parameters
+        ----------
+        UNKNOWN
+        UNKNOWN
+        """
+        for key in fasta:
+            if key in gff3:
+                parts = key.split(".")
+                names = parts.pop(0).split("_") + [""]
+                taxKey = "_".join((n.lower() for n in names if n)) + "." + ".".join(parts)
+                self._addEntry_(
+                    names[0]
+                    ,names[1]
+                    ,names[2]
+                    ,".".join(parts)
+                    ,self.__taxIds.get(taxKey,"")
+                    ,"ensembl"
+                    ,{"fasta": fasta[key], "gff3": gff3[key]}
+                )
+
+
+    def __write_(self, text):
+        """
+        Detailed description.
+
+        Parameters
+        ----------
+        UNKNOWN
+        """
+        self.__text += text+"\n"
 
 
     ##############################
@@ -211,3 +285,9 @@ class Ensembl(abstract.AbstractCrawler):
     # Detailed description.
     #
     __GFF3_EXTENSION = ".gff3.gz"
+
+
+    #
+    # Detailed description.
+    #
+    __TAXONOMY_FILE = "/species_EnsemblVertebrates.txt"

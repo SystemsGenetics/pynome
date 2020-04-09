@@ -57,22 +57,20 @@ class AbstractCrawler(abc.ABC):
     #######################
 
 
-    def addEntry(self, species, genus, intraspecificName, assemblyId, taxonomyName, taxonomyId, mirrorType, mirrorData):
+    def _addEntry_(self, genus, species, intraspecificName, assemblyId, taxonomyId, mirrorType, mirrorData):
         """
         Detailed description.
 
         Parameters
         ----------
-        species : string
-                  Detailed description.
         genus : string
                 Detailed description.
+        species : string
+                  Detailed description.
         intraspecificName : string
                             Detailed description.
         assemblyId : string
                      Detailed description.
-        taxonomyName : string
-                       Detailed description.
         taxonomyId : string
                      Detailed description.
         mirrorType : string
@@ -83,14 +81,18 @@ class AbstractCrawler(abc.ABC):
         print(
             json.dumps(
                 {
-                    "species": species
-                    ,"genus": genus
+                    "genus": genus
+                    ,"species": species
                     ,"intraspecific_name": intraspecificName
                     ,"assembly_id": assemblyId
-                    ,"taxonomy": {"name": taxonomyName, "id": taxonomyId}
+                    ,"taxonomy": {
+                        "name": " ".join((p for p in (genus,species,intraspecificName) if p))
+                        ,"id": taxonomyId
+                    }
                     ,"mirror_type": mirrorType
                     ,"mirror_data": mirrorData
                 }
                 ,indent=4
             )
+            + "\n\n"
         )
