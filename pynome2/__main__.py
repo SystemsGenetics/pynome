@@ -1,5 +1,5 @@
 """
-Detailed description.
+This contains the main entry point function of this application.
 """
 from . import core
 from . import crawler
@@ -11,7 +11,7 @@ from . import crawler
 
 def main():
     """
-    Detailed description.
+    Starts execution of this application.
     """
     core.assembly.registerCrawler(crawler.Ensembl(),"Ensembl")
     core.assembly.crawl()

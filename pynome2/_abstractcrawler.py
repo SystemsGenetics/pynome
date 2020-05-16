@@ -13,7 +13,9 @@ import json
 
 class AbstractCrawler(abc.ABC):
     """
-    Detailed description.
+    This is the abstract crawler class. An interface is provided that crawls its
+    source and adds entries to be added to the local file structure. This class
+    provides a protected function for adding entries to the local database.
     """
 
 
@@ -23,14 +25,21 @@ class AbstractCrawler(abc.ABC):
 
 
     @abc.abstractmethod
-    def crawl(self, species=""):
+    def crawl(
+        self
+        ,species=""
+        ):
         """
-        Detailed description.
+        This interface Crawls the remote database, adding all entries it finds
+        to be added to the local file database. An optional species name can be
+        provided that restricts entries being added to only that species if it
+        is not an empty string.
 
         Parameters
         ----------
         species : string
-                  Detailed description.
+                  Species name used to restrict the entries added to only that
+                  species. If this is empty then all species are added.
         """
         abc.ABC.__init__(self)
 
@@ -40,14 +49,13 @@ class AbstractCrawler(abc.ABC):
     ####################
 
 
-    def assemble(self, rootPath):
+    def assemble(
+        self
+        ):
         """
-        Detailed description.
-
-        Parameters
-        ----------
-        rootPath : string
-                   Detailed description.
+        Updates the directory structure and metadata JSON files of the local
+        database with all entries added to this crawler, creating directories
+        and files that do not exist and overwriting ones that do.
         """
         pass
 
@@ -57,26 +65,38 @@ class AbstractCrawler(abc.ABC):
     #######################
 
 
-    def _addEntry_(self, genus, species, intraspecificName, assemblyId, taxonomyId, mirrorType, mirrorData):
+    def _addEntry_(
+        self
+        ,genus
+        ,species
+        ,intraspecificName
+        ,assemblyId
+        ,taxonomyId
+        ,mirrorType
+        ,mirrorData
+        ):
         """
-        Detailed description.
+        Adds a database entry for this crawler to be used in assembling the
+        local directories and JSON metadata.
 
         Parameters
         ----------
         genus : string
-                Detailed description.
+                The genus of the entry.
         species : string
-                  Detailed description.
+                  The species of the entry.
         intraspecificName : string
-                            Detailed description.
+                            The intra-specific name of the entry.
         assemblyId : string
-                     Detailed description.
+                     The assembly ID of the entry.
         taxonomyId : string
-                     Detailed description.
+                     The taxonomy ID of the entry.
         mirrorType : string
-                     Detailed description.
+                     The mirror type of the entry, determining which mirror
+                     interface is used for downloading its data.
         mirrorData : dictionary
-                     Detailed description.
+                     The JSON compatible data the mirror type requires for
+                     downloading this entries data from its remote source.
         """
         print(
             json.dumps(

@@ -4,11 +4,6 @@ Contains the Ensembl class.
 import ftplib
 import socket
 from . import abstract
-# For FASTA files: they ALWAYS end in *.toplevel.fa.gz
-# Found in http://ftp.ensemblorg.ebi.ac.uk/pub/release-92/fasta/
-#
-# For GFF3 files: they ALWAYS end in *.92.gff3.gz
-# Found in http://ftp.ensemblorg.ebi.ac.uk/pub/release-92/gff3/
 
 
 
@@ -19,7 +14,11 @@ from . import abstract
 
 class Ensembl(abstract.AbstractCrawler):
     """
-    Detailed description.
+    This is the ensembl class. It implements the abstract crawler interface. The
+    remote database is crawled directly through its ftp server to find all valid
+    entries. All information can be found within those directories except for
+    the taxonomy ID. The taxonomy ID is found in a special text file located in
+    the root public folder.
     """
 
 
@@ -28,52 +27,49 @@ class Ensembl(abstract.AbstractCrawler):
     #######################
 
 
-    def __init__(self):
+    def __init__(
+        self
+        ):
         """
-        Detailed description.
+        Initializes a new ensembl crawler.
         """
         abstract.AbstractCrawler.__init__(self)
         self.__text = ""
         self.__taxIds = {}
 
 
-    #######################
-    # PUBLIC - Interfaces #
-    #######################
+    ####################
+    # PUBLIC - Methods #
+    ####################
 
 
-    def crawl(self, species=""):
+    def crawl(
+        self
+        ,species=""
+        ):
         """
-        Detailed description.
+        Implements the pynome2.abstract.AbstractCrawler interface.
 
         Parameters
         ----------
         species : string
-                  Detailed description.
+                  See interface docs.
         """
         self.__ftp = None
         self.__connect_()
-        release_version = 0
-        listing = [x.split("/").pop() for x in self.__ftp.nlst(self.__FTP_ROOT_DIR)]
-        for file_ in listing:
-            if file_.startswith(self.__FTP_RELEASE_BASENAME):
-                version = file_[len(self.__FTP_RELEASE_BASENAME):]
-                if version.isdigit():
-                    version = int(version)
-                    if version > release_version:
-                        release_version = version
-        if release_version:
+        releaseVersion = self.__latestRelease_()
+        if releaseVersion:
             self.__getTaxonomyIds_(
                 self.__FTP_ROOT_DIR
                 + "/"
                 + self.__FTP_RELEASE_BASENAME
-                + str(release_version)
+                + str(releaseVersion)
             )
             fasta = self.__crawlFasta_(
                 self.__FTP_ROOT_DIR
                 + "/"
                 + self.__FTP_RELEASE_BASENAME
-                + str(release_version)
+                + str(releaseVersion)
                 + self.__FTP_FASTA_DIR
             )
             gff3 = self.__crawlGff3_(
@@ -81,10 +77,10 @@ class Ensembl(abstract.AbstractCrawler):
                     self.__FTP_ROOT_DIR
                     + "/"
                     + self.__FTP_RELEASE_BASENAME
-                    + str(release_version)
+                    + str(releaseVersion)
                     + self.__FTP_GFF3_DIR
                 )
-                ,release_version
+                ,releaseVersion
             )
             self.__mergeResults_(fasta,gff3)
 
@@ -94,9 +90,12 @@ class Ensembl(abstract.AbstractCrawler):
     #####################
 
 
-    def __connect_(self):
+    def __connect_(
+        self
+        ):
         """
-        Detailed description.
+        Connects this crawler to the ensembl FTP server, continuously retrying a
+        connection until one is made successfully.
         """
         while True:
             try:
@@ -108,15 +107,32 @@ class Ensembl(abstract.AbstractCrawler):
                 break
 
 
-    def __crawlFasta_(self, directory, depth=0):
+    def __crawlFasta_(
+        self
+        ,directory
+        ,depth=0
+        ):
         """
-        Detailed description.
+        Recursively crawls the given directory, calling this method on any
+        subdirectories found. If the FTP connection is lost this crawler's
+        connect method is called to reconnect and continue without interruption.
 
         Parameters
         ----------
         directory : string
-                    Detailed description.
-        UNKNOWN
+                    The directory path that is recursively crawled for valid
+                    FASTA files.
+        depth : int
+                The current subdirectory depth of this recursive scan. Used to
+                print output about progress for only the top level call of this
+                method.
+
+        Returns
+        -------
+        ret0 : dictionary
+               A lookup table of found valid FASTA files for potential entries
+               where the keys are the file name excluding its FASTA extension
+               and the values are the full path to the file.
         """
         ret = {}
         try:
@@ -143,17 +159,37 @@ class Ensembl(abstract.AbstractCrawler):
         return ret
 
 
-    def __crawlGff3_(self, directory, version, depth=0):
+    def __crawlGff3_(
+        self
+        ,directory
+        ,version
+        ,depth=0
+        ):
         """
-        Detailed description.
+        Recursively crawls the given directory, calling this method on any
+        subdirectories found. If the FTP connection is lost this crawler's
+        connect method is called to reconnect and continue without interruption.
 
         Parameters
         ----------
         directory : string
-                    Detailed description.
+                    The directory path that is recursively crawled for valid
+                    GFF3 files.
         version : string
-                  Detailed description.
-        UNKNOWN
+                  The release number of the release directory that is being
+                  scanned. This is needed for GFF3 because the release number is
+                  part of its valid file name extension.
+        depth : int
+                The current subdirectory depth of this recursive scan. Used to
+                print output about progress for only the top level call of this
+                method.
+
+        Returns
+        -------
+        ret0 : dictionary
+               A lookup table of found valid GFF3 files for potential entries
+               where the keys are the file name excluding its GFF3 extension and
+               the values are the full path to the file.
         """
         ret = {}
         try:
@@ -180,14 +216,19 @@ class Ensembl(abstract.AbstractCrawler):
         return ret
 
 
-    def __getTaxonomyIds_(self, directory):
+    def __getTaxonomyIds_(
+        self
+        ,directory
+        ):
         """
-        Detailed description.
+        Downloads and parses the given taxonomy ID file, populating this
+        crawlers lookup dictionary of taxonomy IDs.
 
         Parameters
         ----------
         directory : string
-                    Detailed description.
+                    The directory on the ensembl FTP server where the special
+                    taxonomy ID file is located.
         """
         self.__text = ""
         self.__taxIds = {}
@@ -198,14 +239,48 @@ class Ensembl(abstract.AbstractCrawler):
                 self.__taxIds[parts[1]+"."+parts[4]] = parts[3]
 
 
-    def __mergeResults_(self, fasta, gff3):
+    def __latestRelease_(
+        self
+        ):
         """
-        Detailed description.
+        Getter method.
+
+        Returns
+        -------
+        ret0 : int
+               The latest release number of all scanned release directories or 0
+               if no release directories were found.
+        """
+        ret = 0
+        listing = [x.split("/").pop() for x in self.__ftp.nlst(self.__FTP_ROOT_DIR)]
+        for file_ in listing:
+            if file_.startswith(self.__FTP_RELEASE_BASENAME):
+                version = file_[len(self.__FTP_RELEASE_BASENAME):]
+                if version.isdigit():
+                    version = int(version)
+                    if version > ret:
+                        ret = version
+        return ret
+
+
+    def __mergeResults_(
+        self
+        ,fasta
+        ,gff3
+        ):
+        """
+        Merges the given FASTA and GFF3 dictionaries of found possible entries,
+        adding an entry to this crawler for any key that both dictionaries
+        contain.
 
         Parameters
         ----------
-        UNKNOWN
-        UNKNOWN
+        fasta : dictionary
+                The FASTA lookup dictionary generated by this crawler's crawl
+                FASTA method.
+        gff3 : dictionary
+               The GFF3 lookup dictionary generated by this crawler's crawl GFF3
+               method.
         """
         for key in fasta:
             if key in gff3:
@@ -223,71 +298,82 @@ class Ensembl(abstract.AbstractCrawler):
                 )
 
 
-    def __write_(self, text):
+    def __write_(
+        self
+        ,text
+        ):
         """
-        Detailed description.
+        Callback function for writing to this crawlers special text holder for
+        downloading a taxonomy ID file.
 
         Parameters
         ----------
-        UNKNOWN
+        text : string
+               The string that is appended to this crawlers special placeholder
+               text.
         """
         self.__text += text+"\n"
 
 
-    ##############################
-    # PRIVATE - Static Variables #
-    ##############################
+    #######################
+    # PRIVATE - Constants #
+    #######################
 
 
     #
-    # Detailed description.
+    # The extension of FASTA files that should be flagged as a possible entry
+    # for this crawler.
     #
     __FASTA_EXTENSION = ".dna.toplevel.fa.gz"
 
 
     #
-    # Detailed description.
+    # The directory on the ensembl FTP server where FASTA data is stored.
     #
     __FTP_FASTA_DIR = "/fasta"
 
 
     #
-    # Detailed description.
+    # The directory on the ensembl FTP server where GFF3 data is stored.
     #
     __FTP_GFF3_DIR = "/gff3"
 
 
     #
-    # Detailed description.
+    # The URL of the ensembl FTP server.
     #
     __FTP_HOST = "ftp.ensembl.org"
 
 
     #
-    # Detailed description.
+    # A list of directory names that this crawler will ignore when crawling the
+    # ensembl FTP server.
     #
     __FTP_IGNORED_DIRS = ["cdna","cds","dna_index","ncrna","pep"]
 
 
     #
-    # Detailed description.
+    # The beginning of the directory name used for releases of data on the
+    # ensembl FTP server.
     #
     __FTP_RELEASE_BASENAME = "release-"
 
 
     #
-    # Detailed description.
+    # The root public directory for the ensembl FTP server.
     #
     __FTP_ROOT_DIR = "/pub"
 
 
     #
-    # Detailed description.
+    # The extension of GFF3 files that should be flagged as a possible entry for
+    # this crawler.
     #
     __GFF3_EXTENSION = ".gff3.gz"
 
 
     #
-    # Detailed description.
+    # The file name of the special text file that contains all taxonomy IDs on
+    # the ensembl FTP server in a release folder.
     #
     __TAXONOMY_FILE = "/species_EnsemblVertebrates.txt"

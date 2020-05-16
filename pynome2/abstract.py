@@ -1,5 +1,5 @@
 """
-Detailed description.
+Contains all abstract interface classes.
 """
 import abc
 

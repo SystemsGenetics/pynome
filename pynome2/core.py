@@ -1,11 +1,11 @@
 """
-Detailed description.
+Contains all core classes, functions, and objects of this application.
 """
 
 from ._assembly import Assembly
 
 
 #
-# Detailed description.
+# The singleton instance of the assembly class.
 #
 assembly = Assembly()
