@@ -29,7 +29,7 @@ class Assembly():
         self
         ):
         """
-        Initializes the initial singleton assembly instance.
+        Initializes the singleton assembly instance.
         """
         self.__crawlers = {}
 
@@ -48,27 +48,23 @@ class Assembly():
         """
         for crawler in self.__crawlers.values():
             crawler.crawl()
+            crawler.assemble()
 
 
     def registerCrawler(
         self
         ,crawler
-        ,name
         ):
         """
-        Registers a new crawler implementation with the given name and class
-        instance.
+        Registers a new crawler implementation with the given class instance.
 
         Parameters
         ----------
         crawler : pynome.abstract.AbstractCrawler
                   The abstract crawler implementation that is registered.
-        name : string
-               The name of the crawler implementation registered which must be
-               unique among all other registered crawlers.
         """
-        if name in self.__crawlers.keys():
-            raise exception.RegisterError("Crawler '"+name+"' already exists.")
         if not isinstance(crawler,abstract.AbstractCrawler):
             raise exception.RegisterError("Given object is not Crawler instance.")
-        self.__crawlers[name] = crawler
+        if crawler.name() in self.__crawlers.keys():
+            raise exception.RegisterError("Crawler '"+name+"' already exists.")
+        self.__crawlers[crawler.name()] = crawler

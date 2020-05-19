@@ -13,7 +13,7 @@ def main():
     """
     Starts execution of this application.
     """
-    core.assembly.registerCrawler(crawler.Ensembl(),"Ensembl")
+    core.assembly.registerCrawler(crawler.Ensembl())
     core.assembly.crawl()
 
 

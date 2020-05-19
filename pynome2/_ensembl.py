@@ -4,6 +4,7 @@ Contains the Ensembl class.
 import ftplib
 import socket
 from . import abstract
+from . import core
 
 
 
@@ -52,7 +53,7 @@ class Ensembl(abstract.AbstractCrawler):
 
         Parameters
         ----------
-        species : string
+        species : object
                   See interface docs.
         """
         self.__ftp = None
@@ -83,6 +84,20 @@ class Ensembl(abstract.AbstractCrawler):
                 ,releaseVersion
             )
             self.__mergeResults_(fasta,gff3)
+
+
+    def name(
+        self
+        ):
+        """
+        Implements the pynome2.abstract.AbstractCrawler interface.
+
+        Returns
+        -------
+        ret0 : object
+               See interface docs.
+        """
+        return "Ensembl"
 
 
     #####################
@@ -146,16 +161,12 @@ class Ensembl(abstract.AbstractCrawler):
         i = 1
         for file_ in listing:
             if not depth:
-                pass
-                print("\r                              ",end="")
-                print("\r[Ensembl] Crawling FASTA %i/%i ..." % (i,len(listing)),end="")
+                core.log.send("Crawling Ensembl FASTA %i/%i"%(i,len(listing)))
             i += 1
             if file_.endswith(self.__FASTA_EXTENSION):
                 ret[file_[:-len(self.__FASTA_EXTENSION)]] = directory+"/"+file_
             elif "." not in file_ and file_ not in self.__FTP_IGNORED_DIRS:
                 ret.update(self.__crawlFasta_(directory+"/"+file_,depth+1))
-        if not depth:
-            print("")
         return ret
 
 
@@ -203,16 +214,13 @@ class Ensembl(abstract.AbstractCrawler):
         i = 1
         for file_ in listing:
             if not depth:
-                print("\r                              ",end="")
-                print("\r[Ensembl] Crawling GFF3 %i/%i ..." % (i,len(listing)),end="")
+                core.log.send("Crawling Ensembl GFF3 %i/%i ..."%(i,len(listing)))
             i += 1
             ending = "."+str(version)+self.__GFF3_EXTENSION
             if file_.endswith(ending):
                 ret[file_[:-len(ending)]] = directory+"/"+file_
             elif "." not in file_:
                 ret.update(self.__crawlGff3_(directory+"/"+file_,version,depth+1))
-        if not depth:
-            print("")
         return ret
 
 

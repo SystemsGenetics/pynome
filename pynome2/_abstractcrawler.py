@@ -3,6 +3,7 @@ Contains the AbstractCrawler class.
 """
 import abc
 import json
+import os
 
 
 
@@ -20,6 +21,21 @@ class AbstractCrawler(abc.ABC):
 
 
     #######################
+    # PUBLIC - Initialize #
+    #######################
+
+
+    def __init__(
+        self
+        ):
+        """
+        Initializes a new abstract crawler instance.
+        """
+        abc.ABC.__init__(self)
+        self.__entries = {}
+
+
+    #######################
     # PUBLIC - Interfaces #
     #######################
 
@@ -30,7 +46,7 @@ class AbstractCrawler(abc.ABC):
         ,species=""
         ):
         """
-        This interface Crawls the remote database, adding all entries it finds
+        This interface crawls the remote database, adding all entries it finds
         to be added to the local file database. An optional species name can be
         provided that restricts entries being added to only that species if it
         is not an empty string.
@@ -41,7 +57,24 @@ class AbstractCrawler(abc.ABC):
                   Species name used to restrict the entries added to only that
                   species. If this is empty then all species are added.
         """
-        abc.ABC.__init__(self)
+        pass
+
+
+    @abc.abstractmethod
+    def name(
+        self
+        ):
+        """
+        This interface is a getter method.
+
+        Returns
+        -------
+        ret0 : object
+               The name of this crawler implementation that must be unique among
+               all registered crawlers and is used as the root directory name
+               for the local database.
+        """
+        pass
 
 
     ####################
@@ -55,9 +88,15 @@ class AbstractCrawler(abc.ABC):
         """
         Updates the directory structure and metadata JSON files of the local
         database with all entries added to this crawler, creating directories
-        and files that do not exist and overwriting ones that do.
+        and files that do not exist and overwriting ones that do. This also
+        clears all entries added from this crawler's crawl method.
         """
-        pass
+        for key in self.__entries:
+            d = os.path.join(self.name(),key)
+            os.makedirs(d,exist_ok=True)
+            with open(os.path.join(d,"metadata.json"),"w") as ofile:
+                ofile.write(json.dumps(self.__entries[key],indent=4) + "\n\n")
+        self.__entries = {}
 
 
     #######################
@@ -98,21 +137,21 @@ class AbstractCrawler(abc.ABC):
                      The JSON compatible data the mirror type requires for
                      downloading this entries data from its remote source.
         """
-        print(
-            json.dumps(
-                {
-                    "genus": genus
-                    ,"species": species
-                    ,"intraspecific_name": intraspecificName
-                    ,"assembly_id": assemblyId
-                    ,"taxonomy": {
-                        "name": " ".join((p for p in (genus,species,intraspecificName) if p))
-                        ,"id": taxonomyId
-                    }
-                    ,"mirror_type": mirrorType
-                    ,"mirror_data": mirrorData
-                }
-                ,indent=4
+        key = os.path.join(taxonomyId,assemblyId)
+        if key in self.__entries:
+            core.log.send(
+                "Duplicate entries '%s' found in crawler %s! Overwriting existing entry!"
+                % (key,self.name())
             )
-            + "\n\n"
-        )
+        self.__entries[key] =  {
+            "genus": genus
+            ,"species": species
+            ,"intraspecific_name": intraspecificName
+            ,"assembly_id": assemblyId
+            ,"taxonomy": {
+                "name": " ".join((p for p in (genus,species,intraspecificName) if p))
+                ,"id": taxonomyId
+            }
+            ,"mirror_type": mirrorType
+            ,"mirror_data": mirrorData
+        }
