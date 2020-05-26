@@ -244,7 +244,9 @@ class Ensembl(abstract.AbstractCrawler):
         for line in self.__text.split("\n")[1:]:
             parts = line.split("\t")
             if len(parts)>=5:
-                self.__taxIds[parts[1]+"."+parts[4]] = parts[3]
+                self.__taxIds[parts[1]] = parts[3]
+        for key in self.__taxIds:
+            print(key,self.__taxIds[key])
 
 
     def __latestRelease_(
@@ -294,15 +296,15 @@ class Ensembl(abstract.AbstractCrawler):
             if key in gff3:
                 parts = key.split(".")
                 names = parts.pop(0).split("_") + [""]
-                taxKey = "_".join((n.lower() for n in names if n)) + "." + ".".join(parts)
+                taxKey = "_".join((n.lower() for n in names if n))
                 self._addEntry_(
                     names[0]
                     ,names[1]
                     ,names[2]
                     ,".".join(parts)
                     ,self.__taxIds.get(taxKey,"")
-                    ,"ensembl"
-                    ,{"fasta": fasta[key], "gff3": gff3[key]}
+                    ,"basicftp"
+                    ,{"fasta": self.__FTP_HOST+fasta[key], "gff3": self.__FTP_HOST+gff3[key]}
                 )
 
 
