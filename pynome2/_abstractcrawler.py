@@ -4,6 +4,7 @@ Contains the AbstractCrawler class.
 import abc
 import json
 import os
+from . import settings
 
 
 
@@ -92,7 +93,7 @@ class AbstractCrawler(abc.ABC):
         clears all entries added from this crawler's crawl method.
         """
         for key in self.__entries:
-            d = os.path.join(self.name(),key)
+            d = os.path.join(settings.rootPath,key)
             os.makedirs(d,exist_ok=True)
             with open(os.path.join(d,"metadata.json"),"w") as ofile:
                 ofile.write(json.dumps(self.__entries[key],indent=4) + "\n\n")
@@ -137,7 +138,7 @@ class AbstractCrawler(abc.ABC):
                      The JSON compatible data the mirror type requires for
                      downloading this entries data from its remote source.
         """
-        key = os.path.join(taxonomyId,assemblyId)
+        key = os.path.join(taxonomyId,assemblyId+"-"+self.name())
         if key in self.__entries:
             core.log.send(
                 "Duplicate entries '%s' found in crawler %s! Overwriting existing entry!"

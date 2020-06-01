@@ -72,6 +72,7 @@ class Ensembl(abstract.AbstractCrawler):
                 + self.__FTP_RELEASE_BASENAME
                 + str(releaseVersion)
                 + self.__FTP_FASTA_DIR
+                ,species
             )
             gff3 = self.__crawlGff3_(
                 (
@@ -81,6 +82,7 @@ class Ensembl(abstract.AbstractCrawler):
                     + str(releaseVersion)
                     + self.__FTP_GFF3_DIR
                 )
+                ,species
                 ,releaseVersion
             )
             self.__mergeResults_(fasta,gff3)
@@ -125,6 +127,7 @@ class Ensembl(abstract.AbstractCrawler):
     def __crawlFasta_(
         self
         ,directory
+        ,species
         ,depth=0
         ):
         """
@@ -137,6 +140,10 @@ class Ensembl(abstract.AbstractCrawler):
         directory : string
                     The directory path that is recursively crawled for valid
                     FASTA files.
+        species : string
+                  The name of the species that is crawled, ignoring any other
+                  species found on the remote server. If this string is blank
+                  then all species are crawled.
         depth : int
                 The current subdirectory depth of this recursive scan. Used to
                 print output about progress for only the top level call of this
@@ -154,25 +161,30 @@ class Ensembl(abstract.AbstractCrawler):
             listing = [x.split("/").pop() for x in self.__ftp.nlst(directory)]
         except ftplib.all_errors:
             self.__connect_()
-            return self.__crawlFasta_(directory,depth)
+            return self.__crawlFasta_(directory,species,depth)
         except socket.timeout:
             self.__connect_()
-            return self.__crawlFasta_(directory,depth)
-        i = 1
+            return self.__crawlFasta_(directory,species,depth)
+        i = 0
         for file_ in listing:
-            if not depth:
-                core.log.send("Crawling Ensembl FASTA %i/%i"%(i,len(listing)))
             i += 1
+            if not depth:
+                if species and species.lower() != file_.split("_")[0].lower():
+                    core.log.send("Ignoring Ensembl FASTA %i/%i"%(i,len(listing)))
+                    continue
+                else:
+                    core.log.send("Crawling Ensembl FASTA %i/%i"%(i,len(listing)))
             if file_.endswith(self.__FASTA_EXTENSION):
                 ret[file_[:-len(self.__FASTA_EXTENSION)]] = directory+"/"+file_
             elif "." not in file_ and file_ not in self.__FTP_IGNORED_DIRS:
-                ret.update(self.__crawlFasta_(directory+"/"+file_,depth+1))
+                ret.update(self.__crawlFasta_(directory+"/"+file_,species,depth+1))
         return ret
 
 
     def __crawlGff3_(
         self
         ,directory
+        ,species
         ,version
         ,depth=0
         ):
@@ -186,6 +198,10 @@ class Ensembl(abstract.AbstractCrawler):
         directory : string
                     The directory path that is recursively crawled for valid
                     GFF3 files.
+        species : string
+                  The name of the species that is crawled, ignoring any other
+                  species found on the remote server. If this string is blank
+                  then all species are crawled.
         version : string
                   The release number of the release directory that is being
                   scanned. This is needed for GFF3 because the release number is
@@ -207,20 +223,24 @@ class Ensembl(abstract.AbstractCrawler):
             listing = [x.split("/").pop() for x in self.__ftp.nlst(directory)]
         except ftplib.all_errors:
             self.__connect_()
-            return self.__crawlGff3_(directory,version,depth)
+            return self.__crawlGff3_(directory,species,version,depth)
         except socket.timeout:
             self.__connect_()
-            return self.__crawlGff3_(directory,version,depth)
-        i = 1
+            return self.__crawlGff3_(directory,species,version,depth)
+        i = 0
         for file_ in listing:
-            if not depth:
-                core.log.send("Crawling Ensembl GFF3 %i/%i ..."%(i,len(listing)))
             i += 1
+            if not depth:
+                if species and species.lower() != file_.split("_")[0].lower():
+                    core.log.send("Ignoring Ensembl GFF3 %i/%i"%(i,len(listing)))
+                    continue
+                else:
+                    core.log.send("Crawling Ensembl GFF3 %i/%i"%(i,len(listing)))
             ending = "."+str(version)+self.__GFF3_EXTENSION
             if file_.endswith(ending):
                 ret[file_[:-len(ending)]] = directory+"/"+file_
             elif "." not in file_:
-                ret.update(self.__crawlGff3_(directory+"/"+file_,version,depth+1))
+                ret.update(self.__crawlGff3_(directory+"/"+file_,species,version,depth+1))
         return ret
 
 
@@ -245,8 +265,6 @@ class Ensembl(abstract.AbstractCrawler):
             parts = line.split("\t")
             if len(parts)>=5:
                 self.__taxIds[parts[1]] = parts[3]
-        for key in self.__taxIds:
-            print(key,self.__taxIds[key])
 
 
     def __latestRelease_(

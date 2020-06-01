@@ -41,13 +41,21 @@ class Assembly():
 
     def crawl(
         self
+        ,species
         ):
         """
         Iterates through all registered crawler implementations and crawls their
         remote database to update the local database metadata.
+
+        Parameters
+        ----------
+        species : string
+                  The name of the species that is crawled, ignoring any other
+                  species found on the remote server. If this string is blank
+                  then all species are crawled.
         """
         for crawler in self.__crawlers.values():
-            crawler.crawl()
+            crawler.crawl(species)
             crawler.assemble()
 
 
