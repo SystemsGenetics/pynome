@@ -4,6 +4,7 @@ This contains the main entry point function of this application.
 import argparse
 from . import core
 from . import crawler
+from . import mirror
 from . import settings
 # https://stackoverflow.com/questions/29026709/how-to-get-ftp-files-modify-time-using-python-ftplib
 # Use the first one for individual files
@@ -24,7 +25,9 @@ def main():
         settings.rootPath = args.rootPath
     core.log.setEcho(not args.notEcho)
     core.assembly.registerCrawler(crawler.Ensembl())
-    core.assembly.crawl(args.species)
+    core.assembly.registerMirror("ftp_gunzip",mirror.FTPGunzip())
+    #core.assembly.crawl(args.species)
+    core.assembly.mirror(args.species)
 
 
 

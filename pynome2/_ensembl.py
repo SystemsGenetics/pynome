@@ -165,15 +165,12 @@ class Ensembl(abstract.AbstractCrawler):
         except socket.timeout:
             self.__connect_()
             return self.__crawlFasta_(directory,species,depth)
-        i = 0
         for file_ in listing:
-            i += 1
             if not depth:
-                if species and species.lower() != file_.split("_")[0].lower():
-                    core.log.send("Ignoring Ensembl FASTA %i/%i"%(i,len(listing)))
+                if species and species.lower() != file_.split("_")[1].lower():
                     continue
                 else:
-                    core.log.send("Crawling Ensembl FASTA %i/%i"%(i,len(listing)))
+                    core.log.send("Crawling Ensembl FASTA "+file_)
             if file_.endswith(self.__FASTA_EXTENSION):
                 ret[file_[:-len(self.__FASTA_EXTENSION)]] = directory+"/"+file_
             elif "." not in file_ and file_ not in self.__FTP_IGNORED_DIRS:
@@ -227,15 +224,12 @@ class Ensembl(abstract.AbstractCrawler):
         except socket.timeout:
             self.__connect_()
             return self.__crawlGff3_(directory,species,version,depth)
-        i = 0
         for file_ in listing:
-            i += 1
             if not depth:
-                if species and species.lower() != file_.split("_")[0].lower():
-                    core.log.send("Ignoring Ensembl GFF3 %i/%i"%(i,len(listing)))
+                if species and species.lower() != file_.split("_")[1].lower():
                     continue
                 else:
-                    core.log.send("Crawling Ensembl GFF3 %i/%i"%(i,len(listing)))
+                    core.log.send("Crawling Ensembl GFF3 "+file_)
             ending = "."+str(version)+self.__GFF3_EXTENSION
             if file_.endswith(ending):
                 ret[file_[:-len(ending)]] = directory+"/"+file_
@@ -321,7 +315,7 @@ class Ensembl(abstract.AbstractCrawler):
                     ,names[2]
                     ,".".join(parts)
                     ,self.__taxIds.get(taxKey,"")
-                    ,"basicftp"
+                    ,"ftp_gunzip"
                     ,{"fasta": self.__FTP_HOST+fasta[key], "gff3": self.__FTP_HOST+gff3[key]}
                 )
 
