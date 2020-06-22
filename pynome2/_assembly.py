@@ -204,12 +204,13 @@ class Assembly():
         if gff3 or "gff3_processed" not in meta:
             meta["gff3_processed"] = False
         self.__saveMeta_(workDir,meta)
+        title = os.path.join(meta["taxonomy"]["id"],os.path.split(workDir)[-1])
         if not meta["fasta_processed"]:
-            self.__postProcessFasta_(workDir,rootName)
+            self.__postProcessFasta_(workDir,rootName,title)
             meta["fasta_processed"] = True
             self.__saveMeta_(workDir,meta)
         if not meta["gff3_processed"]:
-            self.__postProcessGff3_(workDir,rootName)
+            self.__postProcessGff3_(workDir,rootName,title)
             meta["gff3_processed"] = True
             self.__saveMeta_(workDir,meta)
 
@@ -218,6 +219,7 @@ class Assembly():
         self
         ,workDir
         ,rootName
+        ,title
         ):
         """
         Detailed description.
@@ -228,8 +230,10 @@ class Assembly():
                   Detailed description.
         rootName : object
                    Detailed description.
+        title : object
+                Detailed description.
         """
-        core.log.send("Hisat2 Indexing FASTA "+rootName)
+        core.log.send("Hisat2 Indexing FASTA "+title)
         outBase = os.path.join(workDir,rootName)
         filePath = outBase+".fa"
         cmd = ['hisat2-build','--quiet','-p',str(os.cpu_count()),'-f',filePath,outBase]
@@ -240,6 +244,7 @@ class Assembly():
         self
         ,workDir
         ,rootName
+        ,title
         ):
         """
         Detailed description.
@@ -250,13 +255,15 @@ class Assembly():
                   Detailed description.
         rootName : object
                    Detailed description.
+        title : object
+                Detailed description.
         """
-        core.log.send("Writing GTF from GFF "+rootName)
+        core.log.send("Writing GTF from GFF "+title)
         rootPath = os.path.join(workDir,rootName)
         cmd = ['gffread','-T',rootPath+'.gff3','-o',rootPath+'.gtf']
         assert(subprocess.run(cmd).returncode==0)
         with open(rootPath+".Splice_sites",'w') as ofile:
-            core.log.send("Writing Spice sites from GFF "+rootName)
+            core.log.send("Writing Spice sites from GFF "+title)
             cmd = ['hisat2_extract_splice_sites.py',rootPath+".gff3"]
             assert(subprocess.run(cmd,stdout=ofile).returncode==0)
 

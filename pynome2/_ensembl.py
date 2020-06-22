@@ -99,7 +99,7 @@ class Ensembl(abstract.AbstractCrawler):
         ret0 : object
                See interface docs.
         """
-        return "Ensembl"
+        return "ensembl"
 
 
     #####################
@@ -170,7 +170,7 @@ class Ensembl(abstract.AbstractCrawler):
                 if species and species.lower() != file_.split("_")[1].lower():
                     continue
                 else:
-                    core.log.send("Crawling Ensembl FASTA "+file_)
+                    core.log.send("Crawling ensembl FASTA "+file_)
             if file_.endswith(self.__FASTA_EXTENSION):
                 ret[file_[:-len(self.__FASTA_EXTENSION)]] = directory+"/"+file_
             elif "." not in file_ and file_ not in self.__FTP_IGNORED_DIRS:
@@ -229,7 +229,7 @@ class Ensembl(abstract.AbstractCrawler):
                 if species and species.lower() != file_.split("_")[1].lower():
                     continue
                 else:
-                    core.log.send("Crawling Ensembl GFF3 "+file_)
+                    core.log.send("Crawling ensembl GFF3 "+file_)
             ending = "."+str(version)+self.__GFF3_EXTENSION
             if file_.endswith(ending):
                 ret[file_[:-len(ending)]] = directory+"/"+file_

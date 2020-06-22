@@ -6,8 +6,7 @@ from . import core
 from . import crawler
 from . import mirror
 from . import settings
-# https://stackoverflow.com/questions/29026709/how-to-get-ftp-files-modify-time-using-python-ftplib
-# Use the first one for individual files
+# ftp://ftp.ncbi.nlm.nih.gov/genomes/genbank/assembly_summary_genbank.txt
 
 
 
@@ -17,6 +16,8 @@ def main():
     Starts execution of this application.
     """
     parser = argparse.ArgumentParser()
+    parser.add_argument("-c",dest="crawl",action="store_true")
+    parser.add_argument("-m",dest="mirror",action="store_true")
     parser.add_argument("-t",dest="species",default="")
     parser.add_argument("-d",dest="rootPath",default=None)
     parser.add_argument("-q",dest="notEcho",action="store_true")
@@ -26,8 +27,14 @@ def main():
     core.log.setEcho(not args.notEcho)
     core.assembly.registerCrawler(crawler.Ensembl())
     core.assembly.registerMirror("ftp_gunzip",mirror.FTPGunzip())
-    #core.assembly.crawl(args.species)
-    core.assembly.mirror(args.species)
+    if not args.crawl and not args.mirror:
+        core.assembly.crawl(args.species)
+        core.assembly.mirror(args.species)
+    else:
+        if args.crawl:
+            core.assembly.crawl(args.species)
+        if args.mirror:
+            core.assembly.mirror(args.species)
 
 
 
