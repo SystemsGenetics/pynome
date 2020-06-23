@@ -35,6 +35,7 @@ class Ensembl(abstract.AbstractCrawler):
         Initializes a new ensembl crawler.
         """
         abstract.AbstractCrawler.__init__(self)
+        self.__ftp = None
         self.__text = ""
         self.__taxIds = {}
 
