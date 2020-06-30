@@ -2,12 +2,11 @@
 Contains the FTPGunzip class.
 """
 import os
-import datetime
 import ftplib
 import subprocess
-import traceback
 from . import abstract
 from . import core
+from . import utility
 
 
 
@@ -44,11 +43,12 @@ class FTPGunzip(abstract.AbstractMirror):
     ####################
 
 
-    def mirror(
+    def mirrorFasta(
         self
         ,workingDir
-        ,rootName
+        ,path
         ,meta
+        ,title
         ):
         """
         Implements the pynome2.abstract.AbstractMirror interface.
@@ -57,96 +57,61 @@ class FTPGunzip(abstract.AbstractMirror):
         ----------
         workingDir : object
                      See interface docs.
-        rootName : object
-                   See interface docs.
+        path : object
+               See interface docs.
         meta : object
                See interface docs.
+        title : object
+                See interface docs.
 
         Returns
         -------
         ret0 : object
                See interface docs.
         """
-        (fasta,gff3) = self.__downloadDirectives_(os.path.join(workingDir,rootName),meta)
-        if fasta:
-            core.log.send("Downloading FTP FASTA "+rootName)
-            cmd = ["wget",meta["fasta"],"-q","-O",os.path.join(workingDir,rootName+".fa.gz")]
+        core.log.send("Syncing Fasta "+title)
+        fullPath = os.path.join(workingDir,path)
+        if utility.rSync(meta["fasta"],fullPath+".gz",compare=fullPath):
+            core.log.send("Decompressing Fasta "+title)
+            cmd = ["gunzip",fullPath+".gz"]
             assert(subprocess.run(cmd).returncode==0)
-            core.log.send("Decompressing FTP FASTA "+rootName)
-            cmd = ["gunzip",os.path.join(workingDir,rootName+".fa.gz")]
-            assert(subprocess.run(cmd).returncode==0)
-        if gff3:
-            core.log.send("Downloading FTP GFF3 "+rootName)
-            cmd = ["wget",meta["gff3"],"-q","-O",os.path.join(workingDir,rootName+".gff3.gz")]
-            assert(subprocess.run(cmd).returncode==0)
-            core.log.send("Decompressing FTP GFF3 "+rootName)
-            cmd = ["gunzip",os.path.join(workingDir,rootName+".gff3.gz")]
-            assert(subprocess.run(cmd).returncode==0)
-        return (fasta,gff3)
+            return True
+        else:
+            return False
 
 
-    #####################
-    # PRIVATE - Methods #
-    #####################
-
-
-    def __downloadDirectives_(
+    def mirrorGff(
         self
-        ,rootPath
+        ,workingDir
+        ,path
         ,meta
+        ,title
         ):
         """
-        Detailed description.
+        Implements the pynome2.abstract.AbstractMirror interface.
 
         Parameters
         ----------
-        rootPath : object
-                   Detailed description.
+        workingDir : object
+                     See interface docs.
+        path : object
+               See interface docs.
         meta : object
                See interface docs.
+        title : object
+                See interface docs.
+
+        Returns
+        -------
+        ret0 : object
+               See interface docs.
         """
-        fasta = False
-        gff3 = False
-        if not os.path.isfile(rootPath+".fa"):
-            fasta = True
+        core.log.send("Syncing Gff "+title)
+        fullPath = os.path.join(workingDir,path)
+        if utility.rSync(meta["gff"],fullPath+".gz",compare=fullPath):
+            core.log.send("Decompressing Gff "+title)
+            cmd = ["gunzip",fullPath+".gz"]
+            assert(subprocess.run(cmd).returncode==0)
+            return True
         else:
-            rts = self.__timeStamp_(meta["fasta"])
-            lts = datetime.datetime.fromtimestamp(
-                os.stat(rootPath+".fa").st_mtime+86400
-            ).strftime("%Y%m%d%H%M%S")
-            if rts > lts:
-                fasta = True
-        if not os.path.isfile(rootPath+".gff3"):
-            gff3 = True
-        else:
-            rts = self.__timeStamp_(meta["gff3"])
-            lts = datetime.datetime.fromtimestamp(
-                os.stat(rootPath+".gff3").st_mtime+86400
-            ).strftime("%Y%m%d%H%M%S")
-            if rts > lts:
-                gff3 = True
-        return (fasta,gff3)
-
-
-    def __timeStamp_(
-        self
-        ,url
-        ):
-        """
-        Detailed description.
-
-        Parameters
-        ----------
-        url : object
-              Detailed description.
-        """
-        site = url[:url.find("/")]
-        path = url[url.find("/"):]
-        try:
-            ftp = ftplib.FTP(site)
-            ftp.login()
-            ts = ftp.voidcmd("MDTM "+path)
-            return ts.split()[-1].strip()
-        except:
-            traceback.print_exc()
-            return "0"
+            return False

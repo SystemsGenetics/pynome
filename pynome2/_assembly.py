@@ -63,27 +63,20 @@ class Assembly():
                   all species are mirrored.
         """
         for taxId in os.listdir(settings.rootPath):
-            path = os.path.join(settings.rootPath,taxId)
-            if os.path.isdir(path):
-                for assemblyName in os.listdir(path):
-                    try:
+            if taxId.isdecimal():
+                path = os.path.join(settings.rootPath,taxId)
+                if os.path.isdir(path):
+                    for assemblyName in os.listdir(path):
                         workDir = os.path.join(settings.rootPath,taxId,assemblyName)
-                        data = self.__loadMeta_(workDir)
-                        if species and data["species"].lower() != species.lower():
+                        meta = self.__loadMeta_(workDir)
+                        if species and meta["species"].lower() != species.lower():
                             continue
-                        rootName = data["genus"]+"_"+data["species"]
-                        if data["intraspecific_name"]:
-                            rootName += "_"+data["intraspecific_name"]
-                        rootName += "-"+data["assembly_id"]
-                        (fasta,gff3) = self.__mirrors[data["mirror_type"]].mirror(
-                            workDir
-                            ,rootName
-                            ,data["mirror_data"]
-                        )
-                        self.__postProcess_(fasta,gff3,workDir,rootName,data)
-                    except:
-                        traceback.print_exc()
-                        continue
+                        rootName = meta["genus"]+"_"+meta["species"]
+                        if meta["intraspecific_name"]:
+                            rootName += "_"+meta["intraspecific_name"]
+                        rootName += "-"+meta["assembly_id"]
+                        self.__mirrorFasta_(workDir,rootName+".fa",meta)
+                        self.__mirrorGff_(workDir,rootName+".gff",meta)
 
 
     def crawl(
@@ -101,6 +94,7 @@ class Assembly():
                   species found on the remote server. If this string is blank
                   then all species are crawled.
         """
+        self.__prepareDataDirs_()
         for crawler in self.__crawlers.values():
             crawler.crawl(species)
             crawler.assemble()
@@ -172,15 +166,18 @@ class Assembly():
                The metadata information for the given working directory.
         """
         with open(os.path.join(workDir,"metadata.json"),"r") as ifile:
-            return json.loads(ifile.read())
+            meta = json.loads(ifile.read())
+            if "fasta_processed" not in meta:
+                meta["fasta_processed"] = False
+            if "gff_processed" not in meta:
+                meta["gff_processed"] = False
+            return meta
 
 
-    def __postProcess_(
+    def __mirrorFasta_(
         self
-        ,fasta
-        ,gff3
         ,workDir
-        ,rootName
+        ,path
         ,meta
         ):
         """
@@ -188,38 +185,40 @@ class Assembly():
 
         Parameters
         ----------
-        fasta : object
-                Detailed description.
-        gff3 : object
-               Detailed description.
         workDir : object
                   Detailed description.
-        rootName : object
-                   Detailed description.
+        path : object
+               Detailed description.
         meta : object
                Detailed description.
         """
-        if fasta or "fasta_processed" not in meta:
-            meta["fasta_processed"] = False
-        if gff3 or "gff3_processed" not in meta:
-            meta["gff3_processed"] = False
-        self.__saveMeta_(workDir,meta)
         title = os.path.join(meta["taxonomy"]["id"],os.path.split(workDir)[-1])
-        if not meta["fasta_processed"]:
-            self.__postProcessFasta_(workDir,rootName,title)
-            meta["fasta_processed"] = True
-            self.__saveMeta_(workDir,meta)
-        if not meta["gff3_processed"]:
-            self.__postProcessGff3_(workDir,rootName,title)
-            meta["gff3_processed"] = True
-            self.__saveMeta_(workDir,meta)
+        try:
+            fasta = self.__mirrors[meta["mirror_type"]].mirrorFasta(
+                workDir
+                ,path
+                ,meta["mirror_data"]
+                ,title
+            )
+            if fasta:
+                meta["fasta_processed"] = False
+            if not meta["fasta_processed"]:
+                core.log.send("Hisat2 Indexing Fasta "+title)
+                filePath = os.path.join(workDir,path)
+                outBase = filePath[:-3]
+                cmd = ["hisat2-build","--quiet","-p",str(os.cpu_count()),"-f",filePath,outBase]
+                assert(subprocess.run(cmd).returncode==0)
+                meta["fasta_processed"] = True
+                self.__saveMeta_(workDir,meta)
+        except:
+            traceback.print_exc()
 
 
-    def __postProcessFasta_(
+    def __mirrorGff_(
         self
         ,workDir
-        ,rootName
-        ,title
+        ,path
+        ,meta
         ):
         """
         Detailed description.
@@ -228,44 +227,51 @@ class Assembly():
         ----------
         workDir : object
                   Detailed description.
-        rootName : object
-                   Detailed description.
-        title : object
-                Detailed description.
+        path : object
+               Detailed description.
+        meta : object
+               Detailed description.
         """
-        core.log.send("Hisat2 Indexing FASTA "+title)
-        outBase = os.path.join(workDir,rootName)
-        filePath = outBase+".fa"
-        cmd = ['hisat2-build','--quiet','-p',str(os.cpu_count()),'-f',filePath,outBase]
-        assert(subprocess.run(cmd).returncode==0)
+        title = os.path.join(meta["taxonomy"]["id"],os.path.split(workDir)[-1])
+        try:
+            gff = self.__mirrors[meta["mirror_type"]].mirrorGff(
+                workDir
+                ,path
+                ,meta["mirror_data"]
+                ,title
+            )
+            if gff:
+                meta["gff_processed"] = False
+            if not meta["gff_processed"]:
+                core.log.send("Writing Gtf from Gff "+title)
+                filePath = os.path.join(workDir,path)
+                tPath = os.path.join(workDir,"temp.gff")
+                basePath = filePath[:-4]
+                cmd = ["cp",filePath,tPath]
+                assert(subprocess.run(cmd).returncode==0)
+                cmd = ["gffread","-T",tPath,"-o",basePath+".gtf"]
+                assert(subprocess.run(cmd).returncode==0)
+                cmd = ["rm",tPath]
+                assert(subprocess.run(cmd).returncode==0)
+                with open(basePath+".Splice_sites",'w') as ofile:
+                    core.log.send("Writing Spice sites from Gtf "+title)
+                    cmd = ['hisat2_extract_splice_sites.py',basePath+".gtf"]
+                    assert(subprocess.run(cmd,stdout=ofile).returncode==0)
+                meta["gff_processed"] = True
+                self.__saveMeta_(workDir,meta)
+        except:
+            traceback.print_exc()
 
 
-    def __postProcessGff3_(
+    def __prepareDataDirs_(
         self
-        ,workDir
-        ,rootName
-        ,title
         ):
         """
         Detailed description.
-
-        Parameters
-        ----------
-        workDir : object
-                  Detailed description.
-        rootName : object
-                   Detailed description.
-        title : object
-                Detailed description.
         """
-        core.log.send("Writing GTF from GFF "+title)
-        rootPath = os.path.join(workDir,rootName)
-        cmd = ['gffread','-T',rootPath+'.gff3','-o',rootPath+'.gtf']
-        assert(subprocess.run(cmd).returncode==0)
-        with open(rootPath+".Splice_sites",'w') as ofile:
-            core.log.send("Writing Spice sites from GFF "+title)
-            cmd = ['hisat2_extract_splice_sites.py',rootPath+".gff3"]
-            assert(subprocess.run(cmd,stdout=ofile).returncode==0)
+        for crawler in self.__crawlers.values():
+            d = os.path.join(settings.rootPath,"."+crawler.name())
+            os.makedirs(d,exist_ok=True)
 
 
     def __saveMeta_(

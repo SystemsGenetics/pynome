@@ -156,3 +156,12 @@ class AbstractCrawler(abc.ABC):
             ,"mirror_type": mirrorType
             ,"mirror_data": mirrorData
         }
+
+
+    def _dataDir_(
+        self
+        ):
+        """
+        Detailed description.
+        """
+        return os.path.join(settings.rootPath,"."+self.name())

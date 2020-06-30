@@ -38,29 +38,68 @@ class AbstractMirror(abc.ABC):
 
 
     @abc.abstractmethod
-    def mirror(
+    def mirrorFasta(
         self
         ,workingDir
-        ,rootName
+        ,path
         ,meta
+        ,title
         ):
         """
         This interface mirrors a specific species from a remote database, adding
         the required FASTA and GFF files with the given names to the given
         working directory. The custom mirror section of the metadata is also
-        provided.
+        provided. NOPE
 
         Parameters
         ----------
         workingDir : string
                      Path to the working directory where the FASTA and GFF files
                      should be saved locally.
-        rootName : string
-                   The name the FASTA and GFF files must have when saved to the
-                   local directory, with fa or gff3 extensions added.
+        path : object
+               NOPE
         meta : dictionary
                The custom mirror metadata created by the crawler and intended
                for use by this mirror implementation.
+        title : object
+                Detailed description.
+
+        Returns
+        -------
+        ret0 : bool
+               True if a new FASTA file was downloaded or false otherwise.
+        ret1 : bool
+               True if a new GFF3 file was downloaded or false otherwise.
+        """
+        pass
+
+
+    @abc.abstractmethod
+    def mirrorGff(
+        self
+        ,workingDir
+        ,path
+        ,meta
+        ,title
+        ):
+        """
+        This interface mirrors a specific species from a remote database, adding
+        the required FASTA and GFF files with the given names to the given
+        working directory. The custom mirror section of the metadata is also
+        provided. NOPE
+
+        Parameters
+        ----------
+        workingDir : string
+                     Path to the working directory where the FASTA and GFF files
+                     should be saved locally.
+        path : object
+               NOPE
+        meta : dictionary
+               The custom mirror metadata created by the crawler and intended
+               for use by this mirror implementation.
+        title : object
+                Detailed description.
 
         Returns
         -------
