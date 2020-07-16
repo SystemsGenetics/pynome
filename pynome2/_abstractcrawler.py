@@ -4,6 +4,7 @@ Contains the AbstractCrawler class.
 import abc
 import json
 import os
+from . import core
 from . import settings
 
 
@@ -138,7 +139,11 @@ class AbstractCrawler(abc.ABC):
                      The JSON compatible data the mirror type requires for
                      downloading this entries data from its remote source.
         """
-        key = os.path.join(taxonomyId,assemblyId+"-"+self.name())
+        assert(taxonomyId.isdigit())
+        key = os.path.join(
+            taxonomyId
+            ,assemblyId.replace("/","|").replace("\\","|") + "-" + self.name()
+        )
         if key in self.__entries:
             core.log.send(
                 "Duplicate entries '%s' found in crawler %s! Overwriting existing entry!"
@@ -162,6 +167,12 @@ class AbstractCrawler(abc.ABC):
         self
         ):
         """
-        Detailed description.
+        Getter method.
+
+        Returns
+        -------
+        ret0 : string
+               The full path to the special hidden data directory this crawler
+               can use for any remote data files required for crawling.
         """
         return os.path.join(settings.rootPath,"."+self.name())

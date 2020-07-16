@@ -69,10 +69,10 @@ class FTPGunzip(abstract.AbstractMirror):
         ret0 : object
                See interface docs.
         """
-        core.log.send("Syncing Fasta "+title)
+        core.log.send("Syncing FASTA "+title)
         fullPath = os.path.join(workingDir,path)
         if utility.rSync(meta["fasta"],fullPath+".gz",compare=fullPath):
-            core.log.send("Decompressing Fasta "+title)
+            core.log.send("Decompressing FASTA "+title)
             cmd = ["gunzip",fullPath+".gz"]
             assert(subprocess.run(cmd).returncode==0)
             return True
@@ -106,10 +106,10 @@ class FTPGunzip(abstract.AbstractMirror):
         ret0 : object
                See interface docs.
         """
-        core.log.send("Syncing Gff "+title)
+        core.log.send("Syncing GFF "+title)
         fullPath = os.path.join(workingDir,path)
         if utility.rSync(meta["gff"],fullPath+".gz",compare=fullPath):
-            core.log.send("Decompressing Gff "+title)
+            core.log.send("Decompressing GFF "+title)
             cmd = ["gunzip",fullPath+".gz"]
             assert(subprocess.run(cmd).returncode==0)
             return True

@@ -163,7 +163,8 @@ class Assembly():
         Returns
         -------
         ret0 : dictionary
-               The metadata information for the given working directory.
+               The metadata information for the given working directory. If the
+               processed keys are not set then they are added and set to false.
         """
         with open(os.path.join(workDir,"metadata.json"),"r") as ifile:
             meta = json.loads(ifile.read())
@@ -181,16 +182,19 @@ class Assembly():
         ,meta
         ):
         """
-        Detailed description.
+        Mirrors the FASTA file of the given assembly, running post processing on
+        the local FASTA file if a new one has been downloaded from the remote
+        server.
 
         Parameters
         ----------
-        workDir : object
-                  Detailed description.
-        path : object
-               Detailed description.
-        meta : object
-               Detailed description.
+        workDir : string
+                  The working directory of the assembly.
+        path : string
+               The full file name of the given assembly's FASTA file located
+               within the given working directory.
+        meta : dictionary
+               The full metadata of the given assembly.
         """
         title = os.path.join(meta["taxonomy"]["id"],os.path.split(workDir)[-1])
         try:
@@ -203,7 +207,7 @@ class Assembly():
             if fasta:
                 meta["fasta_processed"] = False
             if not meta["fasta_processed"]:
-                core.log.send("Hisat2 Indexing Fasta "+title)
+                core.log.send("Hisat2 Indexing FASTA "+title)
                 filePath = os.path.join(workDir,path)
                 outBase = filePath[:-3]
                 cmd = ["hisat2-build","--quiet","-p",str(os.cpu_count()),"-f",filePath,outBase]
@@ -221,16 +225,19 @@ class Assembly():
         ,meta
         ):
         """
-        Detailed description.
+        Mirrors the GFF file of the given assembly, running post processing on
+        the local GFF file if a new one has been downloaded from the remote
+        server.
 
         Parameters
         ----------
-        workDir : object
-                  Detailed description.
-        path : object
-               Detailed description.
-        meta : object
-               Detailed description.
+        workDir : string
+                  The working directory of the assembly.
+        path : string
+               The full file name of the given assembly's GFF file located
+               within the given working directory.
+        meta : dictionary
+               The full metadata of the given assembly.
         """
         title = os.path.join(meta["taxonomy"]["id"],os.path.split(workDir)[-1])
         try:
@@ -243,7 +250,7 @@ class Assembly():
             if gff:
                 meta["gff_processed"] = False
             if not meta["gff_processed"]:
-                core.log.send("Writing Gtf from Gff "+title)
+                core.log.send("Writing GTF from GFF "+title)
                 filePath = os.path.join(workDir,path)
                 tPath = os.path.join(workDir,"temp.gff")
                 basePath = filePath[:-4]
@@ -254,7 +261,7 @@ class Assembly():
                 cmd = ["rm",tPath]
                 assert(subprocess.run(cmd).returncode==0)
                 with open(basePath+".Splice_sites",'w') as ofile:
-                    core.log.send("Writing Spice sites from Gtf "+title)
+                    core.log.send("Writing Spice sites from GTF "+title)
                     cmd = ['hisat2_extract_splice_sites.py',basePath+".gtf"]
                     assert(subprocess.run(cmd,stdout=ofile).returncode==0)
                 meta["gff_processed"] = True
@@ -267,7 +274,8 @@ class Assembly():
         self
         ):
         """
-        Detailed description.
+        Creates any of the special data directories for all implemented crawlers
+        if they do not exist.
         """
         for crawler in self.__crawlers.values():
             d = os.path.join(settings.rootPath,"."+crawler.name())
@@ -280,14 +288,16 @@ class Assembly():
         ,meta
         ):
         """
-        Detailed description.
+        Saves the given assembly metadata to the given working directory.
 
         Parameters
         ----------
-        workDir : object
-                  Detailed description.
-        meta : object
-               Detailed description.
+        workDir : string
+                  The working directory where the given assembly metadata is
+                  saved as JSON to the special "metadata.json" file.
+        meta : dictionary
+               The given assembly metadata that is saved to the given working
+               directory as JSON.
         """
         with open(os.path.join(workDir,"metadata.json"),"w") as ofile:
             return ofile.write(json.dumps(meta,indent=4) + "\n\n")

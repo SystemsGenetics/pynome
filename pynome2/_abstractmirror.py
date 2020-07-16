@@ -46,30 +46,31 @@ class AbstractMirror(abc.ABC):
         ,title
         ):
         """
-        This interface mirrors a specific species from a remote database, adding
-        the required FASTA and GFF files with the given names to the given
-        working directory. The custom mirror section of the metadata is also
-        provided. NOPE
+        This interface mirrors the FASTA file of a specific assembly from a
+        remote database, adding the required FASTA file with the given name to
+        the given working directory. The custom mirror section of the metadata
+        is also provided.
 
         Parameters
         ----------
         workingDir : string
-                     Path to the working directory where the FASTA and GFF files
-                     should be saved locally.
-        path : object
-               NOPE
+                     Path to the working directory where the FASTA file must be
+                     saved locally.
+        path : string
+               The full file name where the remote FASTA files must be mirrored
+               to within the given working directory.
         meta : dictionary
                The custom mirror metadata created by the crawler and intended
                for use by this mirror implementation.
-        title : object
-                Detailed description.
+        title : string
+                The title of the assembly whose FASTA file is being mirrored.
+                This can be used with log messages to identify the assembly to
+                the user.
 
         Returns
         -------
         ret0 : bool
                True if a new FASTA file was downloaded or false otherwise.
-        ret1 : bool
-               True if a new GFF3 file was downloaded or false otherwise.
         """
         pass
 
@@ -83,29 +84,30 @@ class AbstractMirror(abc.ABC):
         ,title
         ):
         """
-        This interface mirrors a specific species from a remote database, adding
-        the required FASTA and GFF files with the given names to the given
+        This interface mirrors the GFF file of a specific assembly from a remote
+        database, adding the required GFF file with the given name to the given
         working directory. The custom mirror section of the metadata is also
-        provided. NOPE
+        provided.
 
         Parameters
         ----------
         workingDir : string
                      Path to the working directory where the FASTA and GFF files
                      should be saved locally.
-        path : object
-               NOPE
+        path : string
+               The full file name where the remote FASTA files must be mirrored
+               to within the given working directory.
         meta : dictionary
                The custom mirror metadata created by the crawler and intended
                for use by this mirror implementation.
-        title : object
-                Detailed description.
+        title : string
+                The title of the assembly whose FASTA file is being mirrored.
+                This can be used with log messages to identify the assembly to
+                the user.
 
         Returns
         -------
         ret0 : bool
-               True if a new FASTA file was downloaded or false otherwise.
-        ret1 : bool
-               True if a new GFF3 file was downloaded or false otherwise.
+               True if a new GFF file was downloaded or false otherwise.
         """
         pass

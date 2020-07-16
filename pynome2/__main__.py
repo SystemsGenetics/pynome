@@ -6,7 +6,6 @@ from . import core
 from . import crawler
 from . import mirror
 from . import settings
-# ftp://ftp.ncbi.nlm.nih.gov/genomes/genbank/assembly_summary_genbank.txt
 
 
 
@@ -25,7 +24,7 @@ def main():
     if args.rootPath:
         settings.rootPath = args.rootPath
     core.log.setEcho(not args.notEcho)
-    #core.assembly.registerCrawler(crawler.Ensembl())
+    core.assembly.registerCrawler(crawler.Ensembl())
     core.assembly.registerCrawler(crawler.NCBI())
     core.assembly.registerMirror("ftp_gunzip",mirror.FTPGunzip())
     if not args.crawl and not args.mirror:

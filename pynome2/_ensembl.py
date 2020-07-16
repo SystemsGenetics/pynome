@@ -61,14 +61,14 @@ class Ensembl(abstract.AbstractCrawler):
         self.__connect_()
         releaseVersion = self.__latestRelease_()
         if releaseVersion:
-            core.log.send("Loading Ensembl Taxonomy ...")
+            core.log.send("Loading Ensembl taxonomy ...")
             self.__getTaxonomyIds_(
                 self.__FTP_ROOT_DIR
                 + "/"
                 + self.__FTP_RELEASE_BASENAME
                 + str(releaseVersion)
             )
-            core.log.send("Crawling Ensembl Fasta ...")
+            core.log.send("Crawling Ensembl FASTA ...")
             fasta = self.__crawlFasta_(
                 self.__FTP_ROOT_DIR
                 + "/"
@@ -77,7 +77,7 @@ class Ensembl(abstract.AbstractCrawler):
                 + self.__FTP_FASTA_DIR
                 ,species
             )
-            core.log.send("Crawling Ensembl Gff ...")
+            core.log.send("Crawling Ensembl GFF ...")
             gff = self.__crawlGff_(
                 (
                     self.__FTP_ROOT_DIR

@@ -9,7 +9,7 @@ import traceback
 
 
 #
-# int The amount of seconds in one day or 24 hours.
+# The amount of seconds in one day or 24 hours.
 #
 DAY = 86400
 
@@ -22,16 +22,24 @@ def rSync(
     ,compare=""
     ):
     """
-    Detailed description.
+    Synchronizes the given remote URL file with the given local path. An
+    optional comparison path is provided, which is used to compare the timestamp
+    with the remote URL if given instead of the regular path.
 
     Parameters
     ----------
-    url : object
-          Detailed description.
-    path : object
-           Detailed description.
-    compare : object
-              Detailed description.
+    url : string
+          The remote FTP URL of a file that is synchronized with the given local
+          path.
+    path : string
+           The full path to the local file that is synchronized with the given
+           remote URL.
+    compare : string
+              The full path to the local file used to compare the timestamp with
+              the remote in reference to synchronization. The regular path is
+              still used when downloading the remote file if it is newer that
+              this compared local file. If this string is empty then it is
+              ignored.
     """
     d = url.find("://")
     if d != -1:
@@ -66,12 +74,17 @@ def timeStamp(
     url
     ):
     """
-    Detailed description.
+    Getter function.
 
     Parameters
     ----------
-    url : object
-          Detailed description.
+    url : string
+          The FTP URL of a remote file whose FTP timestamp is returned.
+
+    Returns
+    -------
+    ret0 : string
+           The FTP timestamp of the remote file location at the given URL.
     """
     site = url[:url.find("/")]
     path = url[url.find("/"):]
