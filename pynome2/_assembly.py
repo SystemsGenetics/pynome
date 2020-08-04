@@ -207,11 +207,56 @@ class Assembly():
             if fasta:
                 meta["fasta_processed"] = False
             if not meta["fasta_processed"]:
-                core.log.send("Hisat2 Indexing FASTA "+title)
                 filePath = os.path.join(workDir,path)
-                outBase = filePath[:-3]
+                core.log.send("Hisat2 Indexing FASTA "+title)
+                outBase = os.path.join(
+                    workDir
+                    ,(subprocess.check_output(["hisat2","--version"])
+                        .decode()
+                        .split("\n")[0]
+                        .replace("/","|")
+                        .replace(" ","_")
+                    )
+                )
+                os.makedirs(outBase,exist_ok=True)
+                outBase = os.path.join(outBase,path[:-3])
                 cmd = ["hisat2-build","--quiet","-p",str(os.cpu_count()),"-f",filePath,outBase]
                 assert(subprocess.run(cmd).returncode==0)
+                core.log.send("Salmon Indexing FASTA "+title)
+                outBase = os.path.join(
+                    workDir
+                    ,(subprocess.check_output(["salmon","--version"])
+                        .decode()
+                        .split("\n")[0]
+                        .replace("/","|")
+                        .replace(" ","_")
+                    )
+                )
+                cmd = [
+                    "salmon"
+                    ,"index"
+                    ,"--index"
+                    ,outBase
+                    ,"--transcripts"
+                    ,filePath
+                    ,"--threads"
+                    ,str(os.cpu_count())
+                ]
+                assert(subprocess.run(cmd,capture_output=True).returncode==0)
+                core.log.send("Kallisto Indexing FASTA "+title)
+                outBase = os.path.join(
+                    workDir
+                    ,(subprocess.check_output(["kallisto","version"])
+                        .decode()
+                        .split("\n")[0]
+                        .replace("/","|")
+                        .replace(" ","_")
+                    )
+                )
+                os.makedirs(outBase,exist_ok=True)
+                outBase = os.path.join(outBase,path[:-3]+".idx")
+                cmd = ["kallisto","index","--index",outBase,filePath]
+                assert(subprocess.run(cmd,capture_output=True).returncode==0)
                 meta["fasta_processed"] = True
                 self.__saveMeta_(workDir,meta)
         except:

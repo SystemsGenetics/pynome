@@ -148,7 +148,7 @@ class NCBI(abstract.AbstractCrawler):
         """
         tarPath = os.path.join(self._dataDir_(),self.__TAX_NAME)
         core.log.send("Syncing NCBI taxonomy ...")
-        if utility.rSync(self.__FTP_HOST+self.__TAX_DIR,tarPath):
+        if utility.rSync(self.__FTP_HOST+self.__TAX_DIR+self.__TAX_NAME,tarPath):
             cmd = ["tar","-xvf",tarPath,"-C",self._dataDir_()]
             assert(subprocess.run(cmd,capture_output=True).returncode==0)
         core.log.send("Loading NCBI taxonomy ...")
@@ -220,7 +220,7 @@ class NCBI(abstract.AbstractCrawler):
     #
     # string The name of the taxonomy nodes dump file.
     #
-    __NODE_NAME = "node.dmp"
+    __NODE_NAME = "nodes.dmp"
 
 
     #

@@ -222,10 +222,10 @@ class Ensembl(abstract.AbstractCrawler):
             listing = [x.split("/").pop() for x in self.__ftp.nlst(directory)]
         except ftplib.all_errors:
             self.__connect_()
-            return self.__crawlGff3_(directory,species,version,depth)
+            return self.__crawlGff_(directory,species,version,depth)
         except socket.timeout:
             self.__connect_()
-            return self.__crawlGff3_(directory,species,version,depth)
+            return self.__crawlGff_(directory,species,version,depth)
         for file_ in listing:
             if not depth:
                 if species and species.lower() != file_.split("_")[1].lower():
@@ -234,7 +234,7 @@ class Ensembl(abstract.AbstractCrawler):
             if file_.endswith(ending):
                 ret[file_[:-len(ending)]] = directory+"/"+file_
             elif "." not in file_:
-                ret.update(self.__crawlGff3_(directory+"/"+file_,species,version,depth+1))
+                ret.update(self.__crawlGff_(directory+"/"+file_,species,version,depth+1))
         return ret
 
 
