@@ -3,6 +3,7 @@ Contains the Assembly class.
 """
 import json
 import os
+import re
 import subprocess
 import traceback
 from . import abstract
@@ -148,6 +149,94 @@ class Assembly():
     #####################
 
 
+    def __indexWithHisat_(
+        self
+        ,workDir
+        ,path
+        ):
+        """
+        Detailed description.
+
+        Parameters
+        ----------
+        workDir : string
+                  The working directory of the assembly.
+        path : string
+               The full file name of the given assembly's FASTA file located
+               within the given working directory.
+        """
+        version = subprocess.check_output(["hisat2","--version"])
+        version = version.decode().split("\n")[0].split()[-1]
+        assert(re.match("^\d+\.\d+\.\d+$",version))
+        filePath = os.path.join(workDir,path)
+        outBase = os.path.join(workDir,"hisat-"+version)
+        os.makedirs(outBase,exist_ok=True)
+        outBase = os.path.join(outBase,path[:-3])
+        cmd = ["hisat2-build","--quiet","-p",str(os.cpu_count()),"-f",filePath,outBase]
+        assert(subprocess.run(cmd).returncode==0)
+
+
+    def __indexWithKallisto_(
+        self
+        ,workDir
+        ,path
+        ):
+        """
+        Detailed description.
+
+        Parameters
+        ----------
+        workDir : string
+                  The working directory of the assembly.
+        path : string
+               The full file name of the given assembly's FASTA file located
+               within the given working directory.
+        """
+        version = subprocess.check_output(["kallisto","version"])
+        version = version.decode().split("\n")[0].split()[-1]
+        assert(re.match("^\d+\.\d+\.\d+$",version))
+        filePath = os.path.join(workDir,path)
+        outBase = os.path.join(workDir,"kallisto-"+version)
+        os.makedirs(outBase,exist_ok=True)
+        outBase = os.path.join(outBase,path[:-3]+".idx")
+        cmd = ["kallisto","index","--index",outBase,filePath]
+        assert(subprocess.run(cmd,capture_output=True).returncode==0)
+
+
+    def __indexWithSalmon_(
+        self
+        ,workDir
+        ,path
+        ):
+        """
+        Detailed description.
+
+        Parameters
+        ----------
+        workDir : string
+                  The working directory of the assembly.
+        path : string
+               The full file name of the given assembly's FASTA file located
+               within the given working directory.
+        """
+        version = subprocess.check_output(["salmon","--version"])
+        version = version.decode().split("\n")[0].split()[-1]
+        assert(re.match("^\d+\.\d+\.\d+$",version))
+        filePath = os.path.join(workDir,path)
+        outBase = os.path.join(workDir,"salmon-"+version)
+        cmd = [
+            "salmon"
+            ,"index"
+            ,"--index"
+            ,outBase
+            ,"--transcripts"
+            ,filePath
+            ,"--threads"
+            ,str(os.cpu_count())
+        ]
+        assert(subprocess.run(cmd,capture_output=True).returncode==0)
+
+
     def __loadMeta_(
         self
         ,workDir
@@ -168,10 +257,13 @@ class Assembly():
         """
         with open(os.path.join(workDir,"metadata.json"),"r") as ifile:
             meta = json.loads(ifile.read())
-            if "fasta_processed" not in meta:
-                meta["fasta_processed"] = False
-            if "gff_processed" not in meta:
-                meta["gff_processed"] = False
+            if "processed" not in meta:
+                meta["processed"] = {
+                    "hisat": False
+                    ,"salmon": False
+                    ,"kallisto": False
+                    ,"gff": False
+                }
             return meta
 
 
@@ -197,6 +289,7 @@ class Assembly():
                The full metadata of the given assembly.
         """
         title = os.path.join(meta["taxonomy"]["id"],os.path.split(workDir)[-1])
+        fasta = False
         try:
             fasta = self.__mirrors[meta["mirror_type"]].mirrorFasta(
                 workDir
@@ -204,63 +297,36 @@ class Assembly():
                 ,meta["mirror_data"]
                 ,title
             )
-            if fasta:
-                meta["fasta_processed"] = False
-            if not meta["fasta_processed"]:
-                filePath = os.path.join(workDir,path)
-                core.log.send("Hisat2 Indexing FASTA "+title)
-                outBase = os.path.join(
-                    workDir
-                    ,(subprocess.check_output(["hisat2","--version"])
-                        .decode()
-                        .split("\n")[0]
-                        .replace("/","|")
-                        .replace(" ","_")
-                    )
-                )
-                os.makedirs(outBase,exist_ok=True)
-                outBase = os.path.join(outBase,path[:-3])
-                cmd = ["hisat2-build","--quiet","-p",str(os.cpu_count()),"-f",filePath,outBase]
-                assert(subprocess.run(cmd).returncode==0)
-                core.log.send("Salmon Indexing FASTA "+title)
-                outBase = os.path.join(
-                    workDir
-                    ,(subprocess.check_output(["salmon","--version"])
-                        .decode()
-                        .split("\n")[0]
-                        .replace("/","|")
-                        .replace(" ","_")
-                    )
-                )
-                cmd = [
-                    "salmon"
-                    ,"index"
-                    ,"--index"
-                    ,outBase
-                    ,"--transcripts"
-                    ,filePath
-                    ,"--threads"
-                    ,str(os.cpu_count())
-                ]
-                assert(subprocess.run(cmd,capture_output=True).returncode==0)
-                core.log.send("Kallisto Indexing FASTA "+title)
-                outBase = os.path.join(
-                    workDir
-                    ,(subprocess.check_output(["kallisto","version"])
-                        .decode()
-                        .split("\n")[0]
-                        .replace("/","|")
-                        .replace(" ","_")
-                    )
-                )
-                os.makedirs(outBase,exist_ok=True)
-                outBase = os.path.join(outBase,path[:-3]+".idx")
-                cmd = ["kallisto","index","--index",outBase,filePath]
-                assert(subprocess.run(cmd,capture_output=True).returncode==0)
-                meta["fasta_processed"] = True
-                self.__saveMeta_(workDir,meta)
         except:
             traceback.print_exc()
+        if fasta:
+            meta["processed"]["hisat"] = False
+            meta["processed"]["salmon"] = False
+            meta["processed"]["kallisto"] = False
+        if not meta["processed"]["hisat"]:
+            try:
+                core.log.send("Hisat2 Indexing FASTA "+title)
+                self.__indexWithHisat_(workDir,path)
+                meta["processed"]["hisat"] = True
+                self.__saveMeta_(workDir,meta)
+            except:
+                traceback.print_exc()
+        if not meta["processed"]["salmon"]:
+            try:
+                core.log.send("Salmon Indexing FASTA "+title)
+                self.__indexWithSalmon_(workDir,path)
+                meta["processed"]["salmon"] = True
+                self.__saveMeta_(workDir,meta)
+            except:
+                traceback.print_exc()
+        if not meta["processed"]["kallisto"]:
+            try:
+                core.log.send("Kallisto Indexing FASTA "+title)
+                self.__indexWithKallisto_(workDir,path)
+                meta["processed"]["kallisto"] = True
+                self.__saveMeta_(workDir,meta)
+            except:
+                traceback.print_exc()
 
 
     def __mirrorGff_(
@@ -293,8 +359,8 @@ class Assembly():
                 ,title
             )
             if gff:
-                meta["gff_processed"] = False
-            if not meta["gff_processed"]:
+                meta["processed"]["gff"] = False
+            if not meta["processed"]["gff"]:
                 core.log.send("Writing GTF from GFF "+title)
                 filePath = os.path.join(workDir,path)
                 tPath = os.path.join(workDir,"temp.gff")
@@ -309,7 +375,7 @@ class Assembly():
                     core.log.send("Writing Spice sites from GTF "+title)
                     cmd = ['hisat2_extract_splice_sites.py',basePath+".gtf"]
                     assert(subprocess.run(cmd,stdout=ofile).returncode==0)
-                meta["gff_processed"] = True
+                meta["processed"]["gff"] = True
                 self.__saveMeta_(workDir,meta)
         except:
             traceback.print_exc()

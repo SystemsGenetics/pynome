@@ -42,7 +42,7 @@ class NCBI(abstract.AbstractCrawler):
         """
         Initializes a new ensembl crawler.
         """
-        abstract.AbstractCrawler.__init__(self)
+        super().__init__()
         self.__ftp = None
         self.__lines = []
         self.__safeSTIDs = set()
