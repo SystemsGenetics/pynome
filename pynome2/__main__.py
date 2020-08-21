@@ -24,7 +24,8 @@ def main():
     if args.rootPath:
         settings.rootPath = args.rootPath
     core.log.setEcho(not args.notEcho)
-    #core.assembly.registerCrawler(crawler.Ensembl())
+    core.assembly.registerCrawler(crawler.Ensembl())
+    core.assembly.registerCrawler(crawler.Ensembl2())
     core.assembly.registerCrawler(crawler.NCBI())
     core.assembly.registerMirror("ftp_gunzip",mirror.FTPGunzip())
     if not args.crawl and not args.mirror:
