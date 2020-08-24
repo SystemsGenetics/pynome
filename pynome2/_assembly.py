@@ -47,6 +47,50 @@ class Assembly():
     ####################
 
 
+    def index(
+        self
+        ,path
+        ):
+        """
+        Detailed description.
+
+        Parameters
+        ----------
+        path : object
+               Detailed description.
+        """
+        with open(path,"r") as ifile:
+            parts = [x.strip() for x in ifile.read().split("\n") if x]
+            assert(len(parts)==2)
+            taxId = parts[0]
+            assemblyName = parts[1]
+            workDir = os.path.join(settings.rootPath,taxId,assemblyName)
+            meta = self.__loadMeta_(workDir)
+            rootName = meta["genus"]+"_"+meta["species"]
+            if meta["intraspecific_name"]:
+                rootName += "_"+meta["intraspecific_name"]
+            rootName += "-"+meta["assembly_id"]
+            self.__indexFasta_(workDir,rootName+".fa",meta)
+            self.__indexGff_(workDir,rootName+".gff",meta)
+
+
+    def listIndexes(
+        self
+        ):
+        """
+        Detailed description.
+        """
+        i = 0
+        for taxId in os.listdir(settings.rootPath):
+            if taxId.isdecimal():
+                path = os.path.join(settings.rootPath,taxId)
+                if os.path.isdir(path):
+                    for assemblyName in os.listdir(path):
+                        with open("pynome_work_%05d.job"%(i,),"w") as ofile:
+                            ofile.write(taxId+"\n"+assemblyName+"\n")
+                        i += 1
+
+
     def mirror(
         self
         ,species
@@ -147,6 +191,98 @@ class Assembly():
     #####################
     # PRIVATE - Methods #
     #####################
+
+
+    def __indexFasta_(
+        self
+        ,workDir
+        ,path
+        ,meta
+        ):
+        """
+        Indexes the FASTA file of the given assembly, running post processing on
+        the local FASTA file if a new one has been downloaded from the remote
+        server.
+
+        Parameters
+        ----------
+        workDir : string
+                  The working directory of the assembly.
+        path : string
+               The full file name of the given assembly's FASTA file located
+               within the given working directory.
+        meta : dictionary
+               The full metadata of the given assembly.
+        """
+        print(path)
+        if os.path.isfile(os.path.join(workDir,path)):
+            title = os.path.join(meta["taxonomy"]["id"],os.path.split(workDir)[-1])
+            if not meta["processed"]["hisat"]:
+                try:
+                    core.log.send("Hisat2 Indexing FASTA "+title)
+                    self.__indexWithHisat_(workDir,path)
+                    meta["processed"]["hisat"] = True
+                    self.__saveMeta_(workDir,meta)
+                except:
+                    traceback.print_exc()
+            if not meta["processed"]["salmon"]:
+                try:
+                    core.log.send("Salmon Indexing FASTA "+title)
+                    self.__indexWithSalmon_(workDir,path)
+                    meta["processed"]["salmon"] = True
+                    self.__saveMeta_(workDir,meta)
+                except:
+                    traceback.print_exc()
+            if not meta["processed"]["kallisto"]:
+                try:
+                    core.log.send("Kallisto Indexing FASTA "+title)
+                    self.__indexWithKallisto_(workDir,path)
+                    meta["processed"]["kallisto"] = True
+                    self.__saveMeta_(workDir,meta)
+                except:
+                    traceback.print_exc()
+
+
+    def __indexGff_(
+        self
+        ,workDir
+        ,path
+        ,meta
+        ):
+        """
+        Indexes the GFF file of the given assembly, running post processing on
+        the local GFF file if a new one has been downloaded from the remote
+        server.
+
+        Parameters
+        ----------
+        workDir : string
+                  The working directory of the assembly.
+        path : string
+               The full file name of the given assembly's GFF file located
+               within the given working directory.
+        meta : dictionary
+               The full metadata of the given assembly.
+        """
+        if os.path.isfile(os.path.join(workDir,path)):
+            title = os.path.join(meta["taxonomy"]["id"],os.path.split(workDir)[-1])
+            if not meta["processed"]["gff"]:
+                core.log.send("Writing GTF from GFF "+title)
+                filePath = os.path.join(workDir,path)
+                tPath = os.path.join(workDir,"temp.gff")
+                basePath = filePath[:-4]
+                cmd = ["cp",filePath,tPath]
+                assert(subprocess.run(cmd).returncode==0)
+                cmd = ["gffread","-T",tPath,"-o",basePath+".gtf"]
+                assert(subprocess.run(cmd).returncode==0)
+                cmd = ["rm",tPath]
+                assert(subprocess.run(cmd).returncode==0)
+                with open(basePath+".Splice_sites",'w') as ofile:
+                    core.log.send("Writing Spice sites from GTF "+title)
+                    cmd = ['hisat2_extract_splice_sites.py',basePath+".gtf"]
+                    assert(subprocess.run(cmd,stdout=ofile).returncode==0)
+                meta["processed"]["gff"] = True
+                self.__saveMeta_(workDir,meta)
 
 
     def __indexWithHisat_(
@@ -274,9 +410,7 @@ class Assembly():
         ,meta
         ):
         """
-        Mirrors the FASTA file of the given assembly, running post processing on
-        the local FASTA file if a new one has been downloaded from the remote
-        server.
+        Mirrors the FASTA file of the given assembly.
 
         Parameters
         ----------
@@ -303,30 +437,7 @@ class Assembly():
             meta["processed"]["hisat"] = False
             meta["processed"]["salmon"] = False
             meta["processed"]["kallisto"] = False
-        if not meta["processed"]["hisat"]:
-            try:
-                core.log.send("Hisat2 Indexing FASTA "+title)
-                self.__indexWithHisat_(workDir,path)
-                meta["processed"]["hisat"] = True
-                self.__saveMeta_(workDir,meta)
-            except:
-                traceback.print_exc()
-        if not meta["processed"]["salmon"]:
-            try:
-                core.log.send("Salmon Indexing FASTA "+title)
-                self.__indexWithSalmon_(workDir,path)
-                meta["processed"]["salmon"] = True
-                self.__saveMeta_(workDir,meta)
-            except:
-                traceback.print_exc()
-        if not meta["processed"]["kallisto"]:
-            try:
-                core.log.send("Kallisto Indexing FASTA "+title)
-                self.__indexWithKallisto_(workDir,path)
-                meta["processed"]["kallisto"] = True
-                self.__saveMeta_(workDir,meta)
-            except:
-                traceback.print_exc()
+            self.__saveMeta_(workDir,meta)
 
 
     def __mirrorGff_(
@@ -336,9 +447,7 @@ class Assembly():
         ,meta
         ):
         """
-        Mirrors the GFF file of the given assembly, running post processing on
-        the local GFF file if a new one has been downloaded from the remote
-        server.
+        Mirrors the GFF file of the given assembly.
 
         Parameters
         ----------
@@ -351,6 +460,7 @@ class Assembly():
                The full metadata of the given assembly.
         """
         title = os.path.join(meta["taxonomy"]["id"],os.path.split(workDir)[-1])
+        gff = False
         try:
             gff = self.__mirrors[meta["mirror_type"]].mirrorGff(
                 workDir
@@ -358,27 +468,11 @@ class Assembly():
                 ,meta["mirror_data"]
                 ,title
             )
-            if gff:
-                meta["processed"]["gff"] = False
-            if not meta["processed"]["gff"]:
-                core.log.send("Writing GTF from GFF "+title)
-                filePath = os.path.join(workDir,path)
-                tPath = os.path.join(workDir,"temp.gff")
-                basePath = filePath[:-4]
-                cmd = ["cp",filePath,tPath]
-                assert(subprocess.run(cmd).returncode==0)
-                cmd = ["gffread","-T",tPath,"-o",basePath+".gtf"]
-                assert(subprocess.run(cmd).returncode==0)
-                cmd = ["rm",tPath]
-                assert(subprocess.run(cmd).returncode==0)
-                with open(basePath+".Splice_sites",'w') as ofile:
-                    core.log.send("Writing Spice sites from GTF "+title)
-                    cmd = ['hisat2_extract_splice_sites.py',basePath+".gtf"]
-                    assert(subprocess.run(cmd,stdout=ofile).returncode==0)
-                meta["processed"]["gff"] = True
-                self.__saveMeta_(workDir,meta)
         except:
             traceback.print_exc()
+        if gff:
+            meta["processed"]["gff"] = False
+            self.__saveMeta_(workDir,meta)
 
 
     def __prepareDataDirs_(

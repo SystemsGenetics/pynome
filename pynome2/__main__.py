@@ -17,6 +17,9 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("-c",dest="crawl",action="store_true")
     parser.add_argument("-m",dest="mirror",action="store_true")
+    parser.add_argument("-i",dest="index",action="store_true")
+    parser.add_argument("-f",dest="indexFile",default=None)
+    parser.add_argument("-I",dest="listIndexes",action="store_true")
     parser.add_argument("-t",dest="species",default="")
     parser.add_argument("-d",dest="rootPath",default=None)
     parser.add_argument("-q",dest="notEcho",action="store_true")
@@ -28,14 +31,22 @@ def main():
     core.assembly.registerCrawler(crawler.Ensembl2())
     core.assembly.registerCrawler(crawler.NCBI())
     core.assembly.registerMirror("ftp_gunzip",mirror.FTPGunzip())
-    if not args.crawl and not args.mirror:
-        core.assembly.crawl(args.species)
-        core.assembly.mirror(args.species)
+    if args.listIndexes:
+        core.assembly.listIndexes()
     else:
-        if args.crawl:
+        if not args.crawl and not args.mirror and not args.index:
+            assert(args.indexFile is not None)
             core.assembly.crawl(args.species)
-        if args.mirror:
             core.assembly.mirror(args.species)
+            core.assembly.index(args.indexFile)
+        else:
+            if args.crawl:
+                core.assembly.crawl(args.species)
+            if args.mirror:
+                core.assembly.mirror(args.species)
+            if args.index:
+                assert(args.indexFile is not None)
+                core.assembly.index(args.indexFile)
 
 
 
