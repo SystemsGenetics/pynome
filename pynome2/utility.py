@@ -41,9 +41,6 @@ def rSync(
               this compared local file. If this string is empty then it is
               ignored.
     """
-    d = url.find("://")
-    if d != -1:
-        url = url[d+3:]
     if not compare:
         compare = path
     download = False
@@ -86,6 +83,9 @@ def timeStamp(
     ret0 : string
            The FTP timestamp of the remote file location at the given URL.
     """
+    d = url.find("://")
+    if d != -1:
+        url = url[d+3:]
     site = url[:url.find("/")]
     path = url[url.find("/"):]
     try:

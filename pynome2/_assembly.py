@@ -49,46 +49,80 @@ class Assembly():
 
     def index(
         self
-        ,path
+        ,taxId
+        ,name
         ):
         """
         Detailed description.
 
         Parameters
         ----------
-        path : object
+        taxId : object
+                Detailed description.
+        name : object
                Detailed description.
         """
-        with open(path,"r") as ifile:
-            parts = [x.strip() for x in ifile.read().split("\n") if x]
-            assert(len(parts)==2)
-            taxId = parts[0]
-            assemblyName = parts[1]
-            workDir = os.path.join(settings.rootPath,taxId,assemblyName)
-            meta = self.__loadMeta_(workDir)
-            rootName = meta["genus"]+"_"+meta["species"]
-            if meta["intraspecific_name"]:
-                rootName += "_"+meta["intraspecific_name"]
-            rootName += "-"+meta["assembly_id"]
-            self.__indexFasta_(workDir,rootName+".fa",meta)
-            self.__indexGff_(workDir,rootName+".gff",meta)
+        workDir = os.path.join(settings.rootPath,taxId,name)
+        meta = self.__loadMeta_(workDir)
+        rootName = meta["genus"]+"_"+meta["species"]
+        if meta["intraspecific_name"]:
+            rootName += "_"+meta["intraspecific_name"]
+        rootName += "-"+meta["assembly_id"]
+        self.__indexFasta_(workDir,rootName+".fa",meta)
+        self.__indexGff_(workDir,rootName+".gff",meta)
 
 
-    def listIndexes(
+    def indexSpecies(
         self
+        ,species
         ):
         """
         Detailed description.
+
+        Parameters
+        ----------
+        species : object
+                  Detailed description.
         """
-        i = 0
         for taxId in os.listdir(settings.rootPath):
             if taxId.isdecimal():
                 path = os.path.join(settings.rootPath,taxId)
                 if os.path.isdir(path):
                     for assemblyName in os.listdir(path):
-                        with open("pynome_work_%05d.job"%(i,),"w") as ofile:
-                            ofile.write(taxId+"\n"+assemblyName+"\n")
-                        i += 1
+                        workDir = os.path.join(settings.rootPath,taxId,assemblyName)
+                        meta = self.__loadMeta_(workDir)
+                        if meta["species"].lower() != species.lower():
+                            continue
+                        rootName = meta["genus"]+"_"+meta["species"]
+                        if meta["intraspecific_name"]:
+                            rootName += "_"+meta["intraspecific_name"]
+                        rootName += "-"+meta["assembly_id"]
+                        self.__indexFasta_(workDir,rootName+".fa",meta)
+                        self.__indexGff_(workDir,rootName+".gff",meta)
+
+
+    def listAllWork(
+        self
+        ):
+        """
+        Detailed description.
+        """
+        ret = []
+        for taxId in os.listdir(settings.rootPath):
+            if taxId.isdecimal():
+                path = os.path.join(settings.rootPath,taxId)
+                if os.path.isdir(path):
+                    for assemblyName in os.listdir(path):
+                        workDir = os.path.join(settings.rootPath,taxId,assemblyName)
+                        meta = self.__loadMeta_(workDir)
+                        if (
+                            not meta["processed"]["hisat"]
+                            or not meta["processed"]["salmon"]
+                            or not meta["processed"]["kallisto"]
+                            or not meta["processed"]["gff"]
+                        ):
+                            ret.append((taxId,assemblyName))
+        return ret
 
 
     def mirror(
@@ -214,7 +248,6 @@ class Assembly():
         meta : dictionary
                The full metadata of the given assembly.
         """
-        print(path)
         if os.path.isfile(os.path.join(workDir,path)):
             title = os.path.join(meta["taxonomy"]["id"],os.path.split(workDir)[-1])
             if not meta["processed"]["hisat"]:
@@ -224,7 +257,7 @@ class Assembly():
                     meta["processed"]["hisat"] = True
                     self.__saveMeta_(workDir,meta)
                 except:
-                    traceback.print_exc()
+                    core.log.send("Hisat2 Indexing FASTA "+title+" FAILURE!")
             if not meta["processed"]["salmon"]:
                 try:
                     core.log.send("Salmon Indexing FASTA "+title)
@@ -232,7 +265,7 @@ class Assembly():
                     meta["processed"]["salmon"] = True
                     self.__saveMeta_(workDir,meta)
                 except:
-                    traceback.print_exc()
+                    core.log.send("Salmon Indexing FASTA "+title+" FAILURE!")
             if not meta["processed"]["kallisto"]:
                 try:
                     core.log.send("Kallisto Indexing FASTA "+title)
@@ -240,7 +273,7 @@ class Assembly():
                     meta["processed"]["kallisto"] = True
                     self.__saveMeta_(workDir,meta)
                 except:
-                    traceback.print_exc()
+                    core.log.send("Kallisto Indexing FASTA "+title+" FAILURE!")
 
 
     def __indexGff_(
@@ -265,24 +298,27 @@ class Assembly():
                The full metadata of the given assembly.
         """
         if os.path.isfile(os.path.join(workDir,path)):
-            title = os.path.join(meta["taxonomy"]["id"],os.path.split(workDir)[-1])
-            if not meta["processed"]["gff"]:
-                core.log.send("Writing GTF from GFF "+title)
-                filePath = os.path.join(workDir,path)
-                tPath = os.path.join(workDir,"temp.gff")
-                basePath = filePath[:-4]
-                cmd = ["cp",filePath,tPath]
-                assert(subprocess.run(cmd).returncode==0)
-                cmd = ["gffread","-T",tPath,"-o",basePath+".gtf"]
-                assert(subprocess.run(cmd).returncode==0)
-                cmd = ["rm",tPath]
-                assert(subprocess.run(cmd).returncode==0)
-                with open(basePath+".Splice_sites",'w') as ofile:
-                    core.log.send("Writing Spice sites from GTF "+title)
-                    cmd = ['hisat2_extract_splice_sites.py',basePath+".gtf"]
-                    assert(subprocess.run(cmd,stdout=ofile).returncode==0)
-                meta["processed"]["gff"] = True
-                self.__saveMeta_(workDir,meta)
+            try:
+                title = os.path.join(meta["taxonomy"]["id"],os.path.split(workDir)[-1])
+                if not meta["processed"]["gff"]:
+                    core.log.send("Writing GTF from GFF "+title)
+                    filePath = os.path.join(workDir,path)
+                    tPath = os.path.join(workDir,"temp.gff")
+                    basePath = filePath[:-4]
+                    cmd = ["cp",filePath,tPath]
+                    assert(subprocess.run(cmd).returncode==0)
+                    cmd = ["gffread","-T",tPath,"-o",basePath+".gtf"]
+                    assert(subprocess.run(cmd).returncode==0)
+                    cmd = ["rm",tPath]
+                    assert(subprocess.run(cmd).returncode==0)
+                    with open(basePath+".Splice_sites",'w') as ofile:
+                        core.log.send("Writing Spice sites from GTF "+title)
+                        cmd = ['hisat2_extract_splice_sites.py',basePath+".gtf"]
+                        assert(subprocess.run(cmd,stdout=ofile).returncode==0)
+                    meta["processed"]["gff"] = True
+                    self.__saveMeta_(workDir,meta)
+            except:
+                core.log.send("Indexing GFF "+title+" FAILURE!")
 
 
     def __indexWithHisat_(
@@ -432,7 +468,7 @@ class Assembly():
                 ,title
             )
         except:
-            traceback.print_exc()
+            core.log.send("Mirror FASTA "+title+" FAILURE!")
         if fasta:
             meta["processed"]["hisat"] = False
             meta["processed"]["salmon"] = False
@@ -469,7 +505,7 @@ class Assembly():
                 ,title
             )
         except:
-            traceback.print_exc()
+            core.log.send("Mirror GFF "+title+" FAILURE!")
         if gff:
             meta["processed"]["gff"] = False
             self.__saveMeta_(workDir,meta)

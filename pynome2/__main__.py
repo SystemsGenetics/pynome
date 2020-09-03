@@ -10,6 +10,40 @@ from . import settings
 
 
 
+def index(
+    path
+    ):
+    """
+    Detailed description.
+
+    Parameters
+    ----------
+    path : object
+           Detailed description.
+    """
+    with open(path,"r") as ifile:
+        parts = [x.strip() for x in ifile.read().split("\n") if x]
+        assert(len(parts)==2)
+        taxId = parts[0]
+        assemblyName = parts[1]
+        core.assembly.index(taxId,assemblyName)
+
+
+
+
+def listAll():
+    """
+    Detailed description.
+    """
+    i = 0
+    for (taxId,assemblyName) in core.assembly.listAllWork():
+        with open(settings.JOB_NAME%(i,),"w") as ofile:
+            ofile.write(taxId+"\n"+assemblyName+"\n")
+        i += 1
+
+
+
+
 def main():
     """
     Starts execution of this application.
@@ -19,7 +53,7 @@ def main():
     parser.add_argument("-m",dest="mirror",action="store_true")
     parser.add_argument("-i",dest="index",action="store_true")
     parser.add_argument("-f",dest="indexFile",default=None)
-    parser.add_argument("-I",dest="listIndexes",action="store_true")
+    parser.add_argument("-I",dest="listAll",action="store_true")
     parser.add_argument("-t",dest="species",default="")
     parser.add_argument("-d",dest="rootPath",default=None)
     parser.add_argument("-q",dest="notEcho",action="store_true")
@@ -31,22 +65,26 @@ def main():
     core.assembly.registerCrawler(crawler.Ensembl2())
     core.assembly.registerCrawler(crawler.NCBI())
     core.assembly.registerMirror("ftp_gunzip",mirror.FTPGunzip())
-    if args.listIndexes:
-        core.assembly.listIndexes()
+    if args.listAll:
+        listAll()
     else:
         if not args.crawl and not args.mirror and not args.index:
-            assert(args.indexFile is not None)
             core.assembly.crawl(args.species)
             core.assembly.mirror(args.species)
-            core.assembly.index(args.indexFile)
+            if args.indexFile is not None:
+                index(args.indexFile)
+            else:
+                core.assembly.indexSpecies(args.species)
         else:
             if args.crawl:
                 core.assembly.crawl(args.species)
             if args.mirror:
                 core.assembly.mirror(args.species)
             if args.index:
-                assert(args.indexFile is not None)
-                core.assembly.index(args.indexFile)
+                if args.indexFile is not None:
+                    index(args.indexFile)
+                else:
+                    core.assembly.indexSpecies(args.species)
 
 
 

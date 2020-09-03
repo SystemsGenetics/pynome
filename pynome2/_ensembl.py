@@ -210,7 +210,10 @@ class Ensembl(abstract.AbstractCrawler):
             self._connect_()
             return self._crawlFasta_(directory,species,depth)
         for file_ in listing:
-            if not depth:
+            if (
+                ( not depth and not file_.endswith("_collection") )
+                or ( depth == 1 and directory.endswith("_collection") )
+            ):
                 if species and species.lower() != file_.split("_")[1].lower():
                     continue
             if file_.endswith(self.__FASTA_EXTENSION):
@@ -267,7 +270,10 @@ class Ensembl(abstract.AbstractCrawler):
             self._connect_()
             return self._crawlGff_(directory,species,version,depth)
         for file_ in listing:
-            if not depth:
+            if (
+                ( not depth and not file_.endswith("_collection") )
+                or ( depth == 1 and directory.endswith("_collection") )
+            ):
                 if species and species.lower() != file_.split("_")[1].lower():
                     continue
             ending = "."+str(version)+self.__GFF_EXTENSION
@@ -357,7 +363,10 @@ class Ensembl(abstract.AbstractCrawler):
                         ,".".join(parts)
                         ,self.__taxIds[taxKey]
                         ,"ftp_gunzip"
-                        ,{"fasta": self._FTP_HOST+fasta[key], "gff": self._FTP_HOST+gff[key]}
+                        ,{
+                            "fasta": "ftp://"+self._FTP_HOST+fasta[key]
+                            ,"gff": "ftp://"+self._FTP_HOST+gff[key]
+                        }
                     )
 
 
