@@ -1,2 +1,2 @@
-from pynome2.__main__ import main
+from pynome.__main__ import main
 main()

@@ -13,22 +13,10 @@ from setuptools import setup, find_packages
 # Run the setup function to install the program.
 
 setup(
-    name='pynome',
-    version='0.3',
-    packages=find_packages(),
-    install_requires=[
-        'Click',
-        'SQLAlchemy',
-        'tqdm',
-        'pandas',
-        'xmltodict',
-    ],
-    entry_points={
-        # Console scripts are those that can be run directly from the terminal.
-        # String entries here will be the cli invocation for their corresponding
-        # python modulefiles:functions.
-        'console_scripts': [
-            'pynome = pynome.cli:pynome',
-        ]
+    name='pynome'
+    ,version='0.999'
+    ,packages=find_packages()
+    ,entry_points = {
+        'console_scripts': ['pynome = pynome.__main__:main']
     }
 )
