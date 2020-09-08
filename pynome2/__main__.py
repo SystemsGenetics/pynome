@@ -1,5 +1,6 @@
 """
-This contains the main entry point function of this application.
+This contains the main entry point function of this application. It also
+contains functions that execute a specific operation.
 """
 import argparse
 from . import core
@@ -14,12 +15,14 @@ def index(
     path
     ):
     """
-    Detailed description.
+    Indexes an assembly from the given job file path. The given path must be a
+    generated pynome job file with the taxonomy ID and assembly name.
 
     Parameters
     ----------
     path : object
-           Detailed description.
+           Path to a generated pynome job file used to index its referenced
+           assembly.
     """
     with open(path,"r") as ifile:
         parts = [x.strip() for x in ifile.read().split("\n") if x]
@@ -33,7 +36,9 @@ def index(
 
 def listAll():
     """
-    Detailed description.
+    Generates a list of new pynome job files, each one representing one assembly
+    whose indexes need to be updated. The file output is the taxonomy ID and
+    assembly name separated by a new line.
     """
     i = 0
     for (taxId,assemblyName) in core.assembly.listAllWork():

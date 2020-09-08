@@ -53,14 +53,16 @@ class Assembly():
         ,name
         ):
         """
-        Detailed description.
+        Indexes the assembly with the given taxonomy ID and assembly name. If
+        the indexes are already up to date for that assembly then nothing is
+        done.
 
         Parameters
         ----------
-        taxId : object
-                Detailed description.
-        name : object
-               Detailed description.
+        taxId : string
+                The taxonomy ID of the assembly whose indexes are updated.
+        name : string
+               The name of the assembly whose indexes are updated.
         """
         workDir = os.path.join(settings.rootPath,taxId,name)
         meta = self.__loadMeta_(workDir)
@@ -77,12 +79,13 @@ class Assembly():
         ,species
         ):
         """
-        Detailed description.
+        Indexes all assemblies with the given species name. If the indexes are
+        already up to date for any matched assembly then it is skipped.
 
         Parameters
         ----------
-        species : object
-                  Detailed description.
+        species : string
+                  The species name matched with assemblies to index.
         """
         for taxId in os.listdir(settings.rootPath):
             if taxId.isdecimal():
@@ -105,7 +108,13 @@ class Assembly():
         self
         ):
         """
-        Detailed description.
+        Getter method.
+
+        Returns
+        -------
+        ret0 : list
+               Tuples of taxonomy ID and name of all assemblies whose indexes
+               require updating.
         """
         ret = []
         for taxId in os.listdir(settings.rootPath):
@@ -132,7 +141,8 @@ class Assembly():
         """
         Iterates through all local database folders, inspecting their metadata
         file and downloading any new data files if new versions are present on
-        the remote server. Any downloaded data is properly indexed.
+        the remote server. Any assembly whose data is updated is marked to
+        update its indexes.
 
         Parameters
         ----------
@@ -327,7 +337,7 @@ class Assembly():
         ,path
         ):
         """
-        Detailed description.
+        Indexes the FASTA file of the given assembly with the hisat2 program.
 
         Parameters
         ----------
@@ -354,7 +364,7 @@ class Assembly():
         ,path
         ):
         """
-        Detailed description.
+        Indexes the FASTA file of the given assembly with the kallisto program.
 
         Parameters
         ----------
@@ -381,7 +391,7 @@ class Assembly():
         ,path
         ):
         """
-        Detailed description.
+        Indexes the FASTA file of the given assembly with the salmon program.
 
         Parameters
         ----------

@@ -5,9 +5,9 @@ import os
 
 
 #
-# Detailed description.
+# The file name used for generating pynome job files.
 #
-JOB_NAME = "pynome_work_%05d.job"
+JOB_NAME = "pynome_work_%05d.txt"
 
 
 #
