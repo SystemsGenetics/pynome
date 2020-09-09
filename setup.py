@@ -14,7 +14,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='pynome'
-    ,version='0.999'
+    ,version='0.9999'
     ,packages=find_packages()
     ,entry_points = {
         'console_scripts': ['pynome = pynome.__main__:main']
