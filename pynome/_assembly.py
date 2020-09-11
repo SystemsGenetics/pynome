@@ -354,7 +354,7 @@ class Assembly():
         outBase = os.path.join(workDir,"hisat-"+version)
         os.makedirs(outBase,exist_ok=True)
         outBase = os.path.join(outBase,path[:-3])
-        cmd = ["hisat2-build","--quiet","-p",str(os.cpu_count()),"-f",filePath,outBase]
+        cmd = ["hisat2-build","--quiet","-p",str(settings.cpuCount),"-f",filePath,outBase]
         assert(subprocess.run(cmd).returncode==0)
 
 
@@ -414,7 +414,7 @@ class Assembly():
             ,"--transcripts"
             ,filePath
             ,"--threads"
-            ,str(os.cpu_count())
+            ,str(settings.cpuCount)
         ]
         assert(subprocess.run(cmd,capture_output=True).returncode==0)
 

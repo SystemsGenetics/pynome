@@ -62,7 +62,10 @@ def main():
     parser.add_argument("-t",dest="species",default="")
     parser.add_argument("-d",dest="rootPath",default=None)
     parser.add_argument("-q",dest="notEcho",action="store_true")
+    parser.add_argument("-n",dest="cpuCount",type=int,default=0)
     args = parser.parse_args()
+    if args.cpuCount > 0:
+        settings.cpuCount = args.cpuCount
     if args.rootPath:
         settings.rootPath = args.rootPath
     core.log.setEcho(not args.notEcho)
