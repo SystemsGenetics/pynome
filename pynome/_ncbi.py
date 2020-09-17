@@ -77,7 +77,7 @@ class NCBI(abstract.AbstractCrawler):
                 parts = text.split("\t")
                 sParts = parts[7].split()
                 sParts = [sParts[0]," ".join(sParts[1:])]
-                if species and not species in sParts[1]:
+                if species and not species in sParts[0]+" "+sParts[1]:
                     continue
                 if parts[6] in self.__safeSTIDs and self.__hasGff_(parts[-3]):
                     fasta = parts[-3]

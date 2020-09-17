@@ -87,6 +87,8 @@ class Assembly():
         species : string
                   The species name matched with assemblies to index.
         """
+        if not species:
+            return
         for taxId in os.listdir(settings.rootPath):
             if taxId.isdecimal():
                 path = os.path.join(settings.rootPath,taxId)
@@ -94,7 +96,8 @@ class Assembly():
                     for assemblyName in os.listdir(path):
                         workDir = os.path.join(settings.rootPath,taxId,assemblyName)
                         meta = self.__loadMeta_(workDir)
-                        if meta["species"].lower() != species.lower():
+                        fullName = meta["genus"].lower()+" "+meta["species"].lower()
+                        if not species.lower() in fullName:
                             continue
                         rootName = meta["genus"]+"_"+meta["species"]
                         if meta["intraspecific_name"]:
@@ -158,8 +161,10 @@ class Assembly():
                     for assemblyName in os.listdir(path):
                         workDir = os.path.join(settings.rootPath,taxId,assemblyName)
                         meta = self.__loadMeta_(workDir)
-                        if species and meta["species"].lower() != species.lower():
-                            continue
+                        if species:
+                            fullName = meta["genus"].lower()+" "+meta["species"].lower()
+                            if not species.lower() in fullName:
+                                continue
                         rootName = meta["genus"]+"_"+meta["species"]
                         if meta["intraspecific_name"]:
                             rootName += "_"+meta["intraspecific_name"]

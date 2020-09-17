@@ -214,8 +214,10 @@ class Ensembl(abstract.AbstractCrawler):
                 ( not depth and not file_.endswith("_collection") )
                 or ( depth == 1 and directory.endswith("_collection") )
             ):
-                if species and species.lower() != file_.split("_")[1].lower():
-                    continue
+                if species:
+                    fullName = file_.split("_")[0].lower()+" "+file_.split("_")[1].lower()
+                    if not species.lower() in fullName:
+                        continue
             if file_.endswith(self.__FASTA_EXTENSION):
                 ret[file_[:-len(self.__FASTA_EXTENSION)]] = directory+"/"+file_
             elif "." not in file_ and file_ not in self.__FTP_IGNORED_DIRS:
@@ -274,8 +276,10 @@ class Ensembl(abstract.AbstractCrawler):
                 ( not depth and not file_.endswith("_collection") )
                 or ( depth == 1 and directory.endswith("_collection") )
             ):
-                if species and species.lower() != file_.split("_")[1].lower():
-                    continue
+                if species:
+                    fullName = file_.split("_")[0].lower()+" "+file_.split("_")[1].lower()
+                    if not species.lower() in fullName:
+                        continue
             ending = "."+str(version)+self.__GFF_EXTENSION
             if file_.endswith(ending):
                 ret[file_[:-len(ending)]] = directory+"/"+file_
