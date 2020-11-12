@@ -20,11 +20,6 @@ class Log():
     """
 
 
-    #######################
-    # PUBLIC - Initialize #
-    #######################
-
-
     def __init__(
         self
         ):
@@ -32,11 +27,6 @@ class Log():
         Initializes the singleton log instance.
         """
         self.__echo = True
-
-
-    ####################
-    # PUBLIC - Methods #
-    ####################
 
 
     def setEcho(

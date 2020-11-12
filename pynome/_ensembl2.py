@@ -1,8 +1,8 @@
 """
 Contains the Ensembl2 class.
 """
-from . import core
 from ._ensembl import Ensembl
+from . import core
 
 
 
@@ -17,25 +17,8 @@ class Ensembl2(Ensembl):
     inheriting from the original ensembl class because ensembl splits its
     assemblies between two FTP sites.
     """
-
-
-    #######################
-    # PUBLIC - Initialize #
-    #######################
-
-
-    def __init__(
-        self
-        ):
-        """
-        Initializes a new ensembl crawler.
-        """
-        super().__init__()
-
-
-    ####################
-    # PUBLIC - Methods #
-    ####################
+    _FTP_HOST = "ftp.ensemblgenomes.org"
+    _TAXONOMY_FILE = "/species.txt"
 
 
     def crawl(
@@ -43,7 +26,7 @@ class Ensembl2(Ensembl):
         ,species=""
         ):
         """
-        Implements the pynome2.abstract.AbstractCrawler interface.
+        Implements the pynome.interfaces.AbstractCrawler interface.
 
         Parameters
         ----------
@@ -97,7 +80,7 @@ class Ensembl2(Ensembl):
         self
         ):
         """
-        Implements the pynome2.abstract.AbstractCrawler interface.
+        Implements the pynome.interfaces.AbstractCrawler interface.
 
         Returns
         -------
@@ -105,21 +88,3 @@ class Ensembl2(Ensembl):
                See interface docs.
         """
         return "ensembl2"
-
-
-    #########################
-    # PROTECTED - Constants #
-    #########################
-
-
-    #
-    # The URL of the FTP server.
-    #
-    _FTP_HOST = "ftp.ensemblgenomes.org"
-
-
-    #
-    # The file name of the special text file that contains all taxonomy IDs on
-    # the FTP server in a release folder.
-    #
-    _TAXONOMY_FILE = "/species.txt"

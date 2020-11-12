@@ -1,10 +1,10 @@
 """
 Contains the AbstractCrawler class.
 """
+from . import core
 import abc
 import json
 import os
-from . import core
 from . import settings
 
 
@@ -22,11 +22,6 @@ class AbstractCrawler(abc.ABC):
     """
 
 
-    #######################
-    # PUBLIC - Initialize #
-    #######################
-
-
     def __init__(
         self
         ):
@@ -37,9 +32,21 @@ class AbstractCrawler(abc.ABC):
         self.__entries = {}
 
 
-    #######################
-    # PUBLIC - Interfaces #
-    #######################
+    def assemble(
+        self
+        ):
+        """
+        Updates the directory structure and metadata JSON files of the local
+        database with all entries added to this crawler, creating directories
+        and files that do not exist and overwriting ones that do. This also
+        clears all entries added from this crawler's crawl method.
+        """
+        for key in self.__entries:
+            d = os.path.join(settings.rootPath,key)
+            os.makedirs(d,exist_ok=True)
+            with open(os.path.join(d,"metadata.json"),"w") as ofile:
+                ofile.write(json.dumps(self.__entries[key],indent=4) + "\n\n")
+        self.__entries = {}
 
 
     @abc.abstractmethod
@@ -77,33 +84,6 @@ class AbstractCrawler(abc.ABC):
                for the local database.
         """
         pass
-
-
-    ####################
-    # PUBLIC - Methods #
-    ####################
-
-
-    def assemble(
-        self
-        ):
-        """
-        Updates the directory structure and metadata JSON files of the local
-        database with all entries added to this crawler, creating directories
-        and files that do not exist and overwriting ones that do. This also
-        clears all entries added from this crawler's crawl method.
-        """
-        for key in self.__entries:
-            d = os.path.join(settings.rootPath,key)
-            os.makedirs(d,exist_ok=True)
-            with open(os.path.join(d,"metadata.json"),"w") as ofile:
-                ofile.write(json.dumps(self.__entries[key],indent=4) + "\n\n")
-        self.__entries = {}
-
-
-    #######################
-    # PROTECTED - Methods #
-    #######################
 
 
     def _addEntry_(

@@ -1,11 +1,11 @@
 """
 Contains the NCBI class.
 """
+from . import core
 import ftplib
+from . import interfaces
 import os
 import subprocess
-from . import abstract
-from . import core
 from . import utility
 
 
@@ -15,7 +15,7 @@ from . import utility
 
 
 
-class NCBI(abstract.AbstractCrawler):
+class NCBI(interfaces.AbstractCrawler):
     """
     This is the NCBI class. It implements the abstract crawler interface. The
     remote database is crawled in three stages.
@@ -29,11 +29,15 @@ class NCBI(abstract.AbstractCrawler):
     have a proper GFF file in its remote location. If both tests pass its entry
     is added locally.
     """
-
-
-    #######################
-    # PUBLIC - Initialize #
-    #######################
+    __DIV_NAME = "division.dmp"
+    __FASTA_EXTENSION = "_genomic.fna.gz"
+    __FTP_HOST = "ftp.ncbi.nlm.nih.gov"
+    __GFF_EXTENSION = "_genomic.gff.gz"
+    __NODE_NAME = "nodes.dmp"
+    __SUMMARY_PATH = "/genomes/genbank/assembly_summary_genbank.txt"
+    __TAX_DIR = "/pub/taxonomy/"
+    __TAX_NAME = "taxdump.tar.gz"
+    __VALID_DIVS = ["INV","MAM","PLN","PRI","ROD","VRT"]
 
 
     def __init__(
@@ -48,17 +52,12 @@ class NCBI(abstract.AbstractCrawler):
         self.__safeSTIDs = set()
 
 
-    ####################
-    # PUBLIC - Methods #
-    ####################
-
-
     def crawl(
         self
         ,species=""
         ):
         """
-        Implements the pynome2.abstract.AbstractCrawler interface.
+        Implements the pynome.interfaces.AbstractCrawler interface.
 
         Parameters
         ----------
@@ -98,7 +97,7 @@ class NCBI(abstract.AbstractCrawler):
         self
         ):
         """
-        Implements the pynome2.abstract.AbstractCrawler interface.
+        Implements the pynome.interfaces.AbstractCrawler interface.
 
         Returns
         -------
@@ -106,11 +105,6 @@ class NCBI(abstract.AbstractCrawler):
                See interface docs.
         """
         return "ncbi"
-
-
-    #####################
-    # PRIVATE - Methods #
-    #####################
 
 
     def __hasGff_(
@@ -186,65 +180,3 @@ class NCBI(abstract.AbstractCrawler):
                text.
         """
         self.__lines.append(text)
-
-
-    #######################
-    # PRIVATE - Constants #
-    #######################
-
-
-    #
-    # string The name of the taxonomy divisions dump file.
-    #
-    __DIV_NAME = "division.dmp"
-
-
-    #
-    # The extension of FASTA files on the ncbi FTP server.
-    #
-    __FASTA_EXTENSION = "_genomic.fna.gz"
-
-
-    #
-    # The URL of the ncbi FTP server.
-    #
-    __FTP_HOST = "ftp.ncbi.nlm.nih.gov"
-
-
-    #
-    # The extension of GFF files on the ncbi FTP server.
-    #
-    __GFF_EXTENSION = "_genomic.gff.gz"
-
-
-    #
-    # string The name of the taxonomy nodes dump file.
-    #
-    __NODE_NAME = "nodes.dmp"
-
-
-    #
-    # string The path to the assembly summary gene bank text file iterating all
-    # ncbi assemblies.
-    #
-    __SUMMARY_PATH = "/genomes/genbank/assembly_summary_genbank.txt"
-
-
-    #
-    # string The remote directory path where the taxonomy dump archive is
-    # located on the ncbi FTP server.
-    #
-    __TAX_DIR = "/pub/taxonomy/"
-
-
-    #
-    # string The name of the gunzipped taxonomy dump file.
-    #
-    __TAX_NAME = "taxdump.tar.gz"
-
-
-    #
-    # list Strings that are valid three character abbreviations of division
-    # types that are acceptable and whose assemblies should be added as entries.
-    #
-    __VALID_DIVS = ["INV","MAM","PLN","PRI","ROD","VRT"]

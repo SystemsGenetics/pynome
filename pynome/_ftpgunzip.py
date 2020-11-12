@@ -1,11 +1,11 @@
 """
 Contains the FTPGunzip class.
 """
-import os
-import ftplib
-import subprocess
-from . import abstract
 from . import core
+import ftplib
+from . import interfaces
+import os
+import subprocess
 from . import utility
 
 
@@ -15,7 +15,7 @@ from . import utility
 
 
 
-class FTPGunzip(abstract.AbstractMirror):
+class FTPGunzip(interfaces.AbstractMirror):
     """
     This is the FTP Gunzip class. It implements the abstract mirror interface.
     This mirror implementation takes the FTP location of the FASTA and GFF file,
@@ -24,23 +24,13 @@ class FTPGunzip(abstract.AbstractMirror):
     """
 
 
-    #######################
-    # PUBLIC - Initialize #
-    #######################
-
-
     def __init__(
         self
         ):
         """
         Initializes a new FTP Gunzip mirror instance.
         """
-        abstract.AbstractMirror.__init__(self)
-
-
-    ####################
-    # PUBLIC - Methods #
-    ####################
+        super().__init__(self)
 
 
     def mirrorFasta(
@@ -51,7 +41,7 @@ class FTPGunzip(abstract.AbstractMirror):
         ,title
         ):
         """
-        Implements the pynome2.abstract.AbstractMirror interface.
+        Implements the pynome.interfaces.AbstractMirror interface.
 
         Parameters
         ----------
@@ -88,7 +78,7 @@ class FTPGunzip(abstract.AbstractMirror):
         ,title
         ):
         """
-        Implements the pynome2.abstract.AbstractMirror interface.
+        Implements the pynome.interfaces.AbstractMirror interface.
 
         Parameters
         ----------

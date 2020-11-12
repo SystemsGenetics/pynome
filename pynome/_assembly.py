@@ -1,15 +1,15 @@
 """
 Contains the Assembly class.
 """
+from . import core
+from . import interfaces
+from . import exception
 import json
 import os
 import re
+from . import settings
 import subprocess
 import traceback
-from . import abstract
-from . import core
-from . import exception
-from . import settings
 
 
 
@@ -27,11 +27,6 @@ class Assembly():
     """
 
 
-    #######################
-    # PUBLIC - Initialize #
-    #######################
-
-
     def __init__(
         self
         ):
@@ -40,11 +35,6 @@ class Assembly():
         """
         self.__crawlers = {}
         self.__mirrors = {}
-
-
-    ####################
-    # PUBLIC - Methods #
-    ####################
 
 
     def index(
@@ -203,10 +193,10 @@ class Assembly():
 
         Parameters
         ----------
-        crawler : pynome.abstract.AbstractCrawler
+        crawler : class
                   The abstract crawler implementation that is registered.
         """
-        if not isinstance(crawler,abstract.AbstractCrawler):
+        if not isinstance(crawler,interfaces.AbstractCrawler):
             raise exception.RegisterError("Given object is not Crawler instance.")
         if crawler.name() in self.__crawlers.keys():
             raise exception.RegisterError("Crawler '"+name+"' already exists.")
@@ -227,19 +217,14 @@ class Assembly():
         name : string
                The name of the new abstract mirror implementation. This must be
                unique among all registered mirror implementations.
-        mirror : pynome.abstract.AbstractMirror
+        mirror : class
                  The abstract mirror implementation that is registered.
         """
-        if not isinstance(mirror,abstract.AbstractMirror):
+        if not isinstance(mirror,interfaces.AbstractMirror):
             raise exception.RegisterError("Given object is not Mirror instance.")
         if name in self.__mirrors.keys():
             raise exception.RegisterError("Mirror '"+name+"' already exists.")
         self.__mirrors[name] = mirror
-
-
-    #####################
-    # PRIVATE - Methods #
-    #####################
 
 
     def __indexFasta_(

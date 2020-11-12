@@ -18,11 +18,6 @@ class AbstractMirror(abc.ABC):
     """
 
 
-    #######################
-    # PUBLIC - Initialize #
-    #######################
-
-
     def __init__(
         self
         ):
@@ -30,11 +25,6 @@ class AbstractMirror(abc.ABC):
         Initializes a new abstract mirror instance.
         """
         abc.ABC.__init__(self)
-
-
-    #######################
-    # PUBLIC - Interfaces #
-    #######################
 
 
     @abc.abstractmethod

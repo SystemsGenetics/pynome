@@ -8,12 +8,6 @@ import subprocess
 import traceback
 
 
-#
-# The amount of seconds in one day or 24 hours.
-#
-DAY = 86400
-
-
 
 
 def rSync(
@@ -96,3 +90,12 @@ def timeStamp(
     except:
         traceback.print_exc()
         return "0"
+
+
+
+
+
+
+
+
+DAY = 86400

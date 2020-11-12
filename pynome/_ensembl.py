@@ -1,10 +1,10 @@
 """
 Contains the Ensembl class.
 """
-import ftplib
-import socket
-from . import abstract
 from . import core
+import ftplib
+from . import interfaces
+import socket
 
 
 
@@ -13,7 +13,7 @@ from . import core
 
 
 
-class Ensembl(abstract.AbstractCrawler):
+class Ensembl(interfaces.AbstractCrawler):
     """
     This is the ensembl class. It implements the abstract crawler interface. The
     remote database is crawled directly through its ftp server to find all valid
@@ -21,11 +21,15 @@ class Ensembl(abstract.AbstractCrawler):
     the taxonomy ID. The taxonomy ID is found in a special text file located in
     the root public folder.
     """
-
-
-    #######################
-    # PUBLIC - Initialize #
-    #######################
+    _FTP_FASTA_DIR = "/fasta"
+    _FTP_GFF_DIR = "/gff3"
+    _FTP_HOST = "ftp.ensembl.org"
+    _FTP_RELEASE_BASENAME = "release-"
+    _FTP_ROOT_DIR = "/pub"
+    _TAXONOMY_FILE = "/species_EnsemblVertebrates.txt"
+    __FASTA_EXTENSION = ".dna.toplevel.fa.gz"
+    __FTP_IGNORED_DIRS = ["cdna","cds","dna_index","ncrna","pep"]
+    __GFF_EXTENSION = ".gff3.gz"
 
 
     def __init__(
@@ -34,15 +38,10 @@ class Ensembl(abstract.AbstractCrawler):
         """
         Initializes a new ensembl crawler.
         """
-        abstract.AbstractCrawler.__init__(self)
+        super().__init__()
         self.__ftp = None
         self.__text = ""
         self.__taxIds = {}
-
-
-    ####################
-    # PUBLIC - Methods #
-    ####################
 
 
     def crawl(
@@ -50,7 +49,7 @@ class Ensembl(abstract.AbstractCrawler):
         ,species=""
         ):
         """
-        Implements the pynome2.abstract.AbstractCrawler interface.
+        Implements the pynome.interfaces.AbstractCrawler interface.
 
         Parameters
         ----------
@@ -93,7 +92,7 @@ class Ensembl(abstract.AbstractCrawler):
         self
         ):
         """
-        Implements the pynome2.abstract.AbstractCrawler interface.
+        Implements the pynome.interfaces.AbstractCrawler interface.
 
         Returns
         -------
@@ -101,54 +100,6 @@ class Ensembl(abstract.AbstractCrawler):
                See interface docs.
         """
         return "ensembl"
-
-
-    #########################
-    # PROTECTED - Constants #
-    #########################
-
-
-    #
-    # The directory on the ensembl FTP server where FASTA data is stored.
-    #
-    _FTP_FASTA_DIR = "/fasta"
-
-
-    #
-    # The directory on the ensembl FTP server where GFF data is stored.
-    #
-    _FTP_GFF_DIR = "/gff3"
-
-
-    #
-    # The URL of the FTP server.
-    #
-    _FTP_HOST = "ftp.ensembl.org"
-
-
-    #
-    # The beginning of the directory name used for releases of data on the
-    # ensembl FTP server.
-    #
-    _FTP_RELEASE_BASENAME = "release-"
-
-
-    #
-    # The root public directory for the FTP server.
-    #
-    _FTP_ROOT_DIR = "/pub"
-
-
-    #
-    # The file name of the special text file that contains all taxonomy IDs on
-    # the FTP server in a release folder.
-    #
-    _TAXONOMY_FILE = "/species_EnsemblVertebrates.txt"
-
-
-    #######################
-    # PROTECTED - Methods #
-    #######################
 
 
     def _connect_(
@@ -372,37 +323,6 @@ class Ensembl(abstract.AbstractCrawler):
                             ,"gff": "ftp://"+self._FTP_HOST+gff[key]
                         }
                     )
-
-
-    #######################
-    # PRIVATE - Constants #
-    #######################
-
-
-    #
-    # The extension of FASTA files that should be flagged as a possible entry
-    # for this crawler.
-    #
-    __FASTA_EXTENSION = ".dna.toplevel.fa.gz"
-
-
-    #
-    # A list of directory names that this crawler will ignore when crawling the
-    # ensembl FTP server.
-    #
-    __FTP_IGNORED_DIRS = ["cdna","cds","dna_index","ncrna","pep"]
-
-
-    #
-    # The extension of GFF files that should be flagged as a possible entry for
-    # this crawler.
-    #
-    __GFF_EXTENSION = ".gff3.gz"
-
-
-    #####################
-    # PRIVATE - Methods #
-    #####################
 
 
     def __write_(

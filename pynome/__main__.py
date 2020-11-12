@@ -4,8 +4,8 @@ contains functions that execute a specific operation.
 """
 import argparse
 from . import core
-from . import crawler
-from . import mirror
+from . import crawlers
+from . import mirrors
 from . import settings
 
 
@@ -69,10 +69,10 @@ def main():
     if args.rootPath:
         settings.rootPath = args.rootPath
     core.log.setEcho(not args.notEcho)
-    core.assembly.registerCrawler(crawler.Ensembl())
-    core.assembly.registerCrawler(crawler.Ensembl2())
-    core.assembly.registerCrawler(crawler.NCBI())
-    core.assembly.registerMirror("ftp_gunzip",mirror.FTPGunzip())
+    core.assembly.registerCrawler(crawlers.Ensembl())
+    core.assembly.registerCrawler(crawlers.Ensembl2())
+    core.assembly.registerCrawler(crawlers.NCBI())
+    core.assembly.registerMirror("ftp_gunzip",mirrors.FTPGunzip())
     if args.listAll:
         listAll()
     else:
@@ -101,4 +101,5 @@ def main():
 
 
 
-if __name__ == "__main__": main()
+if __name__ == "__main__":
+    main()
