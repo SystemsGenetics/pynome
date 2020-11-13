@@ -28,7 +28,7 @@ class AbstractCrawler(abc.ABC):
         """
         Initializes a new abstract crawler instance.
         """
-        abc.ABC.__init__(self)
+        super().__init__()
         self.__entries = {}
 
 
@@ -40,12 +40,21 @@ class AbstractCrawler(abc.ABC):
         database with all entries added to this crawler, creating directories
         and files that do not exist and overwriting ones that do. This also
         clears all entries added from this crawler's crawl method.
+        DEPRECATED_COMMENT
         """
         for key in self.__entries:
             d = os.path.join(settings.rootPath,key)
             os.makedirs(d,exist_ok=True)
+            path = os.path.join(d,"metadata.json")
+            processed = {}
+            if os.path.isfile(path):
+                with open(path,"r") as ifile:
+                    oldmeta = json.loads(ifile.read())
+                    processed = oldmeta["processed"]
+            meta = self.__entries[key]
+            meta["processed"] = processed
             with open(os.path.join(d,"metadata.json"),"w") as ofile:
-                ofile.write(json.dumps(self.__entries[key],indent=4) + "\n\n")
+                ofile.write(json.dumps(meta,indent=4) + "\n")
         self.__entries = {}
 
 
@@ -93,8 +102,8 @@ class AbstractCrawler(abc.ABC):
         ,intraspecificName
         ,assemblyId
         ,taxonomyId
-        ,mirrorType
-        ,mirrorData
+        ,processType
+        ,processData
         ):
         """
         Adds a database entry for this crawler to be used in assembling the
@@ -112,23 +121,20 @@ class AbstractCrawler(abc.ABC):
                      The assembly ID of the entry.
         taxonomyId : string
                      The taxonomy ID of the entry.
-        mirrorType : string
-                     The mirror type of the entry, determining which mirror
-                     interface is used for downloading its data.
-        mirrorData : dictionary
-                     The JSON compatible data the mirror type requires for
-                     downloading this entries data from its remote source.
+        processType : string
+                      The mirror type of the entry, determining which mirror
+                      interface is used for downloading its data.
+                      DEPCRECATED_COMMENT
+        processData : dictionary
+                      The JSON compatible data the mirror type requires for
+                      downloading this entries data from its remote source.
+                      DEPCRECATED_COMMENT
         """
         assert(taxonomyId.isdigit())
         key = os.path.join(
             taxonomyId
             ,assemblyId.replace("/","|").replace("\\","|") + "-" + self.name()
         )
-        if key in self.__entries:
-            core.log.send(
-                "Duplicate entries '%s' found in crawler %s! Overwriting existing entry!"
-                % (key,self.name())
-            )
         self.__entries[key] =  {
             "genus": genus
             ,"species": species
@@ -138,8 +144,8 @@ class AbstractCrawler(abc.ABC):
                 "name": " ".join((p for p in (genus,species,intraspecificName) if p))
                 ,"id": taxonomyId
             }
-            ,"mirror_type": mirrorType
-            ,"mirror_data": mirrorData
+            ,"process_type": processType
+            ,"process_data": processData
         }
 
 
@@ -156,3 +162,18 @@ class AbstractCrawler(abc.ABC):
                can use for any remote data files required for crawling.
         """
         return os.path.join(settings.rootPath,"."+self.name())
+
+
+    def _log_(
+        self
+        ,message
+        ):
+        """
+        Detailed description.
+
+        Parameters
+        ----------
+        message : object
+                  Detailed description.
+        """
+        core.log.send("("+self.name()+") "+message)

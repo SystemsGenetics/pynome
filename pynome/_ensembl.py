@@ -21,6 +21,7 @@ class Ensembl(interfaces.AbstractCrawler):
     the taxonomy ID. The taxonomy ID is found in a special text file located in
     the root public folder.
     """
+    __CDNA_EXTENSION = ".cdna.all.fa.gz"
     _FTP_FASTA_DIR = "/fasta"
     _FTP_GFF_DIR = "/gff3"
     _FTP_HOST = "ftp.ensembl.org"
@@ -28,7 +29,7 @@ class Ensembl(interfaces.AbstractCrawler):
     _FTP_ROOT_DIR = "/pub"
     _TAXONOMY_FILE = "/species_EnsemblVertebrates.txt"
     __FASTA_EXTENSION = ".dna.toplevel.fa.gz"
-    __FTP_IGNORED_DIRS = ["cdna","cds","dna_index","ncrna","pep"]
+    __FTP_IGNORED_DIRS = ["cds","dna_index","ncrna","pep"]
     __GFF_EXTENSION = ".gff3.gz"
 
 
@@ -59,15 +60,15 @@ class Ensembl(interfaces.AbstractCrawler):
         self._connect_()
         releaseVersion = self._latestRelease_()
         if releaseVersion:
-            core.log.send("Loading Ensembl taxonomy ...")
+            self._log_("Loading taxonomy ...")
             self._getTaxonomyIds_(
                 self._FTP_ROOT_DIR
                 + "/"
                 + self._FTP_RELEASE_BASENAME
                 + str(releaseVersion)
             )
-            core.log.send("Crawling Ensembl FASTA ...")
-            fasta = self._crawlFasta_(
+            self._log_("Crawling FASTA ...")
+            (fasta,cdna) = self._crawlFasta_(
                 self._FTP_ROOT_DIR
                 + "/"
                 + self._FTP_RELEASE_BASENAME
@@ -75,7 +76,7 @@ class Ensembl(interfaces.AbstractCrawler):
                 + self._FTP_FASTA_DIR
                 ,species
             )
-            core.log.send("Crawling Ensembl GFF ...")
+            self._log_("Crawling GFF ...")
             gff = self._crawlGff_(
                 self._FTP_ROOT_DIR
                 + "/"
@@ -85,7 +86,7 @@ class Ensembl(interfaces.AbstractCrawler):
                 ,species
                 ,releaseVersion
             )
-            self._mergeResults_(fasta,gff)
+            self._mergeResults_(fasta,cdna,gff)
 
 
     def name(
@@ -129,6 +130,7 @@ class Ensembl(interfaces.AbstractCrawler):
         Recursively crawls the given directory, calling this method on any
         subdirectories found. If the FTP connection is lost this crawler's
         connect method is called to reconnect and continue without interruption.
+        DEPRECATED_COMMENT
 
         Parameters
         ----------
@@ -151,7 +153,8 @@ class Ensembl(interfaces.AbstractCrawler):
                where the keys are the file name excluding its FASTA extension
                and the values are the full path to the file.
         """
-        ret = {}
+        fasta = {}
+        cdna = {}
         try:
             listing = [x.split("/").pop() for x in self.__ftp.nlst(directory)]
         except ftplib.all_errors:
@@ -166,14 +169,19 @@ class Ensembl(interfaces.AbstractCrawler):
                 or ( depth == 1 and directory.endswith("_collection") )
             ):
                 if species:
-                    fullName = file_.split("_")[0].lower()+" "+file_.split("_")[1].lower()
+                    names = file_.split("_")
+                    fullName = names[0].lower()+" "+names[1].lower()
                     if not species.lower() in fullName:
                         continue
             if file_.endswith(self.__FASTA_EXTENSION):
-                ret[file_[:-len(self.__FASTA_EXTENSION)]] = directory+"/"+file_
+                fasta[file_[:-len(self.__FASTA_EXTENSION)]] = directory+"/"+file_
+            elif file_.endswith(self.__CDNA_EXTENSION):
+                cdna[file_[:-len(self.__CDNA_EXTENSION)]] = directory+"/"+file_
             elif "." not in file_ and file_ not in self.__FTP_IGNORED_DIRS:
-                ret.update(self._crawlFasta_(directory+"/"+file_,species,depth+1))
-        return ret
+                (f,c) = self._crawlFasta_(directory+"/"+file_,species,depth+1)
+                fasta.update(f)
+                cdna.update(c)
+        return (fasta,cdna)
 
 
     def _crawlGff_(
@@ -228,7 +236,8 @@ class Ensembl(interfaces.AbstractCrawler):
                 or ( depth == 1 and directory.endswith("_collection") )
             ):
                 if species:
-                    fullName = file_.split("_")[0].lower()+" "+file_.split("_")[1].lower()
+                    names = file_.split("_")
+                    fullName = names[0].lower()+" "+names[1].lower()
                     if not species.lower() in fullName:
                         continue
             ending = "."+str(version)+self.__GFF_EXTENSION
@@ -289,24 +298,27 @@ class Ensembl(interfaces.AbstractCrawler):
     def _mergeResults_(
         self
         ,fasta
+        ,cdna
         ,gff
         ):
         """
         Merges the given FASTA and GFF3 dictionaries of found possible entries,
         adding an entry to this crawler for any key that both dictionaries
-        contain.
+        contain. DEPRECATED_COMMENT
 
         Parameters
         ----------
         fasta : dictionary
                 The FASTA lookup dictionary generated by this crawler's crawl
                 FASTA method.
+        cdna : object
+               Detailed description.
         gff : dictionary
               The GFF lookup dictionary generated by this crawler's crawl GFF
               method.
         """
         for key in fasta:
-            if key in gff:
+            if key in cdna and key in gff:
                 parts = key.split(".")
                 names = parts.pop(0).split("_") + [""]
                 taxKey = "_".join((n.lower() for n in names if n))
@@ -317,9 +329,10 @@ class Ensembl(interfaces.AbstractCrawler):
                         ,names[2]
                         ,".".join(parts)
                         ,self.__taxIds[taxKey]
-                        ,"ftp_gunzip"
+                        ,"ensembl"
                         ,{
                             "fasta": "ftp://"+self._FTP_HOST+fasta[key]
+                            ,"cdna": "ftp://"+self._FTP_HOST+cdna[key]
                             ,"gff": "ftp://"+self._FTP_HOST+gff[key]
                         }
                     )

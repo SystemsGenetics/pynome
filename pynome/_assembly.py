@@ -3,7 +3,7 @@ Contains the Assembly class.
 """
 from . import core
 from . import interfaces
-from . import exception
+from . import exceptions
 import json
 import os
 import re
@@ -34,7 +34,8 @@ class Assembly():
         Initializes the singleton assembly instance.
         """
         self.__crawlers = {}
-        self.__mirrors = {}
+        self.__processes = {}
+        self.__tasks = {}
 
 
     def index(
@@ -149,7 +150,8 @@ class Assembly():
                 path = os.path.join(settings.rootPath,taxId)
                 if os.path.isdir(path):
                     for assemblyName in os.listdir(path):
-                        workDir = os.path.join(settings.rootPath,taxId,assemblyName)
+                        dataDir = os.path.join(taxId,assemblyName)
+                        workDir = os.path.join(settings.rootPath,dataDir)
                         meta = self.__loadMeta_(workDir)
                         if species:
                             fullName = meta["genus"].lower()+" "+meta["species"].lower()
@@ -159,8 +161,17 @@ class Assembly():
                         if meta["intraspecific_name"]:
                             rootName += "_"+meta["intraspecific_name"]
                         rootName += "-"+meta["assembly_id"]
-                        self.__mirrorFasta_(workDir,rootName+".fa",meta)
-                        self.__mirrorGff_(workDir,rootName+".gff",meta)
+                        process = self.__processes[meta["process_type"]]
+                        for taskName in process.mirrorTasks():
+                            task = self.__tasks[taskName](dataDir,rootName,meta["process_data"])
+                            #try:
+                            if task():
+                                for tn in process.indexTasks():
+                                    if task.name() in process.taskSources(tn):
+                                        meta["processed"][tn] = False
+                                self.__saveMeta_(workDir,meta)
+                            #except:
+                            #    pass
 
 
     def crawl(
@@ -197,10 +208,49 @@ class Assembly():
                   The abstract crawler implementation that is registered.
         """
         if not isinstance(crawler,interfaces.AbstractCrawler):
-            raise exception.RegisterError("Given object is not Crawler instance.")
-        if crawler.name() in self.__crawlers.keys():
-            raise exception.RegisterError("Crawler '"+name+"' already exists.")
+            raise exceptions.RegisterError("Given object is not Crawler instance.")
+        if crawler.name() in self.__crawlers:
+            raise exceptions.RegisterError("Crawler '"+name+"' already exists.")
         self.__crawlers[crawler.name()] = crawler
+
+
+    def registerProcess(
+        self
+        ,process
+        ):
+        """
+        DEPRECATED_COMMENT
+
+        Parameters
+        ----------
+        process : object
+                  DEPRECATED_COMMENT
+        """
+        if not isinstance(process,interfaces.AbstractProcess):
+            raise exceptions.RegisterError("Given object is not Process instance.")
+        if process.name() in self.__processes:
+            raise exceptions.RegisterError("Process '"+name+"' already exists.")
+        self.__processes[process.name()] = process
+
+
+    def registerTask(
+        self
+        ,taskClass
+        ):
+        """
+        DEPRECATED_COMMENT
+
+        Parameters
+        ----------
+        taskClass : object
+                    DEPRECATED_COMMENT
+        """
+        if not issubclass(taskClass,interfaces.AbstractTask):
+            raise exceptions.RegisterError("Given class is not Task subclass.")
+        t = taskClass(None,None,None)
+        if t.name() in self.__tasks:
+            raise exceptions.RegisterError("Task '"+name+"' already exists.")
+        self.__tasks[t.name()] = taskClass
 
 
     def registerMirror(
@@ -221,9 +271,9 @@ class Assembly():
                  The abstract mirror implementation that is registered.
         """
         if not isinstance(mirror,interfaces.AbstractMirror):
-            raise exception.RegisterError("Given object is not Mirror instance.")
+            raise exceptions.RegisterError("Given object is not Mirror instance.")
         if name in self.__mirrors.keys():
-            raise exception.RegisterError("Mirror '"+name+"' already exists.")
+            raise exceptions.RegisterError("Mirror '"+name+"' already exists.")
         self.__mirrors[name] = mirror
 
 

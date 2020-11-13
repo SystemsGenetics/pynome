@@ -24,7 +24,7 @@ class AbstractMirror(abc.ABC):
         """
         Initializes a new abstract mirror instance.
         """
-        abc.ABC.__init__(self)
+        super().__init__()
 
 
     @abc.abstractmethod

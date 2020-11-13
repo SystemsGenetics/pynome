@@ -5,8 +5,9 @@ contains functions that execute a specific operation.
 import argparse
 from . import core
 from . import crawlers
-from . import mirrors
+from . import processes
 from . import settings
+from . import tasks
 
 
 
@@ -70,9 +71,14 @@ def main():
         settings.rootPath = args.rootPath
     core.log.setEcho(not args.notEcho)
     core.assembly.registerCrawler(crawlers.Ensembl())
-    core.assembly.registerCrawler(crawlers.Ensembl2())
-    core.assembly.registerCrawler(crawlers.NCBI())
-    core.assembly.registerMirror("ftp_gunzip",mirrors.FTPGunzip())
+    core.assembly.registerProcess(processes.EnsemblProcess())
+    core.assembly.registerTask(tasks.DownloadFastaTask)
+    core.assembly.registerTask(tasks.DownloadGffTask)
+    core.assembly.registerTask(tasks.IndexHisatTask)
+    core.assembly.registerTask(tasks.WriteGtfTask)
+    #core.assembly.registerCrawler(crawlers.Ensembl2())
+    #core.assembly.registerCrawler(crawlers.NCBI())
+    #core.assembly.registerMirror("ftp_gunzip",mirrors.FTPGunzip())
     if args.listAll:
         listAll()
     else:
