@@ -1,5 +1,5 @@
 """
-Contains the DownloadFastaTask class.
+Contains the DownloadCDNATask class.
 """
 from . import interfaces
 import os
@@ -13,7 +13,7 @@ from . import utility
 
 
 
-class DownloadFastaTask(interfaces.AbstractTask):
+class DownloadCDNATask(interfaces.AbstractTask):
     """
     Detailed description.
     """
@@ -25,10 +25,10 @@ class DownloadFastaTask(interfaces.AbstractTask):
         """
         Detailed description.
         """
-        self._log_("Syncing FASTA")
-        fullPath = os.path.join(self._workDir_(),self._rootName_()+".fa")
-        if utility.rSync(self._meta_()["fasta"],fullPath+".gz",compare=fullPath):
-            self._log_("Decompressing FASTA")
+        self._log_("Syncing CDNA")
+        fullPath = os.path.join(self._workDir_(),self._rootName_()+".cdna.fa")
+        if utility.rSync(self._meta_()["cdna"],fullPath+".gz",compare=fullPath):
+            self._log_("Decompressing CDNA")
             cmd = ["gunzip",fullPath+".gz"]
             assert(subprocess.run(cmd).returncode==0)
             return True
@@ -47,4 +47,4 @@ class DownloadFastaTask(interfaces.AbstractTask):
         ret0 : object
                See interface docs.
         """
-        return "download_fasta"
+        return "download_cdna"

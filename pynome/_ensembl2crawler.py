@@ -1,8 +1,7 @@
 """
-Contains the Ensembl2 class.
+Contains the Ensembl2Crawler class.
 """
-from ._ensembl import Ensembl
-from . import core
+from ._ensemblcrawler import EnsemblCrawler
 
 
 
@@ -11,11 +10,11 @@ from . import core
 
 
 
-class Ensembl2(Ensembl):
+class Ensembl2Crawler(EnsemblCrawler):
     """
-    This is the ensembl2 class. It implements the abstract crawler interface,
-    inheriting from the original ensembl class because ensembl splits its
-    assemblies between two FTP sites.
+    This is the ensembl2 crawler class. It implements the abstract crawler
+    interface, inheriting from the original ensembl class because ensembl splits
+    its assemblies between two FTP sites.
     """
     _FTP_HOST = "ftp.ensemblgenomes.org"
     _TAXONOMY_FILE = "/species.txt"
@@ -36,7 +35,7 @@ class Ensembl2(Ensembl):
         self._connect_()
         releaseVersion = self._latestRelease_()
         if releaseVersion:
-            core.log.send("Loading Ensembl2 taxonomy ...")
+            self._log_("Loading taxonomy ...")
             self._getTaxonomyIds_(
                 self._FTP_ROOT_DIR
                 + "/"
@@ -44,10 +43,11 @@ class Ensembl2(Ensembl):
                 + str(releaseVersion)
             )
             fasta = {}
+            cdna = {}
             gff = {}
             for sDirName in ("fungi","metazoa","plants","protists"):
-                core.log.send("Crawling Ensembl2 "+sDirName+" FASTA ...")
-                f = self._crawlFasta_(
+                self._log_("Crawling "+sDirName+" FASTA ...")
+                (f,c) = self._crawlFasta_(
                     self._FTP_ROOT_DIR
                     + "/"
                     + self._FTP_RELEASE_BASENAME
@@ -58,7 +58,7 @@ class Ensembl2(Ensembl):
                     + self._FTP_FASTA_DIR
                     ,species
                 )
-                core.log.send("Crawling Ensembl2 "+sDirName+" GFF ...")
+                self._log_("Crawling "+sDirName+" GFF ...")
                 g = self._crawlGff_(
                     self._FTP_ROOT_DIR
                     + "/"
@@ -72,8 +72,9 @@ class Ensembl2(Ensembl):
                     ,releaseVersion
                 )
                 fasta.update(f)
+                cdna.update(c)
                 gff.update(g)
-            self._mergeResults_(fasta,gff)
+            self._mergeResults_(fasta,cdna,gff)
 
 
     def name(

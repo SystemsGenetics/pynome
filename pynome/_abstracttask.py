@@ -63,21 +63,6 @@ class AbstractTask(abc.ABC):
         pass
 
 
-    def _dataDir_(
-        self
-        ,fullPath=True
-        ):
-        """
-        Detailed description.
-
-        Parameters
-        ----------
-        fullPath : object
-                   Detailed description.
-        """
-        return os.path.join(settings.rootPath,self.__dataDir)
-
-
     def _log_(
         self
         ,message
@@ -109,3 +94,18 @@ class AbstractTask(abc.ABC):
         Detailed description.
         """
         return self.__rootName
+
+
+    def _workDir_(
+        self
+        ,fullPath=True
+        ):
+        """
+        Detailed description.
+
+        Parameters
+        ----------
+        fullPath : object
+                   Detailed description.
+        """
+        return os.path.join(settings.rootPath,self.__dataDir)

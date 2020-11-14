@@ -1,5 +1,5 @@
 """
-Contains the Ensembl class.
+Contains the EnsemblCrawler class.
 """
 from . import core
 import ftplib
@@ -13,13 +13,13 @@ import socket
 
 
 
-class Ensembl(interfaces.AbstractCrawler):
+class EnsemblCrawler(interfaces.AbstractCrawler):
     """
-    This is the ensembl class. It implements the abstract crawler interface. The
-    remote database is crawled directly through its ftp server to find all valid
-    entries. All information can be found within those directories except for
-    the taxonomy ID. The taxonomy ID is found in a special text file located in
-    the root public folder.
+    This is the ensembl crawler class. It implements the abstract crawler
+    interface. The remote database is crawled directly through its ftp server to
+    find all valid entries. All information can be found within those
+    directories except for the taxonomy ID. The taxonomy ID is found in a
+    special text file located in the root public folder. DEPRECATED_COMMENT
     """
     __CDNA_EXTENSION = ".cdna.all.fa.gz"
     _FTP_FASTA_DIR = "/fasta"

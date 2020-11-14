@@ -1,5 +1,5 @@
 """
-Contains the IndexHisatTask class.
+Contains the IndexSalmonTask class.
 """
 from . import interfaces
 import os
@@ -14,7 +14,7 @@ import subprocess
 
 
 
-class IndexHisatTask(interfaces.AbstractTask):
+class IndexSalmonTask(interfaces.AbstractTask):
     """
     Detailed description.
     """
@@ -26,18 +26,24 @@ class IndexHisatTask(interfaces.AbstractTask):
         """
         Detailed description.
         """
-        filePath = os.path.join(self._workDir_(),self._rootName_()+".fa")
+        filePath = os.path.join(self._workDir_(),self._rootName_()+".cdna.fa")
         if not os.path.isfile(filePath):
             return False
-        self._log_("Indexing with HiSat2")
-        version = subprocess.check_output(["hisat2","--version"])
+        self._log_("Indexing with Salmon")
+        version = subprocess.check_output(["salmon","--version"])
         version = version.decode().split("\n")[0].split()[-1]
         assert(re.match("^\d+\.\d+\.\d+$",version))
-        outDir = os.path.join(self._workDir_(),"hisat-"+version)
-        os.makedirs(outDir,exist_ok=True)
-        outBase = os.path.join(outDir,self._rootName_())
-        cmd = ["hisat2-build","--quiet","-p",str(settings.cpuCount),"-f",filePath,outBase]
-        assert(subprocess.run(cmd).returncode==0)
+        cmd = [
+            "salmon"
+            ,"index"
+            ,"--index"
+            ,os.path.join(self._workDir_(),"salmon-"+version)
+            ,"--transcripts"
+            ,filePath
+            ,"--threads"
+            ,str(settings.cpuCount)
+        ]
+        assert(subprocess.run(cmd,capture_output=True).returncode==0)
         return True
 
 
@@ -52,4 +58,4 @@ class IndexHisatTask(interfaces.AbstractTask):
         ret0 : object
                See interface docs.
         """
-        return "index_hisat"
+        return "index_salmon"

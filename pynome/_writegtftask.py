@@ -2,6 +2,8 @@
 Contains the WriteGtfTask class.
 """
 from . import interfaces
+import os
+import subprocess
 
 
 
@@ -22,9 +24,11 @@ class WriteGtfTask(interfaces.AbstractTask):
         """
         Detailed description.
         """
+        basePath = os.path.join(self._workDir_(),self._rootName_())
+        if not os.path.isfile(basePath+".gff"):
+            return False
         self._log_("Writing GTF from GFF")
-        basePath = os.path.join(self._dataDir_(),self._rootName_())
-        tPath = os.path.join(self._dataDir_(),"temp.gff")
+        tPath = os.path.join(self._workDir_(),"temp.gff")
         cmd = ["cp",basePath+".gff",tPath]
         assert(subprocess.run(cmd).returncode==0)
         cmd = ["gffread","-T",tPath,"-o",basePath+".gtf"]

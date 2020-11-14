@@ -20,6 +20,12 @@ class EnsemblProcess(interfaces.AbstractProcess):
         ,"index_salmon": ["download_cdna"]
         ,"index_kallisto": ["download_cdna"]
     }
+    INPUTS = {
+        "index_hisat": [".fa"]
+        ,"write_gtf": [".gff"]
+        ,"index_salmon": [".cdna.fa"]
+        ,"index_kallisto": [".cdna.fa"]
+    }
 
 
     def indexTasks(
@@ -49,16 +55,31 @@ class EnsemblProcess(interfaces.AbstractProcess):
         return "ensembl"
 
 
-    def taskSources(
+    def taskInputs(
         self
-        ,task
+        ,taskName
         ):
         """
         Detailed description.
 
         Parameters
         ----------
-        task : object
-               Detailed description.
+        taskName : object
+                   Detailed description.
         """
-        return self.DEPS.get(task,[])
+        return self.INPUTS.get(taskName,[])
+
+
+    def taskSources(
+        self
+        ,taskName
+        ):
+        """
+        Detailed description.
+
+        Parameters
+        ----------
+        taskName : object
+                   Detailed description.
+        """
+        return self.DEPS.get(taskName,[])
