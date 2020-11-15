@@ -25,6 +25,8 @@ class DownloadGffTask(interfaces.AbstractTask):
         """
         Detailed description.
         """
+        if not self._meta_().get("gff",""):
+            return False
         self._log_("Syncing GFF")
         fullPath = os.path.join(self._workDir_(),self._rootName_()+".gff")
         if utility.rSync(self._meta_()["gff"],fullPath+".gz",compare=fullPath):
@@ -33,7 +35,7 @@ class DownloadGffTask(interfaces.AbstractTask):
             assert(subprocess.run(cmd).returncode==0)
             return True
         else:
-            return True
+            return False
 
 
     def name(

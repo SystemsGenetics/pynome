@@ -1,7 +1,6 @@
 """
-Contains the NCBI class.
+Contains the NCBICrawler class.
 """
-from . import core
 import ftplib
 from . import interfaces
 import os
@@ -15,7 +14,7 @@ from . import utility
 
 
 
-class NCBI(interfaces.AbstractCrawler):
+class NCBICrawler(interfaces.AbstractCrawler):
     """
     This is the NCBI class. It implements the abstract crawler interface. The
     remote database is crawled in three stages.
@@ -33,11 +32,13 @@ class NCBI(interfaces.AbstractCrawler):
     __FASTA_EXTENSION = "_genomic.fna.gz"
     __FTP_HOST = "ftp.ncbi.nlm.nih.gov"
     __GFF_EXTENSION = "_genomic.gff.gz"
+    __GTF_EXTENSION = "_genomic.gtf.gz"
     __NODE_NAME = "nodes.dmp"
     __SUMMARY_PATH = "/genomes/genbank/assembly_summary_genbank.txt"
     __TAX_DIR = "/pub/taxonomy/"
     __TAX_NAME = "taxdump.tar.gz"
     __VALID_DIVS = ["INV","MAM","PLN","PRI","ROD","VRT"]
+    __VALID_CATS = ["reference genome","representative genome"]
 
 
     def __init__(
@@ -67,10 +68,10 @@ class NCBI(interfaces.AbstractCrawler):
         self.__loadTaxonomy_()
         self.__ftp = ftplib.FTP(self.__FTP_HOST,timeout=10)
         self.__ftp.login()
-        core.log.send("Downloading NCBI assembly summary...")
+        self._log_("Downloading assembly summary...")
         self.__lines = []
         self.__ftp.retrlines("RETR "+self.__SUMMARY_PATH,self.__write_)
-        core.log.send("Crawling NCBI assembly summary...")
+        self._log_("Crawling assembly summary...")
         for text in self.__lines:
             if text and text[0] != "#":
                 parts = text.split("\t")
@@ -78,18 +79,31 @@ class NCBI(interfaces.AbstractCrawler):
                 sParts = [sParts[0]," ".join(sParts[1:])]
                 if species and not species in sParts[0]+" "+sParts[1]:
                     continue
-                if parts[6] in self.__safeSTIDs and self.__hasGff_(parts[-3]):
+                if parts[6] in self.__safeSTIDs and parts[4] in self.__VALID_CATS:
+                    (hasGff,hasGtf) = self.__hasGffGtf_(parts[-3])
+                    if not hasGff and not hasGtf:
+                        continue
                     fasta = parts[-3]
-                    gff = fasta + fasta[fasta.rfind("/"):] + self.__GFF_EXTENSION
+                    gff = ""
+                    gtf = ""
+                    if hasGff:
+                        gff = fasta + fasta[fasta.rfind("/"):] + self.__GFF_EXTENSION
+                    if hasGtf:
+                        gtf = fasta + fasta[fasta.rfind("/"):] + self.__GTF_EXTENSION
                     fasta = fasta + fasta[fasta.rfind("/"):] + self.__FASTA_EXTENSION
+                    introName = sParts[1].split()
+                    if len(introName) > 1:
+                        introName = "_".join(introName[1:])
+                    else:
+                        introName = ""
                     self._addEntry_(
                         sParts[0]
                         ,sParts[1].split()[0]
-                        ,parts[8]
+                        ,introName
                         ,parts[15]
                         ,parts[6]
-                        ,"ftp_gunzip"
-                        ,{"fasta": fasta, "gff": gff}
+                        ,"ncbi"
+                        ,{"fasta": fasta, "gff": gff, "gtf": gtf}
                     )
 
 
@@ -107,12 +121,12 @@ class NCBI(interfaces.AbstractCrawler):
         return "ncbi"
 
 
-    def __hasGff_(
+    def __hasGffGtf_(
         self
         ,url
         ):
         """
-        Getter method.
+        Getter method. DEPRECATED_COMMENT
 
         Parameters
         ----------
@@ -125,11 +139,14 @@ class NCBI(interfaces.AbstractCrawler):
                True if the given remote FTP URL has a GFF file within it or
                false otherwise.
         """
-        listing = self.__ftp.nlst(url[26:])
+        (gff,gtf) = (False,False)
+        listing = self.__ftp.nlst(url[6+len(self.__FTP_HOST):])
         for path in listing:
             if path.endswith(self.__GFF_EXTENSION):
-                return True
-        return False
+                gff = True
+            if path.endswith(self.__GTF_EXTENSION):
+                gtf = True
+        return (gff,gtf)
 
 
     def __loadTaxonomy_(
@@ -141,11 +158,11 @@ class NCBI(interfaces.AbstractCrawler):
         that match a given list of division IDs.
         """
         tarPath = os.path.join(self._dataDir_(),self.__TAX_NAME)
-        core.log.send("Syncing NCBI taxonomy ...")
+        self._log_("Syncing taxonomy ...")
         if utility.rSync(self.__FTP_HOST+self.__TAX_DIR+self.__TAX_NAME,tarPath):
             cmd = ["tar","-xvf",tarPath,"-C",self._dataDir_()]
             assert(subprocess.run(cmd,capture_output=True).returncode==0)
-        core.log.send("Loading NCBI taxonomy ...")
+        self._log_("Loading taxonomy ...")
         divs = []
         with open(os.path.join(self._dataDir_(),self.__DIV_NAME),"r") as ifile:
             while True:

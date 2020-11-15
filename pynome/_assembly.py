@@ -304,7 +304,7 @@ class Assembly():
         ret = meta["genus"]+"_"+meta["species"]
         if meta["intraspecific_name"]:
             ret += "_"+meta["intraspecific_name"]
-        ret += "-"+meta["assembly_id"]
+        ret += "-"+meta["assembly_id"].replace(" ","_")
         return ret
 
 

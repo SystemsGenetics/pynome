@@ -43,7 +43,7 @@ class AbstractCrawler(abc.ABC):
         DEPRECATED_COMMENT
         """
         for key in self.__entries:
-            d = os.path.join(settings.rootPath,key)
+            d = os.path.join(settings.rootPath,key.replace(" ","_"))
             os.makedirs(d,exist_ok=True)
             path = os.path.join(d,"metadata.json")
             processed = {}

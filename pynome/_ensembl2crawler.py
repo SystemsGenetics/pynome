@@ -54,7 +54,6 @@ class Ensembl2Crawler(EnsemblCrawler):
                     + str(releaseVersion)
                     + "/"
                     + sDirName
-                    + "/"
                     + self._FTP_FASTA_DIR
                     ,species
                 )
@@ -66,7 +65,6 @@ class Ensembl2Crawler(EnsemblCrawler):
                     + str(releaseVersion)
                     + "/"
                     + sDirName
-                    + "/"
                     + self._FTP_GFF_DIR
                     ,species
                     ,releaseVersion

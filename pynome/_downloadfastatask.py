@@ -33,7 +33,7 @@ class DownloadFastaTask(interfaces.AbstractTask):
             assert(subprocess.run(cmd).returncode==0)
             return True
         else:
-            return True
+            return False
 
 
     def name(

@@ -1,5 +1,5 @@
 """
-Contains the WriteGtfTask class.
+Contains the WriteCDNATask class.
 """
 from . import interfaces
 import os
@@ -12,7 +12,7 @@ import subprocess
 
 
 
-class WriteGtfTask(interfaces.AbstractTask):
+class WriteCDNATask(interfaces.AbstractTask):
     """
     Detailed description.
     """
@@ -25,17 +25,12 @@ class WriteGtfTask(interfaces.AbstractTask):
         Detailed description.
         """
         basePath = os.path.join(self._workDir_(),self._rootName_())
-        if not os.path.isfile(basePath+".gff"):
+        if not os.path.isfile(basePath+".fa") or not os.path.isfile(basePath+".gtf"):
             return False
-        if self._meta_().get("gtf",""):
-            return True
-        self._log_("Writing GTF from GFF")
-        tPath = os.path.join(self._workDir_(),"temp.gff")
-        cmd = ["cp",basePath+".gff",tPath]
-        assert(subprocess.run(cmd).returncode==0)
-        cmd = ["gffread","-T",tPath,"-o",basePath+".gtf"]
-        assert(subprocess.run(cmd).returncode==0)
-        cmd = ["rm",tPath]
+        self._log_("Writing CDNA from GTF")
+        cmd = ["gffread","-w",basePath+".cdna.fa","-g",basePath+".fa",basePath+".gtf"]
+        assert(subprocess.run(cmd,capture_output=True).returncode==0)
+        cmd = ["rm",basePath+".fa.fai"]
         assert(subprocess.run(cmd).returncode==0)
         return True
 
@@ -51,4 +46,4 @@ class WriteGtfTask(interfaces.AbstractTask):
         ret0 : object
                See interface docs.
         """
-        return "write_gtf"
+        return "write_cdna"

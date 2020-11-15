@@ -1,5 +1,5 @@
 """
-Contains the DownloadCDNATask class.
+Contains the DownloadGtfTask class.
 """
 from . import interfaces
 import os
@@ -13,7 +13,7 @@ from . import utility
 
 
 
-class DownloadCDNATask(interfaces.AbstractTask):
+class DownloadGtfTask(interfaces.AbstractTask):
     """
     Detailed description.
     """
@@ -25,10 +25,12 @@ class DownloadCDNATask(interfaces.AbstractTask):
         """
         Detailed description.
         """
-        self._log_("Syncing CDNA")
-        fullPath = os.path.join(self._workDir_(),self._rootName_()+".cdna.fa")
-        if utility.rSync(self._meta_()["cdna"],fullPath+".gz",compare=fullPath):
-            self._log_("Decompressing CDNA")
+        if not self._meta_().get("gtf",""):
+            return False
+        self._log_("Syncing GTF")
+        fullPath = os.path.join(self._workDir_(),self._rootName_()+".gtf")
+        if utility.rSync(self._meta_()["gtf"],fullPath+".gz",compare=fullPath):
+            self._log_("Decompressing GTF")
             cmd = ["gunzip",fullPath+".gz"]
             assert(subprocess.run(cmd).returncode==0)
             return True
@@ -47,4 +49,4 @@ class DownloadCDNATask(interfaces.AbstractTask):
         ret0 : object
                See interface docs.
         """
-        return "download_cdna"
+        return "download_gtf"
