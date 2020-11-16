@@ -12,7 +12,9 @@ from . import interfaces
 
 class EnsemblProcess(interfaces.AbstractProcess):
     """
-    Detailed description.
+    This is the ensembl process class. It implements the abstract process
+    interface. This provides all tasks required for assemblies crawled from
+    ensembl.
     """
     DEPS = {
         "index_hisat": ["download_fasta"]
@@ -34,7 +36,12 @@ class EnsemblProcess(interfaces.AbstractProcess):
         self
         ):
         """
-        Detailed description.
+        Implements the pynome.interfaces.AbstractProcess interface.
+
+        Returns
+        -------
+        ret0 : object
+               See interface docs.
         """
         return ("index_hisat","write_gtf","write_splice_sites","index_salmon","index_kallisto")
 
@@ -43,7 +50,12 @@ class EnsemblProcess(interfaces.AbstractProcess):
         self
         ):
         """
-        Detailed description.
+        Implements the pynome.interfaces.AbstractProcess interface.
+
+        Returns
+        -------
+        ret0 : object
+               See interface docs.
         """
         return ("download_fasta","download_gff","download_cdna")
 
@@ -52,7 +64,12 @@ class EnsemblProcess(interfaces.AbstractProcess):
         self
         ):
         """
-        Detailed description.
+        Implements the pynome.interfaces.AbstractProcess interface.
+
+        Returns
+        -------
+        ret0 : object
+               See interface docs.
         """
         return "ensembl"
 
@@ -62,12 +79,17 @@ class EnsemblProcess(interfaces.AbstractProcess):
         ,taskName
         ):
         """
-        Detailed description.
+        Implements the pynome.interfaces.AbstractProcess interface.
 
         Parameters
         ----------
         taskName : object
-                   Detailed description.
+                   See interface docs.
+
+        Returns
+        -------
+        ret0 : object
+               See interface docs.
         """
         return self.INPUTS.get(taskName,[])
 
@@ -77,11 +99,16 @@ class EnsemblProcess(interfaces.AbstractProcess):
         ,taskName
         ):
         """
-        Detailed description.
+        Implements the pynome.interfaces.AbstractProcess interface.
 
         Parameters
         ----------
         taskName : object
-                   Detailed description.
+                   See interface docs.
+
+        Returns
+        -------
+        ret0 : object
+               See interface docs.
         """
         return self.DEPS.get(taskName,[])

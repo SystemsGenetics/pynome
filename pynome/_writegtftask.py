@@ -14,7 +14,9 @@ import subprocess
 
 class WriteGtfTask(interfaces.AbstractTask):
     """
-    Detailed description.
+    This is the write Gtf task. It implements the abstract task interface. This
+    writes the local Gtf file with gffread. If the Gtf URL entry in the metadata
+    is not empty then this does nothing.
     """
 
 
@@ -22,7 +24,12 @@ class WriteGtfTask(interfaces.AbstractTask):
         self
         ):
         """
-        Detailed description.
+        Implements the pynome.interfaces.AbstractTask interface.
+
+        Returns
+        -------
+        ret0 : object
+               See interface docs.
         """
         basePath = os.path.join(self._workDir_(),self._rootName_())
         if not os.path.isfile(basePath+".gff"):

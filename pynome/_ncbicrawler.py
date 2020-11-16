@@ -25,8 +25,9 @@ class NCBICrawler(interfaces.AbstractCrawler):
 
     The second stage is downloading the full assembly list and parsing it. Each
     listing is verified to be part of a desired division and then verified to
-    have a proper GFF file in its remote location. If both tests pass its entry
-    is added locally.
+    have a proper GFF or GTF file in its remote location. The final test makes
+    sure it is a reference or representative assembly. If all tests pass its
+    entry is added locally.
     """
     __DIV_NAME = "division.dmp"
     __FASTA_EXTENSION = "_genomic.fna.gz"
@@ -126,7 +127,7 @@ class NCBICrawler(interfaces.AbstractCrawler):
         ,url
         ):
         """
-        Getter method. DEPRECATED_COMMENT
+        Getter method.
 
         Parameters
         ----------
@@ -137,6 +138,9 @@ class NCBICrawler(interfaces.AbstractCrawler):
         -------
         ret0 : bool
                True if the given remote FTP URL has a GFF file within it or
+               false otherwise.
+        ret1 : bool
+               True if the given remote FTP URL has a GTF file within it or
                false otherwise.
         """
         (gff,gtf) = (False,False)

@@ -1,5 +1,5 @@
 """
-Detailed description.
+Contains all process interface implementations.
 """
 
 from ._ensemblprocess import EnsemblProcess

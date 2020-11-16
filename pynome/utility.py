@@ -1,5 +1,5 @@
 """
-Detailed description.
+Contains utility functions used throughout this application.
 """
 import datetime
 import os

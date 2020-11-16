@@ -20,10 +20,12 @@ import traceback
 
 class Assembly():
     """
-    This is the singleton assembly class. It is responsible for storing a list
-    of all available crawler and mirror implementations. It provides method for
-    crawling with all implemented crawlers along with syncing all local database
-    files using the available mirrors. DEPRECATED_COMMENT
+    This is the singleton assembly class. It is responsible for registering and
+    storing a lookup table of all available crawler, process, and task
+    implementations. It provides method for crawling with all implemented
+    crawlers, mirroring all local assemblies, and indexing them. Indexing
+    methods are provided for splitting up the work for each assembly that needs
+    work into separate jobs.
     """
 
 
@@ -46,7 +48,7 @@ class Assembly():
         """
         Indexes the assembly with the given taxonomy ID and assembly name. If
         the indexes are already up to date for that assembly then nothing is
-        done. DEPRECATED_COMMENT
+        done.
 
         Parameters
         ----------
@@ -80,7 +82,6 @@ class Assembly():
         """
         Indexes all assemblies with the given species name. If the indexes are
         already up to date for any matched assembly then it is skipped.
-        DEPRECATED_COMMENT
 
         Parameters
         ----------
@@ -105,13 +106,13 @@ class Assembly():
         self
         ):
         """
-        Getter method. DEPRECATED_COMMENT
+        Getter method.
 
         Returns
         -------
         ret0 : list
-               Tuples of taxonomy ID and name of all assemblies whose indexes
-               require updating.
+               Tuples of taxonomy ID and assembly id of all assemblies whose
+               indexes require updating.
         """
         ret = []
         for taxId in os.listdir(settings.rootPath):
@@ -135,7 +136,7 @@ class Assembly():
         Iterates through all local database folders, inspecting their metadata
         file and downloading any new data files if new versions are present on
         the remote server. Any assembly whose data is updated is marked to
-        update its indexes. DEPRECATED_COMMENT
+        update its appropriate indexes.
 
         Parameters
         ----------
@@ -198,7 +199,7 @@ class Assembly():
 
         Parameters
         ----------
-        crawler : class
+        crawler : instance
                   The abstract crawler implementation that is registered.
         """
         if not isinstance(crawler,interfaces.AbstractCrawler):
@@ -213,12 +214,12 @@ class Assembly():
         ,process
         ):
         """
-        DEPRECATED_COMMENT
+        Registers a new process implementation with the given class instance.
 
         Parameters
         ----------
-        process : object
-                  DEPRECATED_COMMENT
+        process : instance
+                  The abstract process implementation that is registered.
         """
         if not isinstance(process,interfaces.AbstractProcess):
             raise exceptions.RegisterError("Given object is not Process instance.")
@@ -232,12 +233,13 @@ class Assembly():
         ,taskClass
         ):
         """
-        DEPRECATED_COMMENT
+        Registers a new task implementation with the given class.
 
         Parameters
         ----------
-        taskClass : object
-                    DEPRECATED_COMMENT
+        taskClass : class
+                    The abstract crawler implementation class that is
+                    registered.
         """
         if not issubclass(taskClass,interfaces.AbstractTask):
             raise exceptions.RegisterError("Given class is not Task subclass.")
@@ -294,12 +296,19 @@ class Assembly():
         ,meta
         ):
         """
-        Detailed description.
+        Getter method.
 
         Parameters
         ----------
-        meta : object
-               Detailed description.
+        meta : dictionary
+               Metadata of the given assembly whose root name for data files is
+               returned.
+
+        Returns
+        -------
+        ret0 : string
+               The root name that must be used for all data files of the given
+               assembly.
         """
         ret = meta["genus"]+"_"+meta["species"]
         if meta["intraspecific_name"]:

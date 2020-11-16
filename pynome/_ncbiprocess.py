@@ -12,7 +12,9 @@ from . import interfaces
 
 class NCBIProcess(interfaces.AbstractProcess):
     """
-    Detailed description.
+    This is the NCBI process class. It implements the abstract process
+    interface. This provides all tasks required for assemblies crawled from
+    NCBI.
     """
     DEPS = {
         "index_hisat": ["download_fasta"]
@@ -36,16 +38,33 @@ class NCBIProcess(interfaces.AbstractProcess):
         self
         ):
         """
-        Detailed description.
+        Implements the pynome.interfaces.AbstractProcess interface.
+
+        Returns
+        -------
+        ret0 : object
+               See interface docs.
         """
-        return ("index_hisat","write_gtf","write_splice_sites","write_cdna","index_salmon","index_kallisto")
+        return (
+            "index_hisat"
+            ,"write_gtf"
+            ,"write_splice_sites"
+            ,"write_cdna"
+            ,"index_salmon"
+            ,"index_kallisto"
+        )
 
 
     def mirrorTasks(
         self
         ):
         """
-        Detailed description.
+        Implements the pynome.interfaces.AbstractProcess interface.
+
+        Returns
+        -------
+        ret0 : object
+               See interface docs.
         """
         return ("download_fasta","download_gff","download_gtf")
 
@@ -54,7 +73,12 @@ class NCBIProcess(interfaces.AbstractProcess):
         self
         ):
         """
-        Detailed description.
+        Implements the pynome.interfaces.AbstractProcess interface.
+
+        Returns
+        -------
+        ret0 : object
+               See interface docs.
         """
         return "ncbi"
 
@@ -64,12 +88,17 @@ class NCBIProcess(interfaces.AbstractProcess):
         ,taskName
         ):
         """
-        Detailed description.
+        Implements the pynome.interfaces.AbstractProcess interface.
 
         Parameters
         ----------
         taskName : object
-                   Detailed description.
+                   See interface docs.
+
+        Returns
+        -------
+        ret0 : object
+               See interface docs.
         """
         return self.INPUTS.get(taskName,[])
 
@@ -79,11 +108,16 @@ class NCBIProcess(interfaces.AbstractProcess):
         ,taskName
         ):
         """
-        Detailed description.
+        Implements the pynome.interfaces.AbstractProcess interface.
 
         Parameters
         ----------
         taskName : object
-                   Detailed description.
+                   See interface docs.
+
+        Returns
+        -------
+        ret0 : object
+               See interface docs.
         """
         return self.DEPS.get(taskName,[])

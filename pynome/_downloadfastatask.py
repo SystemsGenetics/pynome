@@ -15,7 +15,8 @@ from . import utility
 
 class DownloadFastaTask(interfaces.AbstractTask):
     """
-    Detailed description.
+    This is the download Fasta task. It implements the abstract task interface.
+    This synchronizes the remote Fasta file with the local assembly.
     """
 
 
@@ -23,7 +24,12 @@ class DownloadFastaTask(interfaces.AbstractTask):
         self
         ):
         """
-        Detailed description.
+        Implements the pynome.interfaces.AbstractTask interface.
+
+        Returns
+        -------
+        ret0 : object
+               See interface docs.
         """
         self._log_("Syncing FASTA")
         fullPath = os.path.join(self._workDir_(),self._rootName_()+".fa")

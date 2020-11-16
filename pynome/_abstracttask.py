@@ -15,7 +15,9 @@ from . import settings
 
 class AbstractTask(abc.ABC):
     """
-    Detailed description.
+    This is the abstract task class. It represents a single task to be done for
+    a process type to mirror or index a specific output of data for a specific
+    assembly.
     """
 
 
@@ -26,16 +28,18 @@ class AbstractTask(abc.ABC):
         ,meta
         ):
         """
-        Detailed description.
+        Initializes a new implemented task.
 
         Parameters
         ----------
-        dataDir : object
-                  Detailed description.
-        rootName : object
-                   Detailed description.
-        meta : object
-               Detailed description.
+        dataDir : string
+                  The data directory of the assembly for this new task. This
+                  does not include the root directory path.
+        rootName : string
+                   The root name used for naming all output data files produced
+                   by this task for its assembly.
+        meta : dictionary
+               The processed part of the metadata of this task's assembly.
         """
         super().__init__()
         self.__dataDir = dataDir
@@ -48,7 +52,14 @@ class AbstractTask(abc.ABC):
         self
         ):
         """
-        Detailed description.
+        This interface executes this tasks implementation.
+
+        Returns
+        -------
+        ret0 : bool
+               True if this task successfully executed or false otherwise. For
+               mirror tasks successful execution means a new remote file was
+               downloaded to the local assembly.
         """
         pass
 
@@ -59,6 +70,12 @@ class AbstractTask(abc.ABC):
         ):
         """
         This interface is a getter method.
+
+        Returns
+        -------
+        ret0 : string
+               The name of this task implementation that must be unique among
+               all registered tasks.
         """
         pass
 
@@ -68,12 +85,14 @@ class AbstractTask(abc.ABC):
         ,message
         ):
         """
-        Detailed description.
+        Adds the given message to the logging system. A parenthesis enclosed tag
+        is included at the beginning of the message to show the user what
+        assembly this task is running on.
 
         Parameters
         ----------
-        message : object
-                  Detailed description.
+        message : string
+                  Message that is sent to the logging system.
         """
         core.log.send("("+self.__dataDir+") "+message)
 
@@ -82,7 +101,12 @@ class AbstractTask(abc.ABC):
         self
         ):
         """
-        Detailed description.
+        Getter method.
+
+        Returns
+        -------
+        ret0 : dictionary
+               The processed part of this task's assembly's metadata.
         """
         return self.__meta
 
@@ -91,7 +115,14 @@ class AbstractTask(abc.ABC):
         self
         ):
         """
-        Detailed description.
+        Getter method.
+
+        Returns
+        -------
+        ret0 : string
+               The root name that must be used for naming any output files
+               produced by this task, excluding whatever extension is given to
+               each output file.
         """
         return self.__rootName
 
@@ -107,5 +138,11 @@ class AbstractTask(abc.ABC):
         ----------
         fullPath : object
                    Detailed description.
+
+        Returns
+        -------
+        ret0 : string
+               The full path of the working directory of this task's assembly
+               where any output file should be placed.
         """
         return os.path.join(settings.rootPath,self.__dataDir)

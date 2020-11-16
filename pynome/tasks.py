@@ -1,5 +1,5 @@
 """
-Detailed description.
+Contains all task interface implementations.
 """
 
 from ._downloadcdnatask import DownloadCDNATask

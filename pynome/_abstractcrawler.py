@@ -17,8 +17,7 @@ from . import settings
 class AbstractCrawler(abc.ABC):
     """
     This is the abstract crawler class. An interface is provided that crawls its
-    source and adds entries to be added to the local file structure. This class
-    provides a protected function for adding entries to the local database.
+    source and adds entries to be added to the local file structure.
     """
 
 
@@ -38,9 +37,10 @@ class AbstractCrawler(abc.ABC):
         """
         Updates the directory structure and metadata JSON files of the local
         database with all entries added to this crawler, creating directories
-        and files that do not exist and overwriting ones that do. This also
-        clears all entries added from this crawler's crawl method.
-        DEPRECATED_COMMENT
+        and files that do not exist and overwriting ones that do. If a metadata
+        JSON file already exists for a written assembly, the processed data is
+        preserved in the new JSON file. This also clears all entries added from
+        this crawler's crawl method.
         """
         for key in self.__entries:
             d = os.path.join(settings.rootPath,key.replace(" ","_"))
@@ -87,7 +87,7 @@ class AbstractCrawler(abc.ABC):
 
         Returns
         -------
-        ret0 : object
+        ret0 : string
                The name of this crawler implementation that must be unique among
                all registered crawlers and is used as the root directory name
                for the local database.
@@ -122,13 +122,12 @@ class AbstractCrawler(abc.ABC):
         taxonomyId : string
                      The taxonomy ID of the entry.
         processType : string
-                      The mirror type of the entry, determining which mirror
-                      interface is used for downloading its data.
-                      DEPCRECATED_COMMENT
+                      The process type of the entry, determining which process
+                      interface is used for downloading and indexing its data.
         processData : dictionary
-                      The JSON compatible data the mirror type requires for
-                      downloading this entries data from its remote source.
-                      DEPCRECATED_COMMENT
+                      The JSON compatible data the process type requires for
+                      downloading and indexing this entries data from its remote
+                      source.
         """
         assert(taxonomyId.isdigit())
         key = os.path.join(
@@ -169,11 +168,13 @@ class AbstractCrawler(abc.ABC):
         ,message
         ):
         """
-        Detailed description.
+        Adds the given message to the logging system. A parenthesis enclosed tag
+        is included at the beginning of the message to show the user what
+        crawler the message is coming from.
 
         Parameters
         ----------
-        message : object
-                  Detailed description.
+        message : string
+                  Message that is sent to the logging system.
         """
         core.log.send("("+self.name()+") "+message)

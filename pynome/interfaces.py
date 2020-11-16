@@ -1,5 +1,5 @@
 """
-Contains all abstract interface classes.
+Contains all abstract interface classes private to this application.
 """
 import abc
 

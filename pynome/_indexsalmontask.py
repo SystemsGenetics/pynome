@@ -16,7 +16,8 @@ import subprocess
 
 class IndexSalmonTask(interfaces.AbstractTask):
     """
-    Detailed description.
+    This is the index salmon task. It implements the abstract task interface.
+    This indexes the local CDNA Fasta file with Salmon.
     """
 
 
@@ -24,7 +25,12 @@ class IndexSalmonTask(interfaces.AbstractTask):
         self
         ):
         """
-        Detailed description.
+        Implements the pynome.interfaces.AbstractTask interface.
+
+        Returns
+        -------
+        ret0 : object
+               See interface docs.
         """
         filePath = os.path.join(self._workDir_(),self._rootName_()+".cdna.fa")
         if not os.path.isfile(filePath):

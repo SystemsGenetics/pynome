@@ -19,7 +19,7 @@ class EnsemblCrawler(interfaces.AbstractCrawler):
     interface. The remote database is crawled directly through its ftp server to
     find all valid entries. All information can be found within those
     directories except for the taxonomy ID. The taxonomy ID is found in a
-    special text file located in the root public folder. DEPRECATED_COMMENT
+    special text file located in the root public folder.
     """
     __CDNA_EXTENSION = ".cdna.all.fa.gz"
     _FTP_FASTA_DIR = "/fasta"
@@ -130,7 +130,6 @@ class EnsemblCrawler(interfaces.AbstractCrawler):
         Recursively crawls the given directory, calling this method on any
         subdirectories found. If the FTP connection is lost this crawler's
         connect method is called to reconnect and continue without interruption.
-        DEPRECATED_COMMENT
 
         Parameters
         ----------
@@ -152,6 +151,10 @@ class EnsemblCrawler(interfaces.AbstractCrawler):
                A lookup table of found valid FASTA files for potential entries
                where the keys are the file name excluding its FASTA extension
                and the values are the full path to the file.
+        ret1 : dictionary
+               A lookup table of found valid CDNA files for potential entries
+               where the keys are the file name excluding its CDNA extension and
+               the values are the full path to the file.
         """
         fasta = {}
         cdna = {}
@@ -302,9 +305,9 @@ class EnsemblCrawler(interfaces.AbstractCrawler):
         ,gff
         ):
         """
-        Merges the given FASTA and GFF3 dictionaries of found possible entries,
-        adding an entry to this crawler for any key that both dictionaries
-        contain. DEPRECATED_COMMENT
+        Merges the given FASTA, CDNA, and GFF3 dictionaries of found possible
+        entries, adding an entry to this crawler for any key that all
+        dictionaries contain.
 
         Parameters
         ----------

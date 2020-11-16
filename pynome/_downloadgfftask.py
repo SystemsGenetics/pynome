@@ -15,7 +15,9 @@ from . import utility
 
 class DownloadGffTask(interfaces.AbstractTask):
     """
-    Detailed description.
+    This is the download Gff task. It implements the abstract task interface.
+    This synchronizes the remote Gff file with the local assembly. If the Gff
+    URL entry in the metadata is empty then this does nothing.
     """
 
 
@@ -23,7 +25,12 @@ class DownloadGffTask(interfaces.AbstractTask):
         self
         ):
         """
-        Detailed description.
+        Implements the pynome.interfaces.AbstractTask interface.
+
+        Returns
+        -------
+        ret0 : object
+               See interface docs.
         """
         if not self._meta_().get("gff",""):
             return False

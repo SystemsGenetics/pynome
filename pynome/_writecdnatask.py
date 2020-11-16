@@ -14,7 +14,8 @@ import subprocess
 
 class WriteCDNATask(interfaces.AbstractTask):
     """
-    Detailed description.
+    This is the write CDNA task. It implements the abstract task interface. This
+    writes the local CDNA Fasta file with gffread.
     """
 
 
@@ -22,7 +23,12 @@ class WriteCDNATask(interfaces.AbstractTask):
         self
         ):
         """
-        Detailed description.
+        Implements the pynome.interfaces.AbstractTask interface.
+
+        Returns
+        -------
+        ret0 : object
+               See interface docs.
         """
         basePath = os.path.join(self._workDir_(),self._rootName_())
         if not os.path.isfile(basePath+".fa") or not os.path.isfile(basePath+".gtf"):
