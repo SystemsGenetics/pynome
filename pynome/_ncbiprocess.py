@@ -20,7 +20,7 @@ class NCBIProcess(interfaces.AbstractProcess):
         "index_hisat": ["download_fasta"]
         ,"write_gtf": ["download_gff"]
         ,"write_splice_sites": ["write_gtf","download_gtf"]
-        ,"write_cdna": ["write_gtf","download_gtf"]
+        ,"write_cdna": ["write_gtf","download_gtf","download_fasta"]
         ,"index_salmon": ["write_cdna"]
         ,"index_kallisto": ["write_cdna"]
     }
