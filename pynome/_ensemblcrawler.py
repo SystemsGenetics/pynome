@@ -329,8 +329,8 @@ class EnsemblCrawler(interfaces.AbstractCrawler):
                     self._addEntry_(
                         names[0]
                         ,names[1]
-                        ,names[2]
-                        ,".".join(parts)
+                        ,names[2].replace("_"," ")
+                        ,".".join(parts).replace("_"," ")
                         ,self.__taxIds[taxKey]
                         ,"ensembl"
                         ,{

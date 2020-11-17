@@ -307,7 +307,7 @@ class Assembly():
         if meta["intraspecific_name"]:
             ret += "_"+meta["intraspecific_name"]
         ret += "-"+meta["assembly_id"].replace(" ","_")
-        return ret
+        return re.sub("[\s\\\\/]","_",ret)
 
 
     def __saveMeta_(

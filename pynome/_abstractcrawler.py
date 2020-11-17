@@ -5,6 +5,7 @@ from . import core
 import abc
 import json
 import os
+import re
 from . import settings
 
 
@@ -43,7 +44,7 @@ class AbstractCrawler(abc.ABC):
         this crawler's crawl method.
         """
         for key in self.__entries:
-            d = os.path.join(settings.rootPath,key.replace(" ","_"))
+            d = os.path.join(settings.rootPath,key)
             os.makedirs(d,exist_ok=True)
             path = os.path.join(d,"metadata.json")
             processed = {}
@@ -130,10 +131,7 @@ class AbstractCrawler(abc.ABC):
                       source.
         """
         assert(taxonomyId.isdigit())
-        key = os.path.join(
-            taxonomyId
-            ,assemblyId.replace("/","|").replace("\\","|") + "-" + self.name()
-        )
+        key = os.path.join(taxonomyId,re.sub("[\s\\\\/]","_",assemblyId+"-"+self.name()))
         self.__entries[key] =  {
             "genus": genus
             ,"species": species

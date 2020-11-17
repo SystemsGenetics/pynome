@@ -2,6 +2,7 @@
 # THIS IS A VERY HACKY SCRIPT DESIGNED FOR A VERY SPECIFIC TASK
 import json
 import os
+import re
 import subprocess
 import sys
 
@@ -46,8 +47,8 @@ def getRootName(meta):
     ret = meta["genus"]+"_"+meta["species"]
     if meta["intraspecific_name"]:
         ret += "_"+meta["intraspecific_name"]
-    ret += "-"+meta["assembly_id"].replace(" ","_")
-    return ret
+    ret += "-"+meta["assembly_id"]
+    return re.sub("[\s\\\\/]","_",ret)
 
 
 
@@ -75,7 +76,7 @@ for taxId in os.listdir(oldRootPath):
         if os.path.isdir(path):
             for assemblyName in os.listdir(path):
                 oldWorkDir = os.path.join(path,assemblyName)
-                workDir = os.path.join(rootPath,taxId,assemblyName.replace(" ","_"))
+                workDir = os.path.join(rootPath,taxId,re.sub("[\s\\\\/]","_",assemblyName))
                 if os.path.isdir(workDir):
                     meta = loadMeta(workDir)
                     rootName = getRootName(meta)

@@ -94,7 +94,7 @@ class NCBICrawler(interfaces.AbstractCrawler):
                     fasta = fasta + fasta[fasta.rfind("/"):] + self.__FASTA_EXTENSION
                     introName = sParts[1].split()
                     if len(introName) > 1:
-                        introName = "_".join(introName[1:])
+                        introName = " ".join(introName[1:])
                     else:
                         introName = ""
                     self._addEntry_(
