@@ -39,6 +39,12 @@ class IndexSalmonTask(interfaces.AbstractTask):
         version = subprocess.check_output(["salmon","--version"])
         version = version.decode().split("\n")[0].split()[-1]
         assert(re.match("^\d+\.\d+\.\d+$",version))
+        for p in os.listdir(self._workDir_()):
+            if p.startswith("salmon-"):
+                path = os.path.join(self._workDir_(),p)
+                if os.path.isdir(path):
+                    cmd = ["rm","-fr",os.path.join(self._workDir_(),p)]
+                    assert(subprocess.run(cmd).returncode==0)
         cmd = [
             "salmon"
             ,"index"

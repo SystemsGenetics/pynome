@@ -38,6 +38,12 @@ class IndexKallistoTask(interfaces.AbstractTask):
         version = subprocess.check_output(["kallisto","version"])
         version = version.decode().split("\n")[0].split()[-1]
         assert(re.match("^\d+\.\d+\.\d+$",version))
+        for p in os.listdir(self._workDir_()):
+            if p.startswith("kallisto-"):
+                path = os.path.join(self._workDir_(),p)
+                if os.path.isdir(path):
+                    cmd = ["rm","-fr",os.path.join(self._workDir_(),p)]
+                    assert(subprocess.run(cmd).returncode==0)
         outBase = os.path.join(self._workDir_(),"kallisto-"+version)
         os.makedirs(outBase,exist_ok=True)
         outBase = os.path.join(outBase,self._rootName_()+".idx")

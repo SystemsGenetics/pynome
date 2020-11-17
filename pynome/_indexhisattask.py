@@ -39,8 +39,14 @@ class IndexHisatTask(interfaces.AbstractTask):
         version = subprocess.check_output(["hisat2","--version"])
         version = version.decode().split("\n")[0].split()[-1]
         assert(re.match("^\d+\.\d+\.\d+$",version))
+        for p in os.listdir(self._workDir_()):
+            if p.startswith("hisat-"):
+                path = os.path.join(self._workDir_(),p)
+                if os.path.isdir(path):
+                    cmd = ["rm","-fr",os.path.join(self._workDir_(),p)]
+                    assert(subprocess.run(cmd).returncode==0)
         outDir = os.path.join(self._workDir_(),"hisat-"+version)
-        os.makedirs(outDir,exist_ok=True)
+        os.makedirs(outDir)
         outBase = os.path.join(outDir,self._rootName_())
         cmd = ["hisat2-build","--quiet","-p",str(settings.cpuCount),"-f",filePath,outBase]
         assert(subprocess.run(cmd).returncode==0)

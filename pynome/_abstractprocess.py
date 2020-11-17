@@ -77,7 +77,7 @@ class AbstractProcess(abc.ABC):
             for f in files:
                 if not os.path.isfile(f):
                     return False
-            return not meta[tn]
+            return not meta.get(tn,False)
         if not taskName is None:
             return taskHasWork(taskName)
         else:
