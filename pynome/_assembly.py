@@ -66,13 +66,13 @@ class Assembly():
             for taskName in process.indexTasks():
                 if process.hasWork(workDir,rootName,meta["processed"],taskName):
                     task = self.__tasks[taskName](dataDir,rootName,meta["process_data"])
-                    #try:
-                    if task():
-                        process.completeTask(taskName,meta["processed"])
-                        meta["processed"][taskName] = True
-                        self.__saveMeta_(workDir,meta)
-                    #except:
-                    #    pass
+                    try:
+                        if task():
+                            process.completeTask(taskName,meta["processed"])
+                            meta["processed"][taskName] = True
+                            self.__saveMeta_(workDir,meta)
+                    except:
+                        pass
 
 
     def indexSpecies(
