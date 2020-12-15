@@ -34,10 +34,16 @@ class WriteCDNATask(interfaces.AbstractTask):
         if not os.path.isfile(basePath+".fa") or not os.path.isfile(basePath+".gtf"):
             return False
         self._log_("Writing CDNA from GTF")
-        cmd = ["gffread","-w",basePath+".cdna.fa","-g",basePath+".fa",basePath+".gtf"]
-        assert(subprocess.run(cmd,capture_output=True).returncode==0)
-        cmd = ["rm",basePath+".fa.fai"]
-        assert(subprocess.run(cmd).returncode==0)
+        try:
+            cmd = ["gffread","-w",basePath+".cdna.fa","-g",basePath+".fa",basePath+".gtf"]
+            assert(subprocess.run(cmd,capture_output=True).returncode==0)
+        except BaseException as e:
+            cmd = ["rm","-fr",basePath+".cdna.fa"]
+            subprocess.run(cmd)
+            raise e
+        finally:
+            cmd = ["rm","-fr",basePath+".fa.fai"]
+            subprocess.run(cmd)
         return True
 
 
