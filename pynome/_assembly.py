@@ -2,6 +2,7 @@
 Contains the Assembly class.
 """
 from . import core
+import inspect
 from . import interfaces
 from . import exceptions
 import json
@@ -184,6 +185,7 @@ class Assembly():
                   species found on the remote server. If this string is blank
                   then all species are crawled.
         """
+        self.__copyListScript_()
         self.__prepareDataDirs_()
         for crawler in self.__crawlers.values():
             crawler.crawl(species)
@@ -247,6 +249,20 @@ class Assembly():
         if t.name() in self.__tasks:
             raise exceptions.RegisterError("Task '"+name+"' already exists.")
         self.__tasks[t.name()] = taskClass
+
+
+    def __copyListScript_(
+        self
+        ):
+        """
+        Copies the list script to the root species directory if it does not
+        already exist.
+        """
+        scriptPath = os.path.dirname(inspect.getfile(core))
+        src = os.path.join(scriptPath,"list.py")
+        dst = os.path.join(settings.rootPath,"list.py")
+        if not os.path.isfile(dst):
+            os.popen("cp "+src+" "+dst)
 
 
     def __loadMeta_(
