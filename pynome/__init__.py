@@ -1,9 +1,4 @@
-"""Initialize Pynome.
-
-Set up the logger.
 """
-
-
-import logging
-
-logging.basicConfig(filename='pynome.log', level=logging.DEBUG)
+This is the pynome command line application used for crawling and downloading
+genetic assembly data.
+"""
