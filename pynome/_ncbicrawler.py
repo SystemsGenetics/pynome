@@ -76,6 +76,8 @@ class NCBICrawler(interfaces.AbstractCrawler):
         for text in self.__lines:
             if text and text[0] != "#":
                 parts = text.split("\t")
+                if len(parts) < 16:
+                    continue
                 sParts = parts[7].split()
                 sParts = [sParts[0]," ".join(sParts[1:])]
                 if species and not species in sParts[0]+" "+sParts[1]:
@@ -144,12 +146,16 @@ class NCBICrawler(interfaces.AbstractCrawler):
                false otherwise.
         """
         (gff,gtf) = (False,False)
-        listing = self.__ftp.nlst(url[6+len(self.__FTP_HOST):])
-        for path in listing:
-            if path.endswith(self.__GFF_EXTENSION):
-                gff = True
-            if path.endswith(self.__GTF_EXTENSION):
-                gtf = True
+        dirPath = url[6+len(self.__FTP_HOST):]
+        try:
+            listing = self.__ftp.nlst(dirPath)
+            for path in listing:
+                if path.endswith(self.__GFF_EXTENSION):
+                    gff = True
+                if path.endswith(self.__GTF_EXTENSION):
+                    gtf = True
+        except:
+            self._log_("Failed crawling directory '"+dirPath+"'")
         return (gff,gtf)
 
 
